@@ -1,4 +1,4 @@
-package Memory;
+package ca.mymacewan.memorygame;
 
 /* HIDDEN - Facedown card.
    REVEALED - Faceup card not paired. Max of one at a time.

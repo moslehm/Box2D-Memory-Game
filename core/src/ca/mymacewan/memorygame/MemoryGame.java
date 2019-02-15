@@ -1,33 +1,41 @@
-package Memory;
+package ca.mymacewan.memorygame;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Collections;
 
-import static Memory.State.HIDDEN;
-import static Memory.State.PAIRED;
-import static Memory.State.REVEALED;
+import static ca.mymacewan.memorygame.State.HIDDEN;
+import static ca.mymacewan.memorygame.State.PAIRED;
+import static ca.mymacewan.memorygame.State.REVEALED;
 
 public class MemoryGame {
+    public int numOfCards;// How many cards in the game. it be increased when difficulty increase.
+    private ArrayList<Card> Cards = new ArrayList<Card>(numOfCards);
 
-    private ArrayList<Card> Cards;
+    public void gameStart(){
+        for (int i = 0 ; i < numOfCards; i++){
+            Card tempCard = new Card();
+            int cardValue = i/2;
+            tempCard.setValue(Integer.toString(cardValue));
+            //tempCard.setID(i);
+            Cards.add(tempCard);
+        }
+        Collections.shuffle(Cards);
+    }
 
-    public MemoryGame() {
+ /*   public MemoryGame() {
 
         // Implement dealing + shuffle in here.
-    }
 
-    public MemoryGame(int size) {
-
-    }
+    }*/
 
     public void makeMove(int index) {
-
         if (!(isLegalMove(Cards.get(index)))) {
             return;
         }
-        Iterator<Card> iter = Cards.iterator();
-        while (iter.hasNext()) {
-            Card i = iter.next();
+        Iterator<Card> itr = Cards.iterator();
+        while (itr.hasNext()) {
+            Card i = itr.next();
             // FOR IF ARRAY HAS A CARD ALREADY REVEALED. HANDLES PAIRING AND MISMATCHES
             if (i.getState() == REVEALED) {
                 Card j = Cards.get(index);
@@ -55,13 +63,14 @@ public class MemoryGame {
     }
 
     public boolean isGameOver() {
-        Iterator<Card> iter = Cards.iterator();
-        while (iter.hasNext()) {
-            Card i = iter.next();
+        Iterator<Card> itr = Cards.iterator();
+        while (itr.hasNext()) {
+            Card i = itr.next();
             if (i.getState() != PAIRED) {
                 return false;
             }
         }
+        System.out.println("Congratulation!");
         return true;
     }
 
@@ -74,13 +83,18 @@ public class MemoryGame {
         return true;
     }
 
-    /* public void printCards() {
-        iter = Cards.iterator();
-        while (iter.hasNext()) {
-            i = iter.next();
-    } */
+    public ArrayList<Card> getCards(){
+        return Cards;
+    }
 
-    private dealCards(int size) {
-        
+    //format of output, [index]:[cardValue]:[cardState]
+    public void printCards() {
+        Iterator<Card> itr = Cards.iterator();
+        int index = 0;
+        while (itr.hasNext()) {
+            Card theCard = itr.next();
+            System.out.format("%-3d : %-3s : %-3S \n", index, theCard.getValue(), theCard.getState());
+            index++;
+        }
     }
 }
