@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="536991d1-f82d-4c6b-b150-136eec291624" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/MemoryGame.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/MemoryGame.ipr" afterDir="false" />
+    <list default="true" id="536991d1-f82d-4c6b-b150-136eec291624" name="Default Changelist" comment="Make game logic work with multiple cards held down&#10;&#10;Also cleaned up code">
       <change beforePath="$PROJECT_DIR$/MemoryGame.iws" beforeDir="false" afterPath="$PROJECT_DIR$/MemoryGame.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/core/ca/mymacewan/memorygame/MemoryGameView.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/desktop/ca/mymacewan/memorygame/desktop/DesktopLauncher.class" beforeDir="false" />
     </list>
@@ -108,31 +105,34 @@
           <entry key="project.open.time.19" value="2" />
           <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.20" value="1" />
+          <entry key="project.open.time.3" value="1" />
           <entry key="project.open.time.44" value="1" />
           <entry key="project.open.time.7" value="1" />
-          <entry key="project.opened" value="11" />
+          <entry key="project.opened" value="12" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="gradle" value="1" />
-          <entry key="java" value="12" />
+          <entry key="java" value="13" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="Groovy" value="1" />
-          <entry key="JAVA" value="12" />
+          <entry key="JAVA" value="13" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="1430" />
+          <entry key="java" value="2345" />
+          <entry key="txt" value="444" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="1430" />
+          <entry key="JAVA" value="2345" />
+          <entry key="PLAIN_TEXT" value="444" />
         </counts>
       </usages-collector>
     </session>
@@ -207,8 +207,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1615">
-              <caret line="101" column="29" selection-start-line="101" selection-start-column="19" selection-end-line="101" selection-end-column="29" />
+            <state relative-caret-position="595">
+              <caret line="119" column="16" selection-start-line="119" selection-start-column="16" selection-end-line="119" selection-end-column="16" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -219,20 +219,16 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="30" selection-start-line="30" selection-end-line="30" />
-              <folding>
-                <element signature="e#678#679#0" expanded="true" />
-                <element signature="e#712#713#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="34">
+              <caret line="2" selection-start-line="2" selection-end-line="2" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2261">
+            <state relative-caret-position="306">
               <caret line="156" column="8" selection-start-line="156" selection-start-column="8" selection-end-line="156" selection-end-column="8" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -243,11 +239,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="119">
-              <caret line="9" column="8" selection-start-line="9" selection-start-column="8" selection-end-line="10" selection-end-column="29" />
+              <caret line="9" column="23" selection-start-line="9" selection-start-column="23" selection-end-line="9" selection-end-column="23" />
             </state>
           </provider>
         </entry>
@@ -275,6 +271,9 @@
       <find>thegame</find>
       <find>Cards</find>
       <find>update</find>
+      <find>matchPair</find>
+      <find>start</find>
+      <find>isLegalMove</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -2452,10 +2451,10 @@
         <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/State.java" />
         <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/AssetManager.java" />
         <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Assets.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" />
         <option value="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" />
+        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java" />
+        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java" />
+        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" />
       </list>
     </option>
   </component>
@@ -2491,6 +2490,7 @@
     <panes>
       <pane id="AndroidView" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -2520,7 +2520,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -2532,8 +2531,8 @@
     <property name="MemberChooser.sorted" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551598356556" />
-    <property name="device.picker.selection" value="Nexus_5X_API_24" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551602849337" />
+    <property name="device.picker.selection" value="06157df6a3f49a39" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Mem" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
@@ -2551,7 +2550,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Desktop Run">
+  <component name="RunManager" selected="Android App.Android Run">
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
       <Port>5050</Port>
@@ -2686,6 +2685,7 @@
       <workItem from="1551059012931" duration="6811000" />
       <workItem from="1551239133214" duration="4000" />
       <workItem from="1551565286697" duration="134000" />
+      <workItem from="1551598341425" duration="4277000" />
     </task>
     <task id="LOCAL-00001" summary="Update back end game logic to work with the game view&#10;&#10;Most of the changes here were made by Jonathan to make the code testable&#10;These are temporary changes that will have to be revisited to make the &#10;back end communicate with the view efficiently.">
       <created>1550174932099</created>
@@ -2694,15 +2694,35 @@
       <option name="project" value="LOCAL" />
       <updated>1550174932099</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Modify game resolution to match the touch table's resolution">
+      <created>1551598833562</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1551598833562</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Add getIndex, add setIndex, and clean up code&#10;&#10;The index value makes the game compatible with the view">
+      <created>1551599647948</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1551599647948</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Make game logic work with multiple cards held down&#10;&#10;Also cleaned up code">
+      <created>1551601964328</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1551601964328</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="77684000" />
+    <option name="totallyTimeSpent" value="81961000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12846482" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -2715,14 +2735,14 @@
       <window_info id="UI Designer" order="8" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32903227" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49413645" weight="0.32832617" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49946696" weight="0.39914164" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4914712" visible="true" weight="0.32832617" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4978678" weight="0.39914164" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Android Profiler" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50586355" side_tool="true" visible="true" weight="0.305794" />
-      <window_info active="true" anchor="bottom" id="Messages" order="9" sideWeight="0.49413645" visible="true" weight="0.305794" />
+      <window_info anchor="bottom" id="Android Profiler" order="7" />
+      <window_info active="true" anchor="bottom" id="Event Log" order="8" sideWeight="0.50852877" side_tool="true" visible="true" weight="0.32832617" />
+      <window_info anchor="bottom" id="Messages" order="9" sideWeight="0.49253732" weight="0.305794" />
       <window_info anchor="bottom" id="Logcat" order="10" />
       <window_info anchor="bottom" id="Database Changes" order="11" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="12" show_stripe_button="false" />
@@ -2787,7 +2807,11 @@
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
     <MESSAGE value="Update back end game logic to work with the game view&#10;&#10;These are temporary changes that will have to be revisited to make the &#10;back end communicate with the view efficiently." />
     <MESSAGE value="Update back end game logic to work with the game view&#10;&#10;Most of the changes here were made by Jonathan to make the code testable&#10;These are temporary changes that will have to be revisited to make the &#10;back end communicate with the view efficiently." />
-    <option name="LAST_COMMIT_MESSAGE" value="Update back end game logic to work with the game view&#10;&#10;Most of the changes here were made by Jonathan to make the code testable&#10;These are temporary changes that will have to be revisited to make the &#10;back end communicate with the view efficiently." />
+    <MESSAGE value="Modify game resolution to match the touch table's resolution" />
+    <MESSAGE value="Add getIndex and setIndex to make it compatible with the vie" />
+    <MESSAGE value="Add getIndex, add setIndex, and clean up code&#10;&#10;The index value makes the game compatible with the view" />
+    <MESSAGE value="Make game logic work with multiple cards held down&#10;&#10;Also cleaned up code" />
+    <option name="LAST_COMMIT_MESSAGE" value="Make game logic work with multiple cards held down&#10;&#10;Also cleaned up code" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="editorHistoryManager">
@@ -2889,10 +2913,17 @@
     <entry file="file://$PROJECT_DIR$/desktop/build.gradle">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="9" column="23" selection-start-line="9" selection-start-column="23" selection-end-line="9" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1615">
-          <caret line="101" column="29" selection-start-line="101" selection-start-column="19" selection-end-line="101" selection-end-column="29" />
+        <state relative-caret-position="595">
+          <caret line="119" column="16" selection-start-line="119" selection-start-column="16" selection-end-line="119" selection-end-column="16" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -2901,31 +2932,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="30" selection-start-line="30" selection-end-line="30" />
-          <folding>
-            <element signature="e#678#679#0" expanded="true" />
-            <element signature="e#712#713#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="34">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2261">
+        <state relative-caret-position="306">
           <caret line="156" column="8" selection-start-line="156" selection-start-column="8" selection-end-line="156" selection-end-column="8" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#3724#3725#0" expanded="true" />
             <element signature="e#3767#3768#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="9" column="8" selection-start-line="9" selection-start-column="8" selection-end-line="10" selection-end-column="29" />
         </state>
       </provider>
     </entry>
