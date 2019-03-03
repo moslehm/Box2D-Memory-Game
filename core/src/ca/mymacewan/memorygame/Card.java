@@ -1,32 +1,41 @@
 package ca.mymacewan.memorygame;
 
-public class Card {
+class Card {
 
     private State state;
     private String value;
     private int cardID;
+    private int index;
 
-    public Card() {
+    Card() {
         state = State.HIDDEN;
     }
 
-    public String getValue() {
+    String getValue() {
         return value;
     }
 
-    public State getState() {
+    State getState() {
         return state;
     }
 
-    public int getID() { return cardID; }
+    int getID() { return cardID; }
 
-    public void setState(State state) {
+    void setState(State state) {
         this.state = state;
     }
 
-    public void setValue(String value) {
+    void setValue(String value) {
         this.value = value;
     }
 
-    public void setID(int cardID) { this.cardID = cardID; }
+    void setID(int cardID) { this.cardID = cardID; }
+
+    int getIndex() {
+        return index;
+    }
+
+    void setIndex(int index) {
+        this.index = index;
+    }
 }
