@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import static java.lang.Math.sqrt;
 
 public class MemoryGameView extends ApplicationAdapter {
-	SpriteBatch batch;
-    MemoryGame game;
-	Stage stage;
-    int gameSize = 16;
+	private SpriteBatch batch;
+    private MemoryGame game;
+	private Stage stage;
+    private int gameSize = 16;
 
 	public class CardGroup extends Group {
 		Texture backTexture, frontTexture;
@@ -31,7 +31,7 @@ public class MemoryGameView extends ApplicationAdapter {
 
 		final Card card;
 
-		public CardGroup(final Card card, int x, int y){
+		CardGroup(final Card card, int x, int y){
 			backTexture = Assets.manager.get(Assets.cardBack);
 			frontTexture = Assets.manager.get(Assets.demoCard + card.getValue() + ".png");
 			displayedImage = new Image(backTexture);
@@ -41,6 +41,7 @@ public class MemoryGameView extends ApplicationAdapter {
 			displayedImage.setPosition(convertedXY[0], convertedXY[1]);
 			displayedImage.setOrigin(Align.center);
 			this.addActor(displayedImage);
+			//displayedImage.sizeBy((Gdx.graphics.getWidth() * 0.10f));
 
 			setOrigin(Align.center);
 
@@ -49,7 +50,8 @@ public class MemoryGameView extends ApplicationAdapter {
 
 			addListener((new ClickListener(){
 				public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-					if (game.isLegalMove((Card)getUserObject())) {
+					System.out.println("DOWN: " + pointer);
+					if (((Card) getUserObject()).getState() == State.HIDDEN) {
 						RunnableAction changeTexture = new RunnableAction() {
 							@Override
 							public void run() {
@@ -61,13 +63,17 @@ public class MemoryGameView extends ApplicationAdapter {
 								changeTexture,
 								MyActions.flipIn(0.1f)));
 
-						((Card)getUserObject()).setID(pointer);
-						((Card)getUserObject()).setState(State.REVEALED);
+						((Card) getUserObject()).setID(pointer);
+						game.flipUp(((Card) getUserObject()).getIndex());
+						//System.out.println(((Card) getUserObject()).getIndex());
+						//((Card)getUserObject()).setState(State.REVEALED);
 					}
 					return true;
 				}
 				public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                    if (((Card)getUserObject()).getState()!= State.PAIRED && ((Card)getUserObject()).getID() == pointer){
+					System.out.println("UP: " + pointer);
+					System.out.println("REAL ID: " + ((Card) getUserObject()).getID());
+					if (((Card) getUserObject()).getState()!= State.PAIRED && ((Card) getUserObject()).getID() == pointer){
 						RunnableAction changeTexture = new RunnableAction() {
 							@Override
 							public void run() {
@@ -78,20 +84,22 @@ public class MemoryGameView extends ApplicationAdapter {
 								MyActions.flipOut(0.1f),
 								changeTexture,
 								MyActions.flipIn(0.1f)));
-						//if ()
-						((Card) getUserObject()).setState(State.HIDDEN);
-					}
+						game.flipDown(((Card) getUserObject()).getIndex());
+                    }
 				}
 			}));
 		}
 
 		private float[] convertXY(int x, int y, int cardsPerRow){
-			float xOffset = Gdx.graphics.getWidth() - (cardsPerRow * 150f + (float)(10 * (cardsPerRow - 1)));
-			float yOffset = Gdx.graphics.getHeight() - (cardsPerRow * 150f + (float)(10  * (cardsPerRow - 1)));
+			float cardSize = backTexture.getWidth();
+			float distanceBetweenCard = 10f;
+
+			float xOffset = Gdx.graphics.getWidth() - (cardsPerRow * cardSize + (distanceBetweenCard * (cardsPerRow - 1)));
+			float yOffset = Gdx.graphics.getHeight() - (cardsPerRow * cardSize + (distanceBetweenCard  * (cardsPerRow - 1)));
 			float[] convertedXY = {0f, 0f};
 
-			convertedXY[0] = xOffset/2f + ((160f * ((float) x)));
-			convertedXY[1] = yOffset/2f + ((160f * ((float) y)));
+			convertedXY[0] = xOffset/2f + (((cardSize + distanceBetweenCard) * ((float) x)));
+			convertedXY[1] = yOffset/2f + (((cardSize + distanceBetweenCard) * ((float) y)));
 
 			return convertedXY;
 		}
@@ -116,13 +124,17 @@ public class MemoryGameView extends ApplicationAdapter {
         game.numOfCards = gameSize;
         game.gameStart();
 
-        int gameRows = (int)(gameSize/sqrt(gameSize));
-        ArrayList<Card> cards = game.getCards();
+        createTable(gameSize);
+	}
+
+	private void createTable(int gameSize) {
+		int gameRows = (int)(gameSize/sqrt(gameSize));
+		ArrayList<Card> cards = game.getCards();
 		for (int x = 0; x < gameRows; x++){
 			for (int y = 0; y < gameRows; y++){
 				Card currentCard = cards.get((x * gameRows) + y);
+				currentCard.setIndex((x * gameRows) + y);
 				CardGroup newCardGroup = new CardGroup(currentCard, x, y);
-
 				stage.addActor(newCardGroup);
 			}
 		}
@@ -130,6 +142,7 @@ public class MemoryGameView extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+        update();
 		Gdx.gl.glClearColor(44/255f, 135/255f, 209/255f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
@@ -140,7 +153,14 @@ public class MemoryGameView extends ApplicationAdapter {
 		batch.end();
 	}
 
-	@Override
+    private void update() {
+	    if (game.isGameOver()){
+	        // player won, go to next level
+        }
+        // timer?
+    }
+
+    @Override
 	public void dispose () {
 		batch.dispose();
 		Assets.dispose();
