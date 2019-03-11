@@ -1,25 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="536991d1-f82d-4c6b-b150-136eec291624" name="Default Changelist" comment="">
+    <list default="true" id="a48f42b6-bdcb-492e-8b46-11ad6283a51f" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MemoryGame.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/MemoryGame.ipr" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MemoryGame.iws" beforeDir="false" afterPath="$PROJECT_DIR$/MemoryGame.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/gen/ca/mymacewan/memorygame/BuildConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/gen/ca/mymacewan/memorygame/BuildConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/gen/ca/mymacewan/memorygame/Manifest.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/gen/ca/mymacewan/memorygame/Manifest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/gen/ca/mymacewan/memorygame/R.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/gen/ca/mymacewan/memorygame/R.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/proguard-rules.pro" beforeDir="false" afterPath="$PROJECT_DIR$/android/proguard-rules.pro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/project.properties" beforeDir="false" afterPath="$PROJECT_DIR$/android/project.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/res/drawable-anydpi-v26/ic_launcher.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/res/drawable-anydpi-v26/ic_launcher.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/res/drawable-anydpi-v26/ic_launcher_foreground.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/res/drawable-anydpi-v26/ic_launcher_foreground.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/res/values/color.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/res/values/color.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/res/values/styles.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/ca/mymacewan/memorygame/AndroidLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/ca/mymacewan/memorygame/AndroidLauncher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/core/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/CardGroup.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/desktop/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/desktop/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/core/ca/mymacewan/memorygame/MemoryGameView.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/desktop/ca/mymacewan/memorygame/desktop/DesktopLauncher.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/core/ca/mymacewan/memorygame/MemoryGameView.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/core/ca/mymacewan/memorygame/MemoryGameView.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/desktop/ca/mymacewan/memorygame/desktop/DesktopLauncher.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/desktop/ca/mymacewan/memorygame/desktop/DesktopLauncher.class" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
     <ignored path="$PROJECT_DIR$/out/" />
-    <ignored path="$PROJECT_DIR$/core/.gradle/" />
-    <ignored path="$PROJECT_DIR$/core/build/" />
-    <ignored path="$PROJECT_DIR$/desktop/.gradle/" />
-    <ignored path="$PROJECT_DIR$/desktop/build/" />
     <ignored path="$PROJECT_DIR$/android/.gradle/" />
     <ignored path="$PROJECT_DIR$/android/build/" />
+    <ignored path="$PROJECT_DIR$/desktop/.gradle/" />
+    <ignored path="$PROJECT_DIR$/desktop/build/" />
+    <ignored path="$PROJECT_DIR$/core/.gradle/" />
+    <ignored path="$PROJECT_DIR$/core/build/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,216 +100,102 @@
     </system>
   </component>
   <component name="FUSProjectUsageTrigger">
-    <session id="-1094283459">
+    <session id="-1952500515">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
           <entry key="project.closed" value="1" />
-          <entry key="project.open.time.9" value="1" />
+          <entry key="project.open.time.0" value="1" />
           <entry key="project.opened" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="java" value="1" />
+          <entry key="java" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="JAVA" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="java" value="1" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="JAVA" value="1" />
         </counts>
       </usages-collector>
     </session>
-    <session id="582186539">
-      <usages-collector id="statistics.lifecycle.project">
-        <counts>
-          <entry key="project.closed" value="11" />
-          <entry key="project.open.time.15" value="2" />
-          <entry key="project.open.time.17" value="1" />
-          <entry key="project.open.time.18" value="2" />
-          <entry key="project.open.time.19" value="2" />
-          <entry key="project.open.time.2" value="1" />
-          <entry key="project.open.time.20" value="1" />
-          <entry key="project.open.time.44" value="1" />
-          <entry key="project.open.time.7" value="1" />
-          <entry key="project.opened" value="11" />
-        </counts>
-      </usages-collector>
+    <session id="177038655">
       <usages-collector id="statistics.file.extensions.open">
         <counts>
+          <entry key="gitignore" value="1" />
           <entry key="gradle" value="1" />
-          <entry key="java" value="12" />
+          <entry key="java" value="3" />
+          <entry key="properties" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="Groovy" value="1" />
-          <entry key="JAVA" value="12" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.edit">
-        <counts>
-          <entry key="java" value="1430" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.edit">
-        <counts>
-          <entry key="JAVA" value="1430" />
-        </counts>
-      </usages-collector>
-    </session>
-    <session id="177038655">
-      <usages-collector id="statistics.lifecycle.project">
-        <counts>
-          <entry key="project.closed" value="2" />
-          <entry key="project.open.time.18" value="1" />
-          <entry key="project.open.time.66" value="1" />
-          <entry key="project.opened" value="2" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.open">
-        <counts>
-          <entry key="java" value="3" />
-          <entry key="jpg" value="1" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.open">
-        <counts>
-          <entry key="Image" value="1" />
           <entry key="JAVA" value="3" />
+          <entry key="PLAIN_TEXT" value="1" />
+          <entry key="Properties" value="1" />
         </counts>
       </usages-collector>
-      <usages-collector id="statistics.file.extensions.edit">
-        <counts>
-          <entry key="java" value="298" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.edit">
-        <counts>
-          <entry key="JAVA" value="298" />
-        </counts>
-      </usages-collector>
-    </session>
-    <session id="-419777641">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="3" />
-          <entry key="project.open.time.1" value="2" />
-          <entry key="project.open.time.4" value="1" />
-          <entry key="project.open.time.77" value="1" />
-          <entry key="project.opened" value="4" />
+          <entry key="project.closed" value="6" />
+          <entry key="project.open.time.1" value="3" />
+          <entry key="project.open.time.19" value="1" />
+          <entry key="project.open.time.2" value="1" />
+          <entry key="project.open.time.66" value="1" />
+          <entry key="project.opened" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="5187" />
-          <entry key="txt" value="442" />
+          <entry key="gradle" value="3" />
+          <entry key="txt" value="260" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="5187" />
-          <entry key="PLAIN_TEXT" value="442" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.open">
-        <counts>
-          <entry key="java" value="15" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.open">
-        <counts>
-          <entry key="JAVA" value="15" />
+          <entry key="Groovy" value="3" />
+          <entry key="PLAIN_TEXT" value="260" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1615">
-              <caret line="101" column="29" selection-start-line="101" selection-start-column="19" selection-end-line="101" selection-end-column="29" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="30" selection-start-line="30" selection-end-line="30" />
-              <folding>
-                <element signature="e#678#679#0" expanded="true" />
-                <element signature="e#712#713#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2261">
-              <caret line="156" column="8" selection-start-line="156" selection-start-column="8" selection-end-line="156" selection-end-column="8" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#3724#3725#0" expanded="true" />
-                <element signature="e#3767#3768#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="9" column="8" selection-start-line="9" selection-start-column="8" selection-end-line="10" selection-end-column="29" />
+            <state relative-caret-position="170">
+              <caret line="12" selection-start-line="12" selection-end-line="12" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Class" />
-      </list>
-    </option>
-  </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>draw</find>
-      <find>getUserObject</find>
-      <find>group</find>
-      <find>cardFront</find>
-      <find>getvalue</find>
-      <find>String demoCard</find>
-      <find>String</find>
-      <find>= &quot;</find>
-      <find>.png</find>
-      <find>thegame</find>
-      <find>Cards</find>
-      <find>update</find>
+      <find>:core</find>
+      <find>:android</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="master" />
-      </map>
-    </option>
   </component>
   <component name="GradleLocalSettings">
     <option name="myGradleHomes">
       <map>
-        <entry key="$PROJECT_DIR$" value="C:\Users\PC\.gradle\wrapper\dists\gradle-4.6-bin\4jp4stjndanmxuerzfseyb6wo\gradle-4.6" />
+        <entry key="$PROJECT_DIR$" value="C:\Users\Projects\.gradle\wrapper\dists\gradle-4.6-bin\4jp4stjndanmxuerzfseyb6wo\gradle-4.6" />
       </map>
     </option>
     <option name="myGradleVersions">
@@ -1686,10 +1593,10 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="$PROJECT_DIR$" value="12393215806456" />
+        <entry key="$PROJECT_DIR$" value="12418623489604" />
         <entry key="$PROJECT_DIR$/.gradle" value="0" />
-        <entry key="$PROJECT_DIR$/android/build.gradle" value="3671272845" />
-        <entry key="$PROJECT_DIR$/build.gradle" value="3909981507" />
+        <entry key="$PROJECT_DIR$/android/build.gradle" value="550500384" />
+        <entry key="$PROJECT_DIR$/build.gradle" value="487988746" />
         <entry key="$PROJECT_DIR$/core/build.gradle" value="2971590108" />
         <entry key="$PROJECT_DIR$/desktop/build.gradle" value="1009299178" />
         <entry key="$PROJECT_DIR$/gradle.properties" value="2667656491" />
@@ -2448,14 +2355,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MyActions.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/State.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/AssetManager.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Assets.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" />
         <option value="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" />
+        <option value="$PROJECT_DIR$/build.gradle" />
       </list>
     </option>
   </component>
@@ -2470,10 +2371,10 @@
     <option name="LAST_EDITED_TAB_NAME" />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="155" />
+    <option name="x" value="-8" />
     <option name="y" value="-8" />
-    <option name="width" value="1400" />
-    <option name="height" value="1000" />
+    <option name="width" value="1382" />
+    <option name="height" value="754" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -2489,38 +2390,20 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
+      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="MemoryGame" type="b2602c69:ProjectViewProjectNode" />
-              <item name="w19Wozniak" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="MemoryGame" type="b2602c69:ProjectViewProjectNode" />
-              <item name="w19Wozniak" type="462c0819:PsiDirectoryNode" />
-              <item name="desktop" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-            </path>
-            <path>
-              <item name="MemoryGame" type="b2602c69:ProjectViewProjectNode" />
-              <item name="w19Wozniak" type="462c0819:PsiDirectoryNode" />
-              <item name="desktop" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="MemoryGame" type="b2602c69:ProjectViewProjectNode" />
-              <item name="w19Wozniak" type="462c0819:PsiDirectoryNode" />
-              <item name="desktop" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="desktop" type="462c0819:PsiDirectoryNode" />
+              <item name="w19Wozniak" type="b2602c69:ProjectViewProjectNode" />
+              <item name="w19Wozniak" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -2532,12 +2415,12 @@
     <property name="MemberChooser.sorted" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551598356556" />
-    <property name="device.picker.selection" value="Nexus_5X_API_24" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Mem" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1552342162849" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/libs" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -2556,33 +2439,7 @@
       <Host>localhost</Host>
       <Port>5050</Port>
     </configuration>
-    <configuration name="Android Run" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
-      <module name="android" />
-      <option name="DEPLOY" value="true" />
-      <option name="ARTIFACT_NAME" value="" />
-      <option name="PM_INSTALL_OPTIONS" value="" />
-      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
-      <option name="MODE" value="default_activity" />
-      <option name="CLEAR_LOGCAT" value="false" />
-      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
-      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
-      <option name="FORCE_STOP_RUNNING_APP" value="true" />
-      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
-      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
-      <option name="PREFERRED_AVD" value="" />
-      <option name="DEBUGGER_TYPE" value="Java" />
-      <Java />
-      <Profilers>
-        <option name="ADVANCED_PROFILING_ENABLED" value="false" />
-      </Profilers>
-      <option name="DEEP_LINK" value="" />
-      <option name="ACTIVITY_CLASS" value="" />
-      <method v="2">
-        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" />
-      </method>
-    </configuration>
-    <configuration name="android" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
+    <configuration name="android" type="AndroidRunConfigurationType" factoryName="Android App">
       <module name="android" />
       <option name="DEPLOY" value="true" />
       <option name="ARTIFACT_NAME" value="" />
@@ -2642,6 +2499,53 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="JetRunConfigurationType" factoryName="Kotlin">
+      <module name="android" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="WORKING_DIRECTORY" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType" factoryName="Kotlin script">
+      <module name="android" />
+      <option name="filePath" />
+      <option name="vmParameters" />
+      <option name="alternativeJrePath" />
+      <option name="programParameters" />
+      <option name="passParentEnvs" value="true" />
+      <option name="workingDirectory" />
+      <option name="isAlternativeJrePathEnabled" value="false" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="filePath" />
+      <option name="vmParameters" />
+      <option name="alternativeJrePath" />
+      <option name="programParameters" />
+      <option name="passParentEnvs" value="true" />
+      <option name="workingDirectory" />
+      <option name="isAlternativeJrePathEnabled" value="false" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="WORKING_DIRECTORY" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
       <option name="SERVER_MODE" value="false" />
@@ -2653,9 +2557,8 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Android App.Android Run" />
-      <item itemvalue="Android App.android" />
       <item itemvalue="Application.Desktop Run" />
+      <item itemvalue="Android App.android" />
     </list>
   </component>
   <component name="SvnConfiguration">
@@ -2663,79 +2566,77 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="536991d1-f82d-4c6b-b150-136eec291624" name="Default Changelist" comment="" />
-      <created>1548910567990</created>
+      <changelist id="a48f42b6-bdcb-492e-8b46-11ad6283a51f" name="Default Changelist" comment="" />
+      <created>1552326864476</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1548910567990</updated>
-      <workItem from="1548910569860" duration="1196000" />
-      <workItem from="1548918768698" duration="1076000" />
-      <workItem from="1549468849814" duration="2022000" />
-      <workItem from="1549898077238" duration="2377000" />
-      <workItem from="1549909879987" duration="70000" />
-      <workItem from="1549909954424" duration="10535000" />
-      <workItem from="1550030513847" duration="21645000" />
-      <workItem from="1550106907448" duration="10951000" />
-      <workItem from="1550299117286" duration="2142000" />
-      <workItem from="1550459567267" duration="250000" />
-      <workItem from="1550467997592" duration="1715000" />
-      <workItem from="1550607224501" duration="80000" />
-      <workItem from="1550607336608" duration="3722000" />
-      <workItem from="1550630814107" duration="4810000" />
-      <workItem from="1550899096001" duration="7753000" />
-      <workItem from="1551059012931" duration="6811000" />
-      <workItem from="1551239133214" duration="4000" />
-      <workItem from="1551565286697" duration="134000" />
+      <updated>1552326864476</updated>
+      <workItem from="1552326865576" duration="219000" />
+      <workItem from="1552328132300" duration="140000" />
+      <workItem from="1552328279231" duration="102000" />
+      <workItem from="1552328387601" duration="66000" />
+      <workItem from="1552328731843" duration="846000" />
+      <workItem from="1552329637277" duration="20000" />
+      <workItem from="1552335802648" duration="1465000" />
     </task>
-    <task id="LOCAL-00001" summary="Update back end game logic to work with the game view&#10;&#10;Most of the changes here were made by Jonathan to make the code testable&#10;These are temporary changes that will have to be revisited to make the &#10;back end communicate with the view efficiently.">
-      <created>1550174932099</created>
+    <task id="LOCAL-00001" summary="Switch to sprite sheets&#10;&#10;Separate card images can easily become time consuming so switching to &#10;sprite sheets was the best option.">
+      <created>1552342149099</created>
       <option name="number" value="00001" />
       <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
-      <updated>1550174932099</updated>
+      <updated>1552342149099</updated>
     </task>
     <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="77684000" />
+    <option name="totallyTimeSpent" value="3467000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
+    <frame x="-8" y="-8" width="1382" height="754" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12846482" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25113463" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Build Variants" order="3" side_tool="true" />
-      <window_info id="Image Layers" order="4" />
+      <window_info id="UI Designer" order="4" />
       <window_info id="Favorites" order="5" side_tool="true" />
       <window_info id="Captures" order="6" />
       <window_info id="Capture Tool" order="7" />
-      <window_info id="UI Designer" order="8" />
+      <window_info id="Image Layers" order="8" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32903227" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49413645" weight="0.32832617" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49946696" weight="0.39914164" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49848714" visible="true" weight="0.32903227" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49924356" weight="0.32903227" />
       <window_info anchor="bottom" id="Android Profiler" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50586355" side_tool="true" visible="true" weight="0.305794" />
-      <window_info active="true" anchor="bottom" id="Messages" order="9" sideWeight="0.49413645" visible="true" weight="0.305794" />
-      <window_info anchor="bottom" id="Logcat" order="10" />
-      <window_info anchor="bottom" id="Database Changes" order="11" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="12" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="13" />
-      <window_info anchor="bottom" id="Build" order="14" weight="0.32903227" />
+      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5015129" side_tool="true" visible="true" weight="0.32903227" />
+      <window_info anchor="bottom" id="Logcat" order="9" />
+      <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="11" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Terminal" order="12" sideWeight="0.4977307" weight="0.32903227" />
+      <window_info anchor="bottom" id="Messages" order="13" sideWeight="0.49621785" weight="0.32903227" />
+      <window_info anchor="bottom" id="Build" order="14" sideWeight="0.49546143" weight="0.32903227" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="right" id="Device File Explorer" order="5" side_tool="true" />
-      <window_info anchor="right" id="Maven Projects" order="6" />
-      <window_info anchor="right" id="Database" order="7" />
+      <window_info anchor="right" id="Database" order="4" />
+      <window_info anchor="right" id="Capture Analysis" order="5" />
+      <window_info anchor="right" id="Device File Explorer" order="6" side_tool="true" />
+      <window_info anchor="right" id="Maven Projects" order="7" />
       <window_info anchor="right" id="Palette&#9;" order="8" />
       <window_info anchor="right" id="Theme Preview" order="9" />
       <window_info anchor="right" id="Gradle" order="10" />
@@ -2785,147 +2686,59 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
-    <MESSAGE value="Update back end game logic to work with the game view&#10;&#10;These are temporary changes that will have to be revisited to make the &#10;back end communicate with the view efficiently." />
-    <MESSAGE value="Update back end game logic to work with the game view&#10;&#10;Most of the changes here were made by Jonathan to make the code testable&#10;These are temporary changes that will have to be revisited to make the &#10;back end communicate with the view efficiently." />
-    <option name="LAST_COMMIT_MESSAGE" value="Update back end game logic to work with the game view&#10;&#10;Most of the changes here were made by Jonathan to make the code testable&#10;These are temporary changes that will have to be revisited to make the &#10;back end communicate with the view efficiently." />
+    <MESSAGE value="Switch to sprite sheets&#10;&#10;Separate card images can easily become time consuming so switching to &#10;sprite sheets was the best option." />
+    <option name="LAST_COMMIT_MESSAGE" value="Switch to sprite sheets&#10;&#10;Separate card images can easily become time consuming so switching to &#10;sprite sheets was the best option." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/android/assets/badlogic.jpg">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/scenes/scene2d/utils/Cullable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="27" column="17" selection-start-line="27" selection-start-column="17" selection-end-line="27" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/scenes/scene2d/Group.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="34" column="48" lean-forward="true" selection-start-line="34" selection-start-column="48" selection-end-line="34" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/State.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="11" selection-start-column="11" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/AssetManager.java" />
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Assets.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="52" selection-start-line="11" selection-start-column="52" selection-end-line="11" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_201/src.zip!/java/lang/Thread.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="130">
-          <caret line="747" selection-start-line="747" selection-end-line="747" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MyActions.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="334">
-          <caret line="22" column="32" selection-start-line="22" selection-start-column="32" selection-end-line="22" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/CardGroup.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="22" selection-start-line="2" selection-start-column="22" selection-end-line="2" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/scenes/scene2d/Action.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="25" selection-start-line="25" selection-end-line="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/scenes/scene2d/actions/RunnableAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="24" selection-start-line="24" selection-end-line="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/scenes/scene2d/InputListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="130">
-          <caret line="56" selection-start-line="56" selection-end-line="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/scenes/scene2d/Actor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="157" selection-start-line="157" selection-end-line="157" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/scenes/scene2d/Stage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="246">
-          <caret line="283" selection-start-line="283" selection-end-line="283" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-lwjgl/1.9.9/222a6367453012e0da3caa48b892b5c8ecc42dc/gdx-backend-lwjgl-1.9.9-sources.jar!/com/badlogic/gdx/backends/lwjgl/LwjglInput.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="338" selection-start-line="338" selection-end-line="338" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/desktop/build.gradle">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1615">
-          <caret line="101" column="29" selection-start-line="101" selection-start-column="19" selection-end-line="101" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="30" selection-start-line="30" selection-end-line="30" />
-          <folding>
-            <element signature="e#678#679#0" expanded="true" />
-            <element signature="e#712#713#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2261">
-          <caret line="156" column="8" selection-start-line="156" selection-start-column="8" selection-end-line="156" selection-end-column="8" />
+        <state relative-caret-position="34">
+          <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Assets.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="31" selection-start-column="8" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/BoxAccessor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" column="18" selection-start-line="16" selection-start-column="18" selection-end-line="16" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/android/src/ca/mymacewan/memorygame/AndroidLauncher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="16" selection-start-line="16" selection-end-line="16" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3724#3725#0" expanded="true" />
-            <element signature="e#3767#3768#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gradle.properties">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="213">
+          <caret line="75" selection-start-line="75" selection-end-line="75" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="9" column="8" selection-start-line="9" selection-start-column="8" selection-end-line="10" selection-end-column="29" />
+        <state relative-caret-position="170">
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
         </state>
       </provider>
     </entry>
@@ -2981,7 +2794,7 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>android</last-edited>
+          <last-edited>core</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

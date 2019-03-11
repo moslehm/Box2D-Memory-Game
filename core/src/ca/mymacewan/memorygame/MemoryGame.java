@@ -8,19 +8,22 @@ import static ca.mymacewan.memorygame.State.HIDDEN;
 import static ca.mymacewan.memorygame.State.PAIRED;
 import static ca.mymacewan.memorygame.State.REVEALED;
 
+
 public class MemoryGame {
     int numOfCards; // How many cards in the game. it be increased when difficulty increase.
-    private ArrayList<Card> cards = new ArrayList<Card>(numOfCards);
+    private ArrayList<Card> cards;
 
     /**
      * Starts the game after numOfCards had been set
      */
     void gameStart(){
+        cards = new ArrayList<Card>(numOfCards);
         for (int i = 0 ; i < numOfCards; i++) {
             Card tempCard = new Card();
 
             int cardValue = i/2;
             tempCard.setValue(Integer.toString(cardValue));
+            tempCard.setKey(i);
             cards.add(tempCard);
         }
         Collections.shuffle(cards);
@@ -31,14 +34,14 @@ public class MemoryGame {
      * @param index of card in cards
      */
     void flipUp(int index) {
-        if (!(isLegalMove(cards.get(index)))) {
+        Card card = getCard(index);
+        if (!(isLegalMove(card))) {
             return;
         }
 
-        Card card = cards.get(index);
         card.setState(REVEALED);
         for (Card currentCard : cards) {
-            if (!currentCard.equals(card) && Integer.parseInt(currentCard.getValue()) == Integer.parseInt(card.getValue())) {
+            if (!(currentCard.equals(card)) && (Integer.parseInt(currentCard.getValue()) == Integer.parseInt(card.getValue()))) {
                 if (currentCard.getState() == REVEALED) {
                     currentCard.setState(PAIRED);
                     card.setState(PAIRED);
@@ -82,8 +85,9 @@ public class MemoryGame {
      * @param index of card in cards
      */
     void flipDown(int index){
-        Card card = cards.get(index);
+        Card card = getCard(index);
         if (card.getState() != PAIRED){
+            System.out.println("Not paired, flipping back down.");
             card.setState(HIDDEN);
         }
     }
@@ -111,6 +115,16 @@ public class MemoryGame {
             return card.getState() == HIDDEN;
         }
         return true;
+    }
+
+
+    private Card getCard(int index) {
+        for (Card currentCard : cards) {
+            if (currentCard.getKey() == index) {
+                return currentCard;
+            }
+        }
+        return null;
     }
 
     /**
