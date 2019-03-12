@@ -8,6 +8,7 @@ import static ca.mymacewan.memorygame.State.HIDDEN;
 import static ca.mymacewan.memorygame.State.PAIRED;\
 import static ca.mymacewan.memorygame.State.REVEALED;
 
+
 public class MemoryGame {
     int numOfCards; // How many cards in the game. it be increased when difficulty increase.
     private ArrayList<Card> cards;
@@ -31,6 +32,7 @@ public class MemoryGame {
 
             int cardValue = i/2;
             tempCard.setValue(Integer.toString(cardValue));
+            tempCard.setKey(i);
             cards.add(tempCard);
         }
         Collections.shuffle(cards);
@@ -41,14 +43,14 @@ public class MemoryGame {
      * @param index of card in cards
      */
     void flipUp(int index) {
-        if (!(isLegalMove(cards.get(index)))) {
+        Card card = getCard(index);
+        if (!(isLegalMove(card))) {
             return;
         }
 
-        Card card = cards.get(index);
         card.setState(REVEALED);
         for (Card currentCard : cards) {
-            if (!currentCard.equals(card) && Integer.parseInt(currentCard.getValue()) == Integer.parseInt(card.getValue())) {
+            if (!(currentCard.equals(card)) && (Integer.parseInt(currentCard.getValue()) == Integer.parseInt(card.getValue()))) {
                 if (currentCard.getState() == REVEALED) {
                     currentCard.setState(PAIRED);
                     card.setState(PAIRED);
@@ -94,7 +96,7 @@ public class MemoryGame {
      * @param index of card in cards
      */
     void flipDown(int index){
-        Card card = cards.get(index);
+        Card card = getCard(index);
         if (card.getState() != PAIRED){
             card.setState(HIDDEN);
         }
@@ -114,25 +116,34 @@ public class MemoryGame {
         return true;
     }
 
-    boolean isGameOver() {
+    /**
+     * @param card to check
+     * @return false if card is not HIDDEN, returns true otherwise
+     */
+    private boolean isLegalMove(Card card) {
+        if (cards.contains(card)) {
+            return card.getState() == HIDDEN;
+        }
+      return true;
+    }
+  
+     boolean isGameOver() {
         if (isRoundOver() && (diffLevel == 4)) {
             System.out.println("Congratulation!");
             return true;
         } else {
             return false;
         }
-    }
+     }
 
-    /**
-     * @param card to check
-     * @return false if card is not HIDDEN, returns true otherwise
-     */
-    public boolean isLegalMove(Card card) {
-        if (cards.contains(card)) {
-            return card.getState() == HIDDEN;
+    private Card getCard(int index) {
+        for (Card currentCard : cards) {
+            if (currentCard.getKey() == index) {
+                return currentCard;
+            }
         }
-        return true;
-    }
+        return null;
+
 
     /**
      * Format of output: [index]:[cardValue]:[cardState]
@@ -154,7 +165,7 @@ public class MemoryGame {
     ArrayList<Card> getCards() {
         return cards;
     }
-
+      
     public void updateScore() {
         if ((System.nanoTime() - comboTime) >= comboInterval) {
             score += 100;

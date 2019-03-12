@@ -4,8 +4,7 @@ class Card {
 
     private State state;
     private String value;
-    private int cardID;
-    private int index;
+    private int key;
 
     Card() {
         state = State.HIDDEN;
@@ -19,8 +18,6 @@ class Card {
         return state;
     }
 
-    int getID() { return cardID; }
-
     void setState(State state) {
         this.state = state;
     }
@@ -29,13 +26,11 @@ class Card {
         this.value = value;
     }
 
-    void setID(int cardID) { this.cardID = cardID; }
-
-    int getIndex() {
-        return index;
+    int getKey() {
+        return key;
     }
 
-    void setIndex(int index) {
-        this.index = index;
+    void setKey(int key) {
+        this.key = key;
     }
 }
