@@ -74,7 +74,6 @@
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/desktop/desktop.iml" filepath="$PROJECT_DIR$/desktop/desktop.iml" />
       <module fileurl="file://$PROJECT_DIR$/w19Wozniak.iml" filepath="$PROJECT_DIR$/w19Wozniak.iml" />
-      <module fileurl="file://$PROJECT_DIR$/w19Wozniak.iml" filepath="$PROJECT_DIR$/w19Wozniak.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" project-jdk-name="1.8" project-jdk-type="JavaSDK">
@@ -94,21 +93,21 @@
       <JAVADOC />
       <SOURCES />
     </library>
-    <library name="Gradle: __local_aars__:C.\Users\Projects\Desktop\GitHub\w19Wozniak\libs\JWinPointer.jar:unspecified@jar">
+    <library name="Gradle: __local_aars__:C.\Users\PC\Desktop\GitHub\w19Wozniak\libs\JWinPointer.jar:unspecified@jar">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/libs/JWinPointer.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
     </library>
-    <library name="Gradle: __local_aars__:C.\Users\Projects\Desktop\GitHub\w19Wozniak\libs\tween-engine-api-sources.jar:unspecified@jar">
+    <library name="Gradle: __local_aars__:C.\Users\PC\Desktop\GitHub\w19Wozniak\libs\tween-engine-api-sources.jar:unspecified@jar">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/libs/tween-engine-api-sources.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
     </library>
-    <library name="Gradle: __local_aars__:C.\Users\Projects\Desktop\GitHub\w19Wozniak\libs\tween-engine-api.jar:unspecified@jar">
+    <library name="Gradle: __local_aars__:C.\Users\PC\Desktop\GitHub\w19Wozniak\libs\tween-engine-api.jar:unspecified@jar">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/libs/tween-engine-api.jar!/" />
       </CLASSES>
@@ -195,6 +194,13 @@
       <SOURCES>
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-freetype/1.9.9/839b0670ba0f218435d8dcba7fd58d70939c20e1/gdx-freetype-1.9.9-sources.jar!/" />
       </SOURCES>
+    </library>
+    <library name="Gradle: gdx-freetype-platform-1.9.9-natives-desktop">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-freetype-platform/1.9.9/43485d7534081df8c26c572912935771cdb28b4a/gdx-freetype-platform-1.9.9-natives-desktop.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="Gradle: gdx-platform-1.9.9-natives-desktop">
       <CLASSES>
