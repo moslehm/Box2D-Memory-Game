@@ -25,6 +25,8 @@ import com.badlogic.gdx.physics.box2d.joints.MotorJointDef;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 
+import javax.swing.*;
+import java.sql.Array;
 import java.util.ArrayList;
 
 public class MemoryGameView implements ApplicationListener, InputProcessor {
@@ -33,7 +35,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     protected OrthographicCamera camera;
     final short PHYSICS_ENTITY = 0x1;    // 0001
     final short WORLD_ENTITY = 0x1 << 1; // 0010 or 0x2 in hex
-    //protected Box2DDebugRenderer renderer;
+    protected Box2DDebugRenderer renderer;
     protected World world;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     protected Body groundBody;
@@ -85,7 +87,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         camera.position.set(0, 0, 0);
 
         // Create the debug renderer
-        //renderer = new Box2DDebugRenderer();
+        renderer = new Box2DDebugRenderer();
 
         // Start the memory game
         game = new MemoryGame();
@@ -148,7 +150,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         camera.update();
 
         // Render the world using the debug renderer to view bodies and joints
-        //renderer.render(world, camera.combined);
+        renderer.render(world, camera.combined);
 
         tweenManager.update(Gdx.graphics.getDeltaTime());
 
@@ -286,6 +288,24 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             k++;
         }
     }
+    public void clearLevel(){
+        Body bod;
+        com.badlogic.gdx.utils.Array<JointEdge> Jlist;
+        for(Box box:boxes){
+             bod = box.getBody();
+             Jlist = bod.getJointList();
+             for(JointEdge j:Jlist){
+                world.destroyJoint(j.joint);
+             }
+             world.destroyBody(bod);
+
+    }}
+
+
+    void update(){
+
+    }
+
 
     public void createBox(float xPosition, float yPosition, float angle, Card card){
         PolygonShape shape = new PolygonShape();
@@ -352,11 +372,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     @Override
     public void dispose() {
-        //renderer.dispose();
+        renderer.dispose();
         world.dispose();
         frontSideTexture.getTexture().dispose();
 
-        //renderer = null;
+        renderer = null;
         world = null;
         mouseJoint = null;
         hitBodies = null;
