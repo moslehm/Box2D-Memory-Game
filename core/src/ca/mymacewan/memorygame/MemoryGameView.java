@@ -1,5 +1,6 @@
 package ca.mymacewan.memorygame;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector;
 import jwinpointer.JWinPointerReader;
 import jwinpointer.JWinPointerReader.PointerEventListener;
@@ -41,12 +42,13 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     protected Body hitBody = null;
 
     SpriteBatch batch;
-    //BitmapFont font;
+    BitmapFont font;
     private TextureRegion frontSideTexture;
     private TextureRegion[] backSideTextures;
     private MemoryGame game;
     private int numOfCards = 52;
     ArrayList<Card> cards;
+    int currentScore;
 
     private static TweenManager tweenManager;
 
@@ -106,6 +108,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
         // Batch to draw textures
         batch = new SpriteBatch();
+
+        // Load font
+        font = new BitmapFont(Gdx.files.internal("ArialFont.fnt"));
+
 
         // Set the input processor as the ones overridden in here
         Gdx.input.setInputProcessor(this);
