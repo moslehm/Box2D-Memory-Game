@@ -1,169 +1,525 @@
 package ca.mymacewan.memorygame;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.math.Vector;
+import jwinpointer.JWinPointerReader;
+import jwinpointer.JWinPointerReader.PointerEventListener;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenEquations;
+import aurelienribon.tweenengine.TweenManager;
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.*;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
+import com.badlogic.gdx.physics.box2d.joints.MotorJointDef;
+import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
+import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 
 import java.util.ArrayList;
 
-import static java.lang.Math.sqrt;
+public class MemoryGameView implements ApplicationListener, InputProcessor {
+    // Box2D initialization
+    // PHYSICS_ENTITY will always collide with WORLD_ENTITY
+    protected OrthographicCamera camera;
+    final short PHYSICS_ENTITY = 0x1;    // 0001
+    final short WORLD_ENTITY = 0x1 << 1; // 0010 or 0x2 in hex
+    //protected Box2DDebugRenderer renderer;
+    protected World world;
+    private ArrayList<Box> boxes = new ArrayList<Box>();
+    protected Body groundBody;
+    protected MouseJoint mouseJoint[] = new MouseJoint[80];
+    protected Body hitBodies[]= new Body[80];
+    protected Body hitBody = null;
 
-public class MemoryGameView extends ApplicationAdapter {
-	private SpriteBatch batch;
+    SpriteBatch batch;
+    //BitmapFont font;
+    private TextureRegion frontSideTexture;
+    private TextureRegion[] backSideTextures;
     private MemoryGame game;
-	private Stage stage;
-    private int gameSize = 16;
+    private int numOfCards = 52;
+    ArrayList<Card> cards;
 
-	public class CardGroup extends Group {
-		Texture backTexture, frontTexture;
-		Image displayedImage;
+    private static TweenManager tweenManager;
 
-		final Card card;
+    // == Test Start ==
+    //private static JWinPointerReader jWinPointerReader;
+    // == Test End ==
+    @Override
+    public void create() {
+        for(int i = 0; i < hitBodies.length; i++){
+            hitBodies[i] = null;
+            mouseJoint[i] = null;
+        }
 
-		CardGroup(final Card card, int x, int y){
-			backTexture = Assets.manager.get(Assets.cardBack);
-			frontTexture = Assets.manager.get(Assets.demoCard + card.getValue() + ".png");
-			displayedImage = new Image(backTexture);
+        // "Meters" are the units of Box2D
+        // 1 pixel = 0.018 meters
+        // 1 meter = 55.556 pixels
+        // This can be changed. The lower the meters are, the more the screen "zooms in".
+        float CAMERA_WIDTH_METERS = toMeters(Gdx.graphics.getWidth());
+        float CAMERA_HEIGHT_METERS = toMeters(Gdx.graphics.getHeight());
 
-			float[] convertedXY = convertXY(x, y, (int) (gameSize/sqrt(gameSize)));
+        // Tween setup
+        Tween.setCombinedAttributesLimit(1);
+        Tween.registerAccessor(Box.class, new BoxAccessor());
+        tweenManager = new TweenManager();
 
-			displayedImage.setPosition(convertedXY[0], convertedXY[1]);
-			displayedImage.setOrigin(Align.center);
-			this.addActor(displayedImage);
-			//displayedImage.sizeBy((Gdx.graphics.getWidth() * 0.10f));
+        // setup the camera. In Box2D we operate on a
+        // meter scale, pixels won't do it. So we use
+        // an orthographic camera with a viewport of
+        // CAMERA_WIDTH_METERS in width and CAMERA_HEIGHT_METERS meters in height.
+        // We also position the camera so that it
+        // looks at (0,0) (that's where the middle of the
+        // screen will be located).
+        camera = new OrthographicCamera(CAMERA_WIDTH_METERS, CAMERA_HEIGHT_METERS);
+        camera.position.set(0, 0, 0);
 
-			setOrigin(Align.center);
+        // Create the debug renderer
+        //renderer = new Box2DDebugRenderer();
 
-			this.card = card;
-			setUserObject(this.card);
-
-			addListener((new ClickListener(){
-				public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-					System.out.println("DOWN: " + pointer);
-					if (((Card) getUserObject()).getState() == State.HIDDEN) {
-						RunnableAction changeTexture = new RunnableAction() {
-							@Override
-							public void run() {
-								displayedImage.setDrawable(new SpriteDrawable(new Sprite(frontTexture)));
-							}
-						};
-						displayedImage.addAction(Actions.sequence(
-								MyActions.flipOut(0.1f),
-								changeTexture,
-								MyActions.flipIn(0.1f)));
-
-						((Card) getUserObject()).setID(pointer);
-						game.flipUp(((Card) getUserObject()).getIndex());
-						//System.out.println(((Card) getUserObject()).getIndex());
-						//((Card)getUserObject()).setState(State.REVEALED);
-					}
-					return true;
-				}
-				public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-					System.out.println("UP: " + pointer);
-					System.out.println("REAL ID: " + ((Card) getUserObject()).getID());
-					if (((Card) getUserObject()).getState()!= State.PAIRED && ((Card) getUserObject()).getID() == pointer){
-						RunnableAction changeTexture = new RunnableAction() {
-							@Override
-							public void run() {
-								displayedImage.setDrawable(new SpriteDrawable(new Sprite(backTexture)));
-							}
-						};
-						displayedImage.addAction(Actions.sequence(
-								MyActions.flipOut(0.1f),
-								changeTexture,
-								MyActions.flipIn(0.1f)));
-						game.flipDown(((Card) getUserObject()).getIndex());
-                    }
-				}
-			}));
-		}
-
-		private float[] convertXY(int x, int y, int cardsPerRow){
-			float cardSize = backTexture.getWidth();
-			float distanceBetweenCard = 10f;
-
-			float xOffset = Gdx.graphics.getWidth() - (cardsPerRow * cardSize + (distanceBetweenCard * (cardsPerRow - 1)));
-			float yOffset = Gdx.graphics.getHeight() - (cardsPerRow * cardSize + (distanceBetweenCard  * (cardsPerRow - 1)));
-			float[] convertedXY = {0f, 0f};
-
-			convertedXY[0] = xOffset/2f + (((cardSize + distanceBetweenCard) * ((float) x)));
-			convertedXY[1] = yOffset/2f + (((cardSize + distanceBetweenCard) * ((float) y)));
-
-			return convertedXY;
-		}
-
-		@Override
-		public void draw(Batch batch, float alpha) {
-				displayedImage.draw(batch, alpha);
-		}
-	}
-
-	@Override
-	public void create () {
-    	Assets.load();
-    	Assets.manager.finishLoading();
-
-		batch = new SpriteBatch();
-
-		stage = new Stage();
-		Gdx.input.setInputProcessor(stage);
-
+        // Start the memory game
         game = new MemoryGame();
-        game.numOfCards = gameSize;
+        game.numOfCards = numOfCards;
         game.gameStart();
 
-        createTable(gameSize);
-	}
+        // Create the world for the Box2D bodies
+        world = new World(new Vector2(0, 0), true);
 
-	private void createTable(int gameSize) {
-		int gameRows = (int)(gameSize/sqrt(gameSize));
-		ArrayList<Card> cards = game.getCards();
-		for (int x = 0; x < gameRows; x++){
-			for (int y = 0; y < gameRows; y++){
-				Card currentCard = cards.get((x * gameRows) + y);
-				currentCard.setIndex((x * gameRows) + y);
-				CardGroup newCardGroup = new CardGroup(currentCard, x, y);
-				stage.addActor(newCardGroup);
-			}
-		}
-	}
+        // We also need an invisible zero size ground body
+        // to which we can connect the mouse joints and friction joints
+        BodyDef bodyDef = new BodyDef();
+        groundBody = world.createBody(bodyDef);
 
-	@Override
-	public void render () {
-        update();
-		Gdx.gl.glClearColor(44/255f, 135/255f, 209/255f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
+        // Call abstract method to populate the world
+        createWorld(world);
 
-		stage.act(Gdx.graphics.getDeltaTime());
-		stage.draw();
+        // Creates the boxes and joints
+        createGame();
 
-		batch.end();
-	}
+        // Batch to draw textures
+        batch = new SpriteBatch();
 
-    private void update() {
-	    if (game.isGameOver()){
-	        // player won, go to next level
+        // Set the input processor as the ones overridden in here
+        Gdx.input.setInputProcessor(this);
+
+        frontSideTexture = new TextureRegion(new Texture(Gdx.files.internal("cardBack.png")));
+        Texture textureSheet = new Texture(Gdx.files.internal("AlphabetSheet.png"));
+        TextureRegion[][] tmpRegions = TextureRegion.split(textureSheet, 150, 150);
+        backSideTextures = new TextureRegion[7 * 4];
+        int index = 0;
+        for (int y = 0; y < 7; y++) {
+            for (int x = 0; x < 4; x++) {
+                backSideTextures[index++] = tmpRegions[x][y];
+            }
         }
-        // timer?
+
+        // == Windows multi touch test Start ==
+        //jWinPointerReader = new JWinPointerReader(world);
+        //jWinPointerReader.addPointerEventListener();
+        // == Windows multi touch test End ==
+    }
+
+
+    @Override
+    public void render() {
+        // Background colour
+        Gdx.gl.glClearColor(44 / 255f, 135 / 255f, 209 / 255f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Update the world with a fixed time step
+        world.step(Gdx.app.getGraphics().getDeltaTime(), 3, 3);
+
+        // Clear the screen and setup the projection matrix
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        camera.update();
+
+        // Render the world using the debug renderer to view bodies and joints
+        //renderer.render(world, camera.combined);
+
+        tweenManager.update(Gdx.graphics.getDeltaTime());
+
+        // Render each box via the SpriteBatch.
+        // Set the projection matrix of the SpriteBatch to the camera's combined matrix.
+        // This will make the SpriteBatch work in world coordinates (meters)
+        batch.getProjectionMatrix().set(camera.combined);
+        batch.begin();
+        for (int i = 0; i < boxes.size(); i++) {
+            Box box = boxes.get(i);
+            Body boxBody = box.getBody();
+            Vector2 position = boxBody.getPosition(); // Get the box's center position
+            float angle = MathUtils.radiansToDegrees * boxBody.getAngle(); // Get the box's rotation angle around the center
+
+            // x, y: Unrotated position of bottom left corner of the box
+            // originX, originY: Rotation center relative to the bottom left corner of the box
+            // width, height: width and height of the box
+            // scaleX, scaleY: Scale on the x- and y-axis
+            // Draw the front side
+            batch.draw(frontSideTexture, position.x - 0.5f, position.y - 0.5f,
+                    0.5f, 0.5f,
+                    1, 1,
+                    (float) Math.max(-Math.cos(box.getScaleX() * Math.PI), 0), 1f,
+                    angle);
+            // Draw the back side
+            // To make it set textures from the game logic, do backSideTextures[card.getIndex] or something
+            //System.out.println("i: " + Integer.toString(i));
+            //System.out.println("cards.get(i).getValue()): " + cards.get(i).getValue());
+            batch.draw(backSideTextures[Integer.parseInt(cards.get(i).getValue())], position.x - 0.5f, position.y - 0.5f,
+                    0.5f, 0.5f,
+                    1, 1,
+                    (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), 1f,
+                    angle);
+        }
+        batch.end();
+    }
+
+    protected void createWorld(World world) {
+
+        float boardWidth = toMeters(Gdx.graphics.getWidth());
+        float boardHeight = toMeters(Gdx.graphics.getHeight());
+        float halfWidth = boardWidth / 2f;
+        float halfHeight = boardHeight / 2f;
+        // Ground body
+        {
+            BodyDef bd = new BodyDef();
+            bd.position.set(0, 0);
+            groundBody = world.createBody(bd);
+
+            EdgeShape shape = new EdgeShape();
+
+            FixtureDef sd = new FixtureDef();
+            sd.shape = shape;
+            sd.density = 0;
+            sd.restitution = 0.4f;
+
+            // categoryBits is what the body is (a world entity)
+            // maskBits is what it collides with (a physics entity)
+            sd.filter.categoryBits = WORLD_ENTITY;
+            sd.filter.maskBits = PHYSICS_ENTITY;
+
+            // Draws the edges around the board
+            // LEFT
+            shape.set(new Vector2(-halfWidth, -halfHeight), new Vector2(-halfWidth, halfHeight));
+            groundBody.createFixture(sd);
+
+            // RIGHT
+            shape.set(new Vector2(halfWidth, -halfHeight), new Vector2(halfWidth, halfHeight));
+            groundBody.createFixture(sd);
+
+            // TOP
+            shape.set(new Vector2(-halfWidth, halfHeight), new Vector2(halfWidth, halfHeight));
+            groundBody.createFixture(sd);
+
+            // BOTTOM
+            shape.set(new Vector2(-halfWidth, -halfHeight), new Vector2(halfWidth, -halfHeight));
+            groundBody.createFixture(sd);
+
+            shape.dispose();
+        }
+    }
+
+    private void tweenHelpingHand(Box box, int targetX) {
+        // Kill current tween - or pre-existing
+        tweenManager.killTarget(box);
+
+        // Scale X down
+        Tween.to(box, BoxAccessor.SCALE_X, 0.3f)
+                .target(targetX)
+                .ease(TweenEquations.easeInOutSine)
+                .start(tweenManager);
+
+    }
+
+    private void createGame() {
+        cards = game.getCards();
+
+        float halfWidth = toMeters(Gdx.graphics.getWidth()) / 2f;
+        float halfHeight = toMeters(Gdx.graphics.getHeight()) / 2f;
+
+        float goldenAngle = (float) ((2 * Math.PI) / Math.pow((1f + Math.sqrt(5)) / 2f, 2));
+        float radius = 0f;
+        float maxRadius = 3.5f;
+        float scalingFactor = 0f;
+        float angle;
+        int k = 0;
+        int currentNumOfCards = 0;
+        float xPosition;
+        float yPosition;
+        boolean farFromAxis;
+        boolean xPointInRange;
+        boolean yPointInRange;
+        boolean inRange;
+        while (currentNumOfCards < cards.size()) {
+            // Box bodies
+            angle = k * goldenAngle;// * 0.367f;
+            radius = scalingFactor * (float) Math.sqrt(k);
+            scalingFactor = (float) (maxRadius / Math.sqrt(k)) - 1f;
+            xPosition = (float) (radius * Math.cos(angle) * 1.1f - 0.2f);
+            yPosition = (float) (radius * Math.sin(angle) - 0.3f);
+            farFromAxis = xPosition > 0.5 && yPosition > 0.5;
+            xPointInRange = xPosition < halfWidth && xPosition > 0;
+            yPointInRange = yPosition < halfHeight && yPosition > 0;
+            inRange = (30 < k && 33 > k) | 34 < k;
+            if (inRange && xPointInRange && yPointInRange && farFromAxis) {
+                createBox(xPosition, yPosition, angle, cards.get(currentNumOfCards));
+                currentNumOfCards++;
+                createBox(-xPosition, -yPosition, angle, cards.get(currentNumOfCards));
+                currentNumOfCards++;
+                createBox(xPosition, -yPosition, angle, cards.get(currentNumOfCards));
+                currentNumOfCards++;
+                createBox(-xPosition, yPosition, angle, cards.get(currentNumOfCards));
+                currentNumOfCards++;
+            }
+            k++;
+        }
+    }
+
+    public void createBox(float xPosition, float yPosition, float angle, Card card){
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(0.5f, 0.5f);
+
+
+        PolygonShape body = new PolygonShape();
+        body.setAsBox(0.5f, 0.5f);
+
+        FixtureDef fd = new FixtureDef();
+        fd.shape = shape;
+        fd.density = 1.0f;
+        fd.friction = 0.3f;
+        fd.filter.categoryBits = PHYSICS_ENTITY;
+        fd.filter.maskBits = WORLD_ENTITY;
+
+        // Create the BodyDef, set a position, and other properties.
+        BodyDef boxBodyDef = new BodyDef();
+        boxBodyDef.type = BodyType.DynamicBody;
+        boxBodyDef.position.x = xPosition;
+        boxBodyDef.position.y = yPosition;
+        //boxBodyDef.angle = angle;
+        Body boxBody = world.createBody(boxBodyDef);
+        boxBody.createFixture(fd);
+
+        Box box = new Box(boxBody, 1f, card);
+
+        // Add the box to our list of boxes
+        boxes.add(box);
+
+        // Motor joint body
+        // This is just stationary a point at center of each box
+        // Motor joints will be connected to this to snap the boxes back
+        // to their original positions
+        Body jointBody;
+        BodyDef jointBodyDef = new BodyDef();
+        jointBodyDef.position.set(xPosition, yPosition);
+        jointBody = world.createBody(jointBodyDef);
+
+        // Motor joint
+        MotorJointDef jointDef = new MotorJointDef();
+        jointDef.angularOffset = 0f;
+        jointDef.collideConnected = false;
+        jointDef.correctionFactor = 1f;
+        jointDef.maxForce = 70f;
+        jointDef.maxTorque = 50f;
+        jointDef.initialize(jointBody, boxBody);
+        world.createJoint(jointDef);
+
+        // Friction joint
+        // Connected between each box and the ground body
+        // Used to make the movement of boxes more "realistic"
+        FrictionJointDef jd = new FrictionJointDef();
+        jd.localAnchorA.set(0, 0);
+        jd.localAnchorB.set(0, 0);
+        jd.bodyA = groundBody;
+        jd.bodyB = boxBody;
+        jd.collideConnected = true;
+        jd.maxForce = 50;//mass * gravity;
+        jd.maxTorque = 20;//mass * radius * gravity;
+        world.createJoint(jd);
+        shape.dispose();
     }
 
     @Override
-	public void dispose () {
-		batch.dispose();
-		Assets.dispose();
-		stage.dispose();
-	}
+    public void dispose() {
+        //renderer.dispose();
+        world.dispose();
+        frontSideTexture.getTexture().dispose();
+
+        //renderer = null;
+        world = null;
+        mouseJoint = null;
+        hitBodies = null;
+    }
+
+    public float toMeters(float pixels) {
+        return pixels * 0.018f;
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    // Instantiate vector and the callback here to avoid errors from the GC
+    Vector3 testPoint = new Vector3();
+    QueryCallback callback = new QueryCallback() {
+        @Override
+        public boolean reportFixture(Fixture fixture) {
+            // Checks if the hit point is inside the fixture of the body
+            if (fixture.testPoint(testPoint.x, testPoint.y)) {
+                hitBody = fixture.getBody();
+                return false;
+            } else
+                return true;
+        }
+    };
+
+
+    @Override
+    public boolean touchDown(int x, int y, int pointer, int button) {
+        // Converts the mouse coordinates to meters (world coordinates)
+        camera.unproject(testPoint.set(x, y, 0));
+        // Checks which bodies are within the given bounding box around the mouse pointer
+        hitBodies[pointer] = null;
+        hitBody = hitBodies[pointer];
+
+        world.QueryAABB(callback, testPoint.x - 0.0001f, testPoint.y - 0.0001f, testPoint.x + 0.0001f, testPoint.y + 0.0001f);
+
+        if (hitBody == groundBody) hitBody = null;
+
+        // Ignores kinematic bodies
+        if (hitBody != null && hitBody.getType() == BodyType.KinematicBody) return false;
+
+        // If hitBodies points to a valid body.
+        // We change start the flip animation then we create
+        // a new mouse joint and attach it to the hit body.
+        if (hitBody != null) {
+            for (Box box : boxes) {
+                if (box.getBody() == hitBody) {
+                    Card boxCard = box.getCard();
+                    if (boxCard.getState() == State.HIDDEN) {
+                        tweenHelpingHand(box, 0);
+                        System.out.println("Flipping card at index: " + boxCard.getKey());
+                        game.flipUp(boxCard.getKey());
+                        box.setID(pointer);
+                    }
+                }
+            }
+
+
+            // Create mouse joint because hitBodies is a box, even if it's not flipping
+            MouseJointDef def = new MouseJointDef();
+            def.bodyA = groundBody;
+            def.bodyB = hitBody;
+            def.collideConnected = true;
+            def.target.set(testPoint.x, testPoint.y);
+            def.maxForce = 1000000.0f * hitBody.getMass();
+
+            mouseJoint[pointer] = (MouseJoint) world.createJoint(def);
+            hitBody.setAwake(true);
+        }
+
+        return false;
+    }
+
+     //another temporary vector
+    Vector2 target = new Vector2();
+
+    @Override
+    public boolean touchDragged(int x, int y, int pointer) {
+        // if a mouse joint exists we simply update
+        // the target of the joint based on the new
+        // mouse coordinates
+        if (mouseJoint[pointer] != null) {
+            camera.unproject(testPoint.set(x, y, 0));
+            mouseJoint[pointer].setTarget(target.set(testPoint.x, testPoint.y));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int x, int y, int pointer, int button) {
+        //System.out.println("Pointer up: " + pointer);
+        //System.out.println("mouseJoint null: " + (mouseJoint[pointer] != null));
+
+        // if a mouse joint exists we simply destroy it
+        if (mouseJoint[pointer] != null) {
+            for (Box box : boxes) {
+                if (box.getBody() == mouseJoint[pointer].getBodyB()) {
+                    Card boxCard = box.getCard();
+                    if (boxCard.getState()!= State.PAIRED) {
+                        tweenHelpingHand(box, 1);
+                        game.flipDown(boxCard.getKey());
+                    }
+                }
+            }
+            world.destroyJoint(mouseJoint[pointer]);
+            mouseJoint[pointer] = null;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int x, int y) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
+        return false;
+    }
+
+    public void pause() {
+
+    }
+
+    public void resume() {
+
+    }
+
+    public void resize(int width, int height) {
+
+    }
+
+    /*@Override
+    public void pointerXYEvent(int i, int i1, int i2, boolean b, int i3, int i4, int i5) {
+
+    }
+
+    @Override
+    public void pointerButtonEvent(int i, int i1, int i2, boolean b, int i3) {
+
+    }
+
+    @Override
+    public void pointerEvent(int i, int i1, int i2, boolean b) {
+
+    }*/
+
+	/*public boolean keyDown(int keyCode) {
+		if (keyCode == Keys.W) {
+			Vector2 f = m_body.getWorldVector(tmp.set(0, -200));
+			Vector2 p = m_body.getWorldPoint(tmp.set(0, 2));
+			m_body.applyForce(f, p, true);
+		}
+		if (keyCode == Keys.A) m_body.applyTorque(50, true);
+		if (keyCode == Keys.D) m_body.applyTorque(-50, true);
+
+		return false;
+	}*/
 }
