@@ -12,11 +12,20 @@ import static ca.mymacewan.memorygame.State.REVEALED;
 public class MemoryGame {
     int numOfCards; // How many cards in the game. it be increased when difficulty increase.
     private ArrayList<Card> cards;
+    private short [] difficulty = {8, 16, 24, 40, 52};
+    private short diffLevel;
+    private int score;
+    private int combo;
+    private long startTime;
+    private long comboTime;
+    private static long comboInterval = 10000000000L;
 
     /**
      * Starts the game after numOfCards had been set
      */
     void gameStart(){
+        startTime = System.nanoTime();
+        combo = 1;
         cards = new ArrayList<Card>(numOfCards);
         for (int i = 0 ; i < numOfCards; i++) {
             Card tempCard = new Card();
@@ -45,6 +54,8 @@ public class MemoryGame {
                 if (currentCard.getState() == REVEALED) {
                     currentCard.setState(PAIRED);
                     card.setState(PAIRED);
+                    updateScore();
+                    comboTime = System.nanoTime() - startTime;
                     return;
                 }
             }
@@ -87,7 +98,6 @@ public class MemoryGame {
     void flipDown(int index){
         Card card = getCard(index);
         if (card.getState() != PAIRED){
-            System.out.println("Not paired, flipping back down.");
             card.setState(HIDDEN);
         }
     }
@@ -96,7 +106,7 @@ public class MemoryGame {
     /**
      * @return false if any of the cards are not PAIRED, returns true otherwise
      */
-    boolean isGameOver() {
+    boolean isRoundOver() {
         for (Card i : cards) {
             if (i.getState() != PAIRED) {
                 return false;
@@ -114,9 +124,17 @@ public class MemoryGame {
         if (cards.contains(card)) {
             return card.getState() == HIDDEN;
         }
-        return true;
+      return true;
     }
-
+  
+     boolean isGameOver() {
+        if (isRoundOver() && (diffLevel == 4)) {
+            System.out.println("Congratulation!");
+            return true;
+        } else {
+            return false;
+        }
+     }
 
     private Card getCard(int index) {
         for (Card currentCard : cards) {
@@ -146,5 +164,35 @@ public class MemoryGame {
      */
     ArrayList<Card> getCards() {
         return cards;
+    }
+      
+    public void updateScore() {
+        if ((System.nanoTime() - comboTime) >= comboInterval) {
+            score += 100;
+            combo = 1;
+        } else {
+            score += 100*combo;
+            if (combo < 4) {
+                combo += 1;
+            }
+        }
+        return;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void nextDiff() {
+        if (numOfCards == 0) {
+            numOfCards = difficulty[0];
+            gameStart();
+            return;
+        }
+        if (diffLevel < 4) {
+            diffLevel += 1;
+            numOfCards = difficulty[diffLevel];
+            gameStart();
+        }
     }
 }
