@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Collections;
 
 import static ca.mymacewan.memorygame.State.HIDDEN;
-import static ca.mymacewan.memorygame.State.PAIRED;\
+import static ca.mymacewan.memorygame.State.PAIRED;
 import static ca.mymacewan.memorygame.State.REVEALED;
 
 
@@ -143,7 +143,7 @@ public class MemoryGame {
             }
         }
         return null;
-
+    }
 
     /**
      * Format of output: [index]:[cardValue]:[cardState]
