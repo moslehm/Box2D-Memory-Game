@@ -70,6 +70,7 @@
   <component name="ExternalProjectsManager">
     <system id="GRADLE">
       <state>
+
         <projects_view>
           <tree_state>
             <expand>
@@ -234,6 +235,11 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
   </component>
   <component name="GradleLocalSettings">
     <option name="myGradleHomes">
@@ -2401,6 +2407,7 @@
         <option value="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" />
         <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" />
+        <option value="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" />
       </list>
     </option>
   </component>
@@ -2866,7 +2873,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java">
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/scenes/scene2d/Action.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="408">
           <caret line="50" column="21" selection-start-line="50" selection-start-column="21" selection-end-line="50" selection-end-column="21" />

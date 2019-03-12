@@ -18,7 +18,6 @@ class Card {
         return state;
     }
 
-
     void setState(State state) {
         this.state = state;
     }
@@ -26,7 +25,6 @@ class Card {
     void setValue(String value) {
         this.value = value;
     }
-
 
     int getKey() {
         return key;
