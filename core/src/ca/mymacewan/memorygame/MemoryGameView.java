@@ -2,6 +2,7 @@ package ca.mymacewan.memorygame;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.physics.box2d.joints.*;
 import com.badlogic.gdx.utils.Array;
 import jwinpointer.JWinPointerReader;
 import jwinpointer.JWinPointerReader.PointerEventListener;
@@ -21,10 +22,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
-import com.badlogic.gdx.physics.box2d.joints.MotorJointDef;
-import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
-import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 
 
 import java.util.ArrayList;
@@ -62,13 +59,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     // == Test End ==
     @Override
     public void create() {
-        // TODO: Organize array initialization
-        for (int i = 0; i < hitBodies.length; i++) {
-            hitBodies[i] = null;
-            mouseJoints.add(null);
-            frictionJoints.add(null);
-            motorJoints.add(null);
-        }
 
         // "Meters" are the units of Box2D
         // 1 pixel = 0.018 meters
@@ -170,7 +160,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         batch.begin();
 
         // Draw backside first to make the front side of the cards on top
-        for (int i = 0; i < boxes.size(); i++){
+        for (int i = 0; i < boxes.size(); i++) {
             Box box = boxes.get(i);
             Body boxBody = box.getBody();
             Vector2 position = boxBody.getPosition(); // Get the box's center position
@@ -210,7 +200,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.begin();
         // Display score
-        font.draw(batch, Integer.toString(currentScore), Gdx.graphics.getWidth()/2f - textLayout.width/2f, Gdx.graphics.getHeight()/2f + textLayout.height/2f);
+        font.draw(batch, Integer.toString(currentScore), Gdx.graphics.getWidth() / 2f - textLayout.width / 2f, Gdx.graphics.getHeight() / 2f + textLayout.height / 2f);
         batch.end();
     }
 
@@ -273,6 +263,16 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     int currentNumOfCards;
 
     private void createGame() {
+            hitBodies = new Body[80];
+            mouseJoints = new Array<MouseJoint>();
+            frictionJoints = new Array<Joint>();
+            motorJoints = new Array<Joint>();
+        for (int i = 0; i < hitBodies.length; i++) {
+            hitBodies[i] = null;
+            mouseJoints.add(null);
+            frictionJoints.add(null);
+            motorJoints.add(null);
+        }
         cards = game.getCards();
         currentNumOfCards = 0;
 
@@ -316,35 +316,26 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         }
     }
 
-    public void clearLevel() {
-        Body bod;
-        com.badlogic.gdx.utils.Array<JointEdge> Jlist;
-        for (Box box : boxes) {
-            bod = box.getBody();
-            Jlist = bod.getJointList();
-            for (JointEdge j : Jlist) {
-                world.destroyJoint(j.joint);
-            }
-            world.destroyBody(bod);
-
-        }
-    }
-
     boolean roundInProgress = true;
+
     void update() {
         currentScore = game.getScore();
         textLayout.setText(font, Integer.toString(currentScore));
-        if(game.isIdle()){
+        if (game.isIdle()) {
             //restart game here;
         }
         if (game.isRoundOver() && roundInProgress) {
+            roundInProgress = false;
             // Round over
             // Destroy bodies and joints
             // Then start next round
             destroyAll();
-            roundInProgress = false;
+            game.nextDiff();
+            game.gameStart();
+            createGame();
             // Lets pretend i started the next round.
         }
+
     }
 
     void destroyAll() {
@@ -356,6 +347,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
                     jointToDestroy = null;
                 }
             }
+
             MouseJoint mouseJointToDestroy;
             for (int i = 0; i < mouseJoints.size; i++) {
                 mouseJointToDestroy = mouseJoints.get(i);
@@ -368,6 +360,28 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             // One more for loop to remove the last kind of joint, motor joints
             //Use the motorJoints array
             // TODO: Brayden
+            Joint motorJointToDestroy;
+            for (int i = 0; i < motorJoints.size; i++) {
+                motorJointToDestroy = motorJoints.get(i);
+                if (motorJoints.get(i) != null) {
+                    world.destroyJoint(motorJointToDestroy);
+                    motorJoints.set(i, null);
+
+                }
+            }
+            Body bod;
+            int size = boxes.size();
+            while(boxes.size() > 0) {
+                Box box = boxes.get(0);
+                bod = box.getBody();
+                if (bod != null) {
+                    world.destroyBody(bod);
+                    bod = null;
+                }
+                boxes.remove(0);
+
+            }
+            boxes.removeAll(boxes);
         }
     }
 
@@ -473,6 +487,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     @Override
     public boolean touchDown(int x, int y, int pointer, int button) {
+        roundInProgress = true;
         game.resetIdleTime();
 
         // Converts the mouse coordinates to meters (world coordinates)
