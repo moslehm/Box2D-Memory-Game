@@ -48,10 +48,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     SpriteBatch batch;
     BitmapFont font;
     GlyphLayout textLayout = new GlyphLayout();
-    private TextureRegion frontSideTexture;
-    private TextureRegion[] backSideTextures;
+    private TextureRegion backSideTexture;
+    private TextureRegion[] frontSideTextures;
     private MemoryGame game;
     ArrayList<Card> cards;
+    private float halfBoxSize = 0.5f;
     int currentScore;
 
     private static TweenManager tweenManager;
@@ -123,14 +124,14 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         // Set the input processor as the ones overridden in here
         Gdx.input.setInputProcessor(this);
 
-        frontSideTexture = new TextureRegion(new Texture(Gdx.files.internal("cardBack.png")));
+        backSideTexture = new TextureRegion(new Texture(Gdx.files.internal("cardBack.png")));
         Texture textureSheet = new Texture(Gdx.files.internal("AlphabetSheet.png"));
         TextureRegion[][] tmpRegions = TextureRegion.split(textureSheet, 150, 150);
-        backSideTextures = new TextureRegion[7 * 4];
+        frontSideTextures = new TextureRegion[7 * 4];
         int index = 0;
         for (int y = 0; y < 7; y++) {
             for (int x = 0; x < 4; x++) {
-                backSideTextures[index++] = tmpRegions[x][y];
+                frontSideTextures[index++] = tmpRegions[x][y];
             }
         }
 
@@ -168,7 +169,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         batch.getProjectionMatrix().set(camera.combined);
         batch.begin();
 
-        for (int i = 0; i < boxes.size(); i++) {
+        // Draw backside first to make the front side of the cards on top
+        for (int i = 0; i < boxes.size(); i++){
             Box box = boxes.get(i);
             Body boxBody = box.getBody();
             Vector2 position = boxBody.getPosition(); // Get the box's center position
@@ -179,18 +181,27 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             // width, height: width and height of the box
             // scaleX, scaleY: Scale on the x- and y-axis
             // Draw the front side
-            batch.draw(frontSideTexture, position.x - 0.5f, position.y - 0.5f,
-                    0.5f, 0.5f,
-                    1, 1,
+            batch.draw(backSideTexture, position.x - halfBoxSize, position.y - halfBoxSize,
+                    halfBoxSize, halfBoxSize,
+                    halfBoxSize * 2, halfBoxSize * 2,
                     (float) Math.max(-Math.cos(box.getScaleX() * Math.PI), 0), 1f,
                     angle);
+        }
+
+        // Draw front
+        for (int i = 0; i < boxes.size(); i++) {
+            Box box = boxes.get(i);
+            Body boxBody = box.getBody();
+            Vector2 position = boxBody.getPosition(); // Get the box's center position
+            float angle = MathUtils.radiansToDegrees * boxBody.getAngle(); // Get the box's rotation angle around the center
+
             // Draw the back side
-            // To make it set textures from the game logic, do backSideTextures[card.getIndex] or something
+            // To make it set textures from the game logic, do frontSideTextures[card.getIndex] or something
             //System.out.println("i: " + Integer.toString(i));
             //System.out.println("cards.get(i).getValue()): " + cards.get(i).getValue());
-            batch.draw(backSideTextures[Integer.parseInt(cards.get(i).getValue())], position.x - 0.5f, position.y - 0.5f,
-                    0.5f, 0.5f,
-                    1, 1,
+            batch.draw(frontSideTextures[Integer.parseInt(cards.get(i).getValue())], position.x - halfBoxSize, position.y - halfBoxSize,
+                    halfBoxSize, halfBoxSize,
+                    halfBoxSize * 2, halfBoxSize * 2,
                     (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), 1f,
                     angle);
         }
@@ -286,8 +297,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             radius = scalingFactor * (float) Math.sqrt(k);
             scalingFactor = (float) (maxRadius / Math.sqrt(k)) - 1f;
             xPosition = (float) (radius * Math.cos(angle) * 1.1f - 0.2f);
-            yPosition = (float) (radius * Math.sin(angle) - 0.3f);
-            farFromAxis = xPosition > 0.5 && yPosition > 0.5;
+            yPosition = (float) (radius * Math.sin(angle) * 1.1f);
+            farFromAxis = xPosition > halfBoxSize && yPosition > halfBoxSize;
             xPointInRange = xPosition < halfWidth && xPosition > 0;
             yPointInRange = yPosition < halfHeight && yPosition > 0;
             inRange = (30 < k && 33 > k) | 34 < k;
@@ -362,12 +373,12 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
 
     public void createBox(float xPosition, float yPosition, float angle, Card card) {
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(0.5f, 0.5f);
 
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(halfBoxSize, halfBoxSize);
 
         PolygonShape body = new PolygonShape();
-        body.setAsBox(0.5f, 0.5f);
+        body.setAsBox(halfBoxSize, halfBoxSize);
 
         FixtureDef fd = new FixtureDef();
         fd.shape = shape;
@@ -428,7 +439,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     public void dispose() {
         renderer.dispose();
         world.dispose();
-        frontSideTexture.getTexture().dispose();
+        backSideTexture.getTexture().dispose();
 
         renderer = null;
         world = null;
@@ -438,16 +449,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     public float toMeters(float pixels) {
         return pixels * 0.018f;
-    }
-
-    @Override
-    public boolean keyDown(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyTyped(char character) {
-        return false;
     }
 
     @Override
@@ -560,6 +561,16 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             mouseJoints.set(pointer, null);
             targetMouseJoint = null;
         }
+        return false;
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
         return false;
     }
 
