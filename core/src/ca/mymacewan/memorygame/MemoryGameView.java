@@ -41,6 +41,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     protected Body groundBody;
     protected Array<MouseJoint> mouseJoints = new Array<MouseJoint>();
     protected Array<Joint> frictionJoints = new Array<Joint>();
+    protected Array<Joint> motorJoints = new Array<Joint>();
     protected Body hitBodies[] = new Body[80];
     protected Body hitBody = null;
 
@@ -60,10 +61,12 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     // == Test End ==
     @Override
     public void create() {
+        // TODO: Organize array initialization
         for (int i = 0; i < hitBodies.length; i++) {
             hitBodies[i] = null;
             mouseJoints.add(null);
             frictionJoints.add(null);
+            motorJoints.add(null);
         }
 
         // "Meters" are the units of Box2D
@@ -250,8 +253,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     }
 
+    int currentNumOfCards;
     private void createGame() {
         cards = game.getCards();
+        currentNumOfCards = 0;
 
         float halfWidth = toMeters(Gdx.graphics.getWidth()) / 2f;
         float halfHeight = toMeters(Gdx.graphics.getHeight()) / 2f;
@@ -262,7 +267,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         float scalingFactor = 0f;
         float angle;
         int k = 0;
-        int currentNumOfCards = 0;
         float xPosition;
         float yPosition;
         boolean farFromAxis;
@@ -339,6 +343,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
                     mouseJointToDestroy = null;
                 }
             }
+            // One more for loop to remove the last kind of joint, motor joints
+            //Use the motorJoints array
+            // TODO: Brayden
         }
     }
 
@@ -389,7 +396,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         jointDef.maxForce = 70f;
         jointDef.maxTorque = 50f;
         jointDef.initialize(jointBody, boxBody);
-        world.createJoint(jointDef);
+        motorJoints.set(currentNumOfCards, world.createJoint(jointDef));
 
         // Friction joint
         // Connected between each box and the ground body
