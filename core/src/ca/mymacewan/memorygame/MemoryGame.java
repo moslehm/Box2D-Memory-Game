@@ -10,9 +10,9 @@ import static ca.mymacewan.memorygame.State.REVEALED;
 
 
 public class MemoryGame {
-    int numOfCards; // How many cards in the game. it be increased when difficulty increase.
+    private int numOfCards; // How many cards in the game. it be increased when difficulty increase.
     private ArrayList<Card> cards;
-    private short [] difficulty = {8, 16, 24, 40, 52};
+    private short [] difficulty = {4, 8, 16, 24, 40, 52};
     private short diffLevel;
     private int score;
     private int combo;
@@ -24,6 +24,7 @@ public class MemoryGame {
      * Starts the game after numOfCards had been set
      */
     void gameStart(){
+        numOfCards = difficulty[0];
         startTime = System.nanoTime();
         combo = 1;
         cards = new ArrayList<Card>(numOfCards);
@@ -184,11 +185,6 @@ public class MemoryGame {
     }
 
     public void nextDiff() {
-        if (numOfCards == 0) {
-            numOfCards = difficulty[0];
-            gameStart();
-            return;
-        }
         if (diffLevel < 4) {
             diffLevel += 1;
             numOfCards = difficulty[diffLevel];
