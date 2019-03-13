@@ -1,5 +1,7 @@
 package ca.mymacewan.memorygame;
 
+import com.sun.xml.internal.xsom.impl.scd.Step;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Collections;
@@ -18,7 +20,9 @@ public class MemoryGame {
     private int combo;
     private long startTime;
     private long comboTime;
-    private final long COMBO_INTERVAL = 10000000000L;
+    private long idleStartTime;
+    private static long isIdleTime = 90000000000L; //90 seconds;
+    private static long comboInterval = 10000000000L;
 
     /**
      * Starts the game after numOfCards had been set
@@ -48,7 +52,7 @@ public class MemoryGame {
         if (!(isLegalMove(card))) {
             return;
         }
-
+        idleStartTime = System.nanoTime();
         card.setState(REVEALED);
         for (Card currentCard : cards) {
             if (!(currentCard.equals(card)) && (Integer.parseInt(currentCard.getValue()) == Integer.parseInt(card.getValue()))) {
@@ -168,7 +172,7 @@ public class MemoryGame {
     }
       
     public void updateScore() {
-        if ((System.nanoTime() - comboTime) >= COMBO_INTERVAL) {
+        if ((System.nanoTime() - comboTime) >= comboInterval) {
             score += 100;
             combo = 1;
         } else {
@@ -184,16 +188,26 @@ public class MemoryGame {
         return score;
     }
 
-    public boolean isIdle(){
-        // return true if timeSinceLastMove > 90 seconds
-        return false;
-    }
-
     public void nextDiff() {
         if (diffLevel < 4) {
             diffLevel += 1;
             numOfCards = difficulty[diffLevel];
             gameStart();
+        }
+    }
+
+    //run this function for each touch
+    public void resetIdleTime()  {
+        idleStartTime = System.nanoTime();
+    }
+
+    //run this function for each frame to test is idle or not
+    //restart the game for returning true
+    public boolean isIdle() {
+        if (System.nanoTime() - idleStartTime > isIdleTime) {
+            return true;
+        } else {
+            return false;
         }
     }
 }
