@@ -319,14 +319,16 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         }
     }
 
+    boolean roundInProgress = true;
     void update() {
         currentScore = game.getScore();
         textLayout.setText(font, Integer.toString(currentScore));
-        if (game.isRoundOver()) {
+        if (game.isRoundOver() && roundInProgress) {
             // Round over
             // Destroy bodies and joints
             // Then start next round
             destroyAll();
+            roundInProgress = false;
             // Lets pretend i started the next round.
         }
     }
