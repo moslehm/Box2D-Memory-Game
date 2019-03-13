@@ -18,7 +18,7 @@ public class MemoryGame {
     private int combo;
     private long startTime;
     private long comboTime;
-    private static long comboInterval = 10000000000L;
+    private final long COMBO_INTERVAL = 10000000000L;
 
     /**
      * Starts the game after numOfCards had been set
@@ -168,7 +168,7 @@ public class MemoryGame {
     }
       
     public void updateScore() {
-        if ((System.nanoTime() - comboTime) >= comboInterval) {
+        if ((System.nanoTime() - comboTime) >= COMBO_INTERVAL) {
             score += 100;
             combo = 1;
         } else {
@@ -182,6 +182,11 @@ public class MemoryGame {
 
     public int getScore() {
         return score;
+    }
+
+    public boolean isIdle(){
+        // return true if timeSinceLastMove > 90 seconds
+        return false;
     }
 
     public void nextDiff() {
