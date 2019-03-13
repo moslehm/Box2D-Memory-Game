@@ -2,6 +2,7 @@ package ca.mymacewan.memorygame;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector;
+import com.badlogic.gdx.utils.Array;
 import jwinpointer.JWinPointerReader;
 import jwinpointer.JWinPointerReader.PointerEventListener;
 import aurelienribon.tweenengine.Tween;
@@ -25,8 +26,7 @@ import com.badlogic.gdx.physics.box2d.joints.MotorJointDef;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 
-import javax.swing.*;
-import java.sql.Array;
+
 import java.util.ArrayList;
 
 public class MemoryGameView implements ApplicationListener, InputProcessor {
@@ -39,8 +39,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     protected World world;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     protected Body groundBody;
-    protected MouseJoint mouseJoint[] = new MouseJoint[80];
-    protected Body hitBodies[]= new Body[80];
+    protected Array<MouseJoint> mouseJoints = new Array<MouseJoint>();
+    protected Array<Joint> frictionJoints = new Array<Joint>();
+    protected Body hitBodies[] = new Body[80];
     protected Body hitBody = null;
 
     SpriteBatch batch;
@@ -59,9 +60,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     // == Test End ==
     @Override
     public void create() {
-        for(int i = 0; i < hitBodies.length; i++){
+        for (int i = 0; i < hitBodies.length; i++) {
             hitBodies[i] = null;
-            mouseJoint[i] = null;
+            mouseJoints.add(null);
+            frictionJoints.add(null);
         }
 
         // "Meters" are the units of Box2D
@@ -91,7 +93,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
         // Start the memory game
         game = new MemoryGame();
-        game.numOfCards = numOfCards;
         game.gameStart();
 
         // Create the world for the Box2D bodies
@@ -138,6 +139,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     @Override
     public void render() {
+        update();
+
         // Background colour
         Gdx.gl.glClearColor(44 / 255f, 135 / 255f, 209 / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -165,25 +168,27 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             Vector2 position = boxBody.getPosition(); // Get the box's center position
             float angle = MathUtils.radiansToDegrees * boxBody.getAngle(); // Get the box's rotation angle around the center
 
-            // x, y: Unrotated position of bottom left corner of the box
-            // originX, originY: Rotation center relative to the bottom left corner of the box
-            // width, height: width and height of the box
-            // scaleX, scaleY: Scale on the x- and y-axis
-            // Draw the front side
-            batch.draw(frontSideTexture, position.x - 0.5f, position.y - 0.5f,
-                    0.5f, 0.5f,
-                    1, 1,
-                    (float) Math.max(-Math.cos(box.getScaleX() * Math.PI), 0), 1f,
-                    angle);
-            // Draw the back side
-            // To make it set textures from the game logic, do backSideTextures[card.getIndex] or something
-            //System.out.println("i: " + Integer.toString(i));
-            //System.out.println("cards.get(i).getValue()): " + cards.get(i).getValue());
-            batch.draw(backSideTextures[Integer.parseInt(cards.get(i).getValue())], position.x - 0.5f, position.y - 0.5f,
-                    0.5f, 0.5f,
-                    1, 1,
-                    (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), 1f,
-                    angle);
+            if (boxes.size() > 0) {
+                // x, y: Unrotated position of bottom left corner of the box
+                // originX, originY: Rotation center relative to the bottom left corner of the box
+                // width, height: width and height of the box
+                // scaleX, scaleY: Scale on the x- and y-axis
+                // Draw the front side
+                batch.draw(frontSideTexture, position.x - 0.5f, position.y - 0.5f,
+                        0.5f, 0.5f,
+                        1, 1,
+                        (float) Math.max(-Math.cos(box.getScaleX() * Math.PI), 0), 1f,
+                        angle);
+                // Draw the back side
+                // To make it set textures from the game logic, do backSideTextures[card.getIndex] or something
+                //System.out.println("i: " + Integer.toString(i));
+                //System.out.println("cards.get(i).getValue()): " + cards.get(i).getValue());
+                batch.draw(backSideTextures[Integer.parseInt(cards.get(i).getValue())], position.x - 0.5f, position.y - 0.5f,
+                        0.5f, 0.5f,
+                        1, 1,
+                        (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), 1f,
+                        angle);
+            }
         }
         batch.end();
     }
@@ -288,26 +293,57 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             k++;
         }
     }
-    public void clearLevel(){
+
+    public void clearLevel() {
         Body bod;
         com.badlogic.gdx.utils.Array<JointEdge> Jlist;
-        for(Box box:boxes){
-             bod = box.getBody();
-             Jlist = bod.getJointList();
-             for(JointEdge j:Jlist){
+        for (Box box : boxes) {
+            bod = box.getBody();
+            Jlist = bod.getJointList();
+            for (JointEdge j : Jlist) {
                 world.destroyJoint(j.joint);
-             }
-             world.destroyBody(bod);
+            }
+            world.destroyBody(bod);
 
-    }}
+        }
+    }
 
+    boolean roundInProgress = true;
 
-    void update(){
+    void update() {
+        if (game.isRoundOver() && roundInProgress) {
+            // Round over
+            // Destroy bodies and joints
+            // Then start next round
+            destroyAll();
+            roundInProgress = false;
+            // Lets pretend i started the next round.
+        }
+    }
 
+    void destroyAll() {
+        if (!world.isLocked()) {
+            // Destroy joints one by one using this
+            for (Joint jointToDestroy : frictionJoints) {
+                if (jointToDestroy != null) {
+                    world.destroyJoint(jointToDestroy);
+                    jointToDestroy = null;
+                }
+            }
+            MouseJoint mouseJointToDestroy;
+            for (int i = 0; i < mouseJoints.size ; i++){
+                mouseJointToDestroy = mouseJoints.get(i);
+                if (mouseJoints.get(i) != null){
+                    world.destroyJoint(mouseJointToDestroy);
+                    mouseJoints.set(i, null);
+                    mouseJointToDestroy = null;
+                }
+            }
+        }
     }
 
 
-    public void createBox(float xPosition, float yPosition, float angle, Card card){
+    public void createBox(float xPosition, float yPosition, float angle, Card card) {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(0.5f, 0.5f);
 
@@ -366,7 +402,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         jd.collideConnected = true;
         jd.maxForce = 50;//mass * gravity;
         jd.maxTorque = 20;//mass * radius * gravity;
-        world.createJoint(jd);
+        frictionJoints.add(world.createJoint(jd));
         shape.dispose();
     }
 
@@ -378,7 +414,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
         renderer = null;
         world = null;
-        mouseJoint = null;
+        mouseJoints = null;
         hitBodies = null;
     }
 
@@ -456,14 +492,14 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             def.target.set(testPoint.x, testPoint.y);
             def.maxForce = 1000000.0f * hitBody.getMass();
 
-            mouseJoint[pointer] = (MouseJoint) world.createJoint(def);
+            mouseJoints.insert(pointer, (MouseJoint) world.createJoint(def));
             hitBody.setAwake(true);
         }
 
         return false;
     }
 
-     //another temporary vector
+    //another temporary vector
     Vector2 target = new Vector2();
 
     @Override
@@ -471,9 +507,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         // if a mouse joint exists we simply update
         // the target of the joint based on the new
         // mouse coordinates
-        if (mouseJoint[pointer] != null) {
+        MouseJoint targetMouseJoint = mouseJoints.get(pointer);
+        if (targetMouseJoint != null) {
             camera.unproject(testPoint.set(x, y, 0));
-            mouseJoint[pointer].setTarget(target.set(testPoint.x, testPoint.y));
+            targetMouseJoint.setTarget(target.set(testPoint.x, testPoint.y));
         }
         return false;
     }
@@ -484,18 +521,21 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         //System.out.println("mouseJoint null: " + (mouseJoint[pointer] != null));
 
         // if a mouse joint exists we simply destroy it
-        if (mouseJoint[pointer] != null) {
+        System.out.println(pointer);
+        if (mouseJoints.get(pointer) != null) {
+            MouseJoint targetMouseJoint = mouseJoints.get(pointer);
             for (Box box : boxes) {
-                if (box.getBody() == mouseJoint[pointer].getBodyB()) {
+                if (box.getBody() == targetMouseJoint.getBodyB()) {
                     Card boxCard = box.getCard();
-                    if (boxCard.getState()!= State.PAIRED) {
+                    if (boxCard.getState() != State.PAIRED) {
                         tweenHelpingHand(box, 1);
                         game.flipDown(boxCard.getKey());
                     }
                 }
             }
-            world.destroyJoint(mouseJoint[pointer]);
-            mouseJoint[pointer] = null;
+            world.destroyJoint(targetMouseJoint);
+            mouseJoints.set(pointer, null);
+            targetMouseJoint = null;
         }
         return false;
     }
