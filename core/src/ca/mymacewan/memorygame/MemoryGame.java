@@ -1,5 +1,7 @@
 package ca.mymacewan.memorygame;
 
+import com.sun.xml.internal.xsom.impl.scd.Step;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Collections;
@@ -18,6 +20,8 @@ public class MemoryGame {
     private int combo;
     private long startTime;
     private long comboTime;
+    private long idleStartTime;
+    private static long isIdleTime = 90000000000L; //90 seconds;
     private static long comboInterval = 10000000000L;
 
     /**
@@ -48,7 +52,7 @@ public class MemoryGame {
         if (!(isLegalMove(card))) {
             return;
         }
-
+        idleStartTime = System.nanoTime();
         card.setState(REVEALED);
         for (Card currentCard : cards) {
             if (!(currentCard.equals(card)) && (Integer.parseInt(currentCard.getValue()) == Integer.parseInt(card.getValue()))) {
@@ -189,6 +193,21 @@ public class MemoryGame {
             diffLevel += 1;
             numOfCards = difficulty[diffLevel];
             gameStart();
+        }
+    }
+
+    //run this function for each touch
+    public void resetIdleTime()  {
+        idleStartTime = System.nanoTime();
+    }
+
+    //run this function for each frame to test is idle or not
+    //restart the game for returning true
+    public boolean isIdle() {
+        if (System.nanoTime() - idleStartTime > isIdleTime) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

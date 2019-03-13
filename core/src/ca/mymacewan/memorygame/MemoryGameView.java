@@ -311,6 +311,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     boolean roundInProgress = true;
 
     void update() {
+        if(game.isIdle()){
+            //restart game here;
+        }
         if (game.isRoundOver() && roundInProgress) {
             // Round over
             // Destroy bodies and joints
@@ -454,6 +457,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     @Override
     public boolean touchDown(int x, int y, int pointer, int button) {
+        game.resetIdleTime();
+
         // Converts the mouse coordinates to meters (world coordinates)
         camera.unproject(testPoint.set(x, y, 0));
         // Checks which bodies are within the given bounding box around the mouse pointer
@@ -504,6 +509,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     @Override
     public boolean touchDragged(int x, int y, int pointer) {
+        game.resetIdleTime();
+
         // if a mouse joint exists we simply update
         // the target of the joint based on the new
         // mouse coordinates
@@ -517,6 +524,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     @Override
     public boolean touchUp(int x, int y, int pointer, int button) {
+        game.resetIdleTime();
         //System.out.println("Pointer up: " + pointer);
         //System.out.println("mouseJoint null: " + (mouseJoint[pointer] != null));
 
