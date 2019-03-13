@@ -1,7 +1,7 @@
 package ca.mymacewan.memorygame;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.math.Vector;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Array;
 import jwinpointer.JWinPointerReader;
 import jwinpointer.JWinPointerReader.PointerEventListener;
@@ -47,10 +47,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     SpriteBatch batch;
     BitmapFont font;
+    GlyphLayout textLayout = new GlyphLayout();
     private TextureRegion frontSideTexture;
     private TextureRegion[] backSideTextures;
     private MemoryGame game;
-    private int numOfCards = 52;
     ArrayList<Card> cards;
     int currentScore;
 
@@ -97,6 +97,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         // Start the memory game
         game = new MemoryGame();
         game.gameStart();
+        currentScore = game.getScore();
 
         // Create the world for the Box2D bodies
         world = new World(new Vector2(0, 0), true);
@@ -133,6 +134,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             }
         }
 
+
         // == Windows multi touch test Start ==
         //jWinPointerReader = new JWinPointerReader(world);
         //jWinPointerReader.addPointerEventListener();
@@ -165,39 +167,43 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         // This will make the SpriteBatch work in world coordinates (meters)
         batch.getProjectionMatrix().set(camera.combined);
         batch.begin();
+
         for (int i = 0; i < boxes.size(); i++) {
             Box box = boxes.get(i);
             Body boxBody = box.getBody();
             Vector2 position = boxBody.getPosition(); // Get the box's center position
             float angle = MathUtils.radiansToDegrees * boxBody.getAngle(); // Get the box's rotation angle around the center
 
-            if (boxes.size() > 0) {
-                // x, y: Unrotated position of bottom left corner of the box
-                // originX, originY: Rotation center relative to the bottom left corner of the box
-                // width, height: width and height of the box
-                // scaleX, scaleY: Scale on the x- and y-axis
-                // Draw the front side
-                batch.draw(frontSideTexture, position.x - 0.5f, position.y - 0.5f,
-                        0.5f, 0.5f,
-                        1, 1,
-                        (float) Math.max(-Math.cos(box.getScaleX() * Math.PI), 0), 1f,
-                        angle);
-                // Draw the back side
-                // To make it set textures from the game logic, do backSideTextures[card.getIndex] or something
-                //System.out.println("i: " + Integer.toString(i));
-                //System.out.println("cards.get(i).getValue()): " + cards.get(i).getValue());
-                batch.draw(backSideTextures[Integer.parseInt(cards.get(i).getValue())], position.x - 0.5f, position.y - 0.5f,
-                        0.5f, 0.5f,
-                        1, 1,
-                        (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), 1f,
-                        angle);
-            }
+            // x, y: Unrotated position of bottom left corner of the box
+            // originX, originY: Rotation center relative to the bottom left corner of the box
+            // width, height: width and height of the box
+            // scaleX, scaleY: Scale on the x- and y-axis
+            // Draw the front side
+            batch.draw(frontSideTexture, position.x - 0.5f, position.y - 0.5f,
+                    0.5f, 0.5f,
+                    1, 1,
+                    (float) Math.max(-Math.cos(box.getScaleX() * Math.PI), 0), 1f,
+                    angle);
+            // Draw the back side
+            // To make it set textures from the game logic, do backSideTextures[card.getIndex] or something
+            //System.out.println("i: " + Integer.toString(i));
+            //System.out.println("cards.get(i).getValue()): " + cards.get(i).getValue());
+            batch.draw(backSideTextures[Integer.parseInt(cards.get(i).getValue())], position.x - 0.5f, position.y - 0.5f,
+                    0.5f, 0.5f,
+                    1, 1,
+                    (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), 1f,
+                    angle);
         }
+        batch.end();
+
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.begin();
+        // Display score
+        font.draw(batch, Integer.toString(currentScore), Gdx.graphics.getWidth()/2f - textLayout.width/2f, Gdx.graphics.getHeight()/2f + textLayout.height/2f);
         batch.end();
     }
 
     protected void createWorld(World world) {
-
         float boardWidth = toMeters(Gdx.graphics.getWidth());
         float boardHeight = toMeters(Gdx.graphics.getHeight());
         float halfWidth = boardWidth / 2f;
@@ -254,6 +260,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     }
 
     int currentNumOfCards;
+
     private void createGame() {
         cards = game.getCards();
         currentNumOfCards = 0;
@@ -313,8 +320,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     }
 
     boolean roundInProgress = true;
-
     void update() {
+        currentScore = game.getScore();
+        textLayout.setText(font, Integer.toString(currentScore));
         if(game.isIdle()){
             //restart game here;
         }
@@ -338,9 +346,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
                 }
             }
             MouseJoint mouseJointToDestroy;
-            for (int i = 0; i < mouseJoints.size ; i++){
+            for (int i = 0; i < mouseJoints.size; i++) {
                 mouseJointToDestroy = mouseJoints.get(i);
-                if (mouseJoints.get(i) != null){
+                if (mouseJoints.get(i) != null) {
                     world.destroyJoint(mouseJointToDestroy);
                     mouseJoints.set(i, null);
                     mouseJointToDestroy = null;
