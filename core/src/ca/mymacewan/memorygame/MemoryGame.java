@@ -14,7 +14,7 @@ import static ca.mymacewan.memorygame.State.REVEALED;
 public class MemoryGame {
     private int numOfCards; // How many cards in the game. it be increased when difficulty increase.
     private ArrayList<Card> cards;
-    private short [] difficulty = {4,8, 16, 24, 40, 52};
+    private short [] difficulty = {4, 8, 16, 24, 40, 52};
     private short diffLevel;
     private int score;
     private int combo;
@@ -32,10 +32,10 @@ public class MemoryGame {
         startTime = System.nanoTime();
         combo = 1;
         cards = new ArrayList<Card>(numOfCards);
-        for (int i = 0 ; i < numOfCards; i++) {
+        for (int i = 0; i < numOfCards; i++) {
             Card tempCard = new Card();
 
-            int cardValue = i/2;
+            int cardValue = i / 2;
             tempCard.setValue(Integer.toString(cardValue));
             tempCard.setKey(i);
             cards.add(tempCard);
@@ -129,17 +129,21 @@ public class MemoryGame {
         if (cards.contains(card)) {
             return card.getState() == HIDDEN;
         }
-      return true;
+        return true;
     }
-  
-     boolean isGameOver() {
+
+    boolean isGameOver() {
         if (isRoundOver() && (diffLevel == 4)) {
             System.out.println("Congratulation!");
             return true;
         } else {
             return false;
         }
-     }
+    }
+
+    public int getDifficulty(){
+        return diffLevel;
+    }
 
     private Card getCard(int index) {
         for (Card currentCard : cards) {
@@ -170,13 +174,13 @@ public class MemoryGame {
     ArrayList<Card> getCards() {
         return cards;
     }
-      
+
     public void updateScore() {
         if ((System.nanoTime() - comboTime) >= comboInterval) {
             score += 100;
             combo = 1;
         } else {
-            score += 100*combo;
+            score += 100 * combo;
             if (combo < 4) {
                 combo += 1;
             }
@@ -195,7 +199,7 @@ public class MemoryGame {
     }
 
     //run this function for each touch
-    public void resetIdleTime()  {
+    public void resetIdleTime() {
         idleStartTime = System.nanoTime();
     }
 
