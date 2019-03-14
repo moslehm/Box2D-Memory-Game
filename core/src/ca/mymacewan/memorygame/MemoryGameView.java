@@ -2,7 +2,6 @@ package ca.mymacewan.memorygame;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.physics.box2d.joints.*;
 import com.badlogic.gdx.utils.Array;
 import jwinpointer.JWinPointerReader;
 import jwinpointer.JWinPointerReader.PointerEventListener;
@@ -22,6 +21,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
+import com.badlogic.gdx.physics.box2d.joints.MotorJointDef;
+import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
+import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 
 
 import java.util.ArrayList;
@@ -160,7 +163,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         batch.begin();
 
         // Draw backside first to make the front side of the cards on top
-        for (int i = 0; i < boxes.size(); i++) {
+        for (int i = 0; i < boxes.size(); i++){
             Box box = boxes.get(i);
             Body boxBody = box.getBody();
             Vector2 position = boxBody.getPosition(); // Get the box's center position
@@ -275,6 +278,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         }
         cards = game.getCards();
         currentNumOfCards = 0;
+        float spacing = updateBoxes(game.getDifficulty());
 
         float halfWidth = toMeters(Gdx.graphics.getWidth()) / 2f;
         float halfHeight = toMeters(Gdx.graphics.getHeight()) / 2f;
@@ -291,13 +295,14 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         boolean xPointInRange;
         boolean yPointInRange;
         boolean inRange;
+
         while (currentNumOfCards < cards.size()) {
             // Box bodies
             angle = k * goldenAngle;// * 0.367f;
             radius = scalingFactor * (float) Math.sqrt(k);
             scalingFactor = (float) (maxRadius / Math.sqrt(k)) - 1f;
-            xPosition = (float) (radius * Math.cos(angle) * 1.1f - 0.2f);
-            yPosition = (float) (radius * Math.sin(angle) * 1.1f);
+            xPosition = (float) (radius * Math.cos(angle) * spacing - 0.2f);
+            yPosition = (float) (radius * Math.sin(angle) * spacing);
             farFromAxis = xPosition > halfBoxSize && yPosition > halfBoxSize;
             xPointInRange = xPosition < halfWidth && xPosition > 0;
             yPointInRange = yPosition < halfHeight && yPosition > 0;
@@ -316,12 +321,46 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         }
     }
 
-    boolean roundInProgress = true;
+    // Returns a value that would be multiplied by the x/y coordinates to space out the boxes
+    private float updateBoxes(int difficulty) {
+        if (difficulty == 8) {
+            halfBoxSize = 2f;
+            return 1.5f;
+        } else if (difficulty == 16) {
+            halfBoxSize = 0.8f;
+            return 1.5f;
+        } else if (difficulty == 24) {
+            halfBoxSize = 0.6f;
+            return 1.4f;
+        } else if (difficulty == 40) {
+            halfBoxSize = 0.5f;
+            return 1.3f;
+        } else if (difficulty == 52) {
+            halfBoxSize = 0.5f;
+            return 1.1f;
+        }
+        return 1f;
+    }
 
+    public void clearLevel() {
+        Body bod;
+        com.badlogic.gdx.utils.Array<JointEdge> Jlist;
+        for (Box box : boxes) {
+            bod = box.getBody();
+            Jlist = bod.getJointList();
+            for (JointEdge j : Jlist) {
+                world.destroyJoint(j.joint);
+            }
+            world.destroyBody(bod);
+
+        }
+    }
+
+    boolean roundInProgress = true;
     void update() {
         currentScore = game.getScore();
         textLayout.setText(font, Integer.toString(currentScore));
-        if (game.isIdle()) {
+        if(game.isIdle()){
             //restart game here;
         }
         if (game.isRoundOver() && roundInProgress) {
@@ -335,7 +374,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             createGame();
             // Lets pretend i started the next round.
         }
-
     }
 
     void destroyAll() {
@@ -358,7 +396,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
                 }
             }
             // One more for loop to remove the last kind of joint, motor joints
-            //Use the motorJoints array
+            // Use the motorJoints array
             // TODO: Brayden
             Joint motorJointToDestroy;
             for (int i = 0; i < motorJoints.size; i++) {
