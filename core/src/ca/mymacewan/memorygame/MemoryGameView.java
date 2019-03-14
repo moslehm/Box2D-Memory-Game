@@ -1,5 +1,6 @@
 package ca.mymacewan.memorygame;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.Array;
@@ -35,7 +36,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     protected OrthographicCamera camera;
     final short PHYSICS_ENTITY = 0x1;    // 0001
     final short WORLD_ENTITY = 0x1 << 1; // 0010 or 0x2 in hex
-    protected Box2DDebugRenderer renderer;
+    //protected Box2DDebugRenderer renderer;
     protected World world;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     protected Body groundBody;
@@ -52,7 +53,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     private TextureRegion[] frontSideTextures;
     private MemoryGame game;
     ArrayList<Card> cards;
-    private float halfBoxSize = 0.5f;
+    int difficulty;
+    private float halfBoxSizes[] = {1.8f, 0.9f, 0.9f, 0.7f, 0.6f};
+    private float xyBoxSpacing[][] = {{2.8f, 1.5f}, {3.6f, 1.5f}, {2.6f, 1.5f}, {2.6f, 1.2f}, {1.8f, 1.1f}};
     int currentScore;
 
     private static TweenManager tweenManager;
@@ -86,7 +89,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         camera.position.set(0, 0, 0);
 
         // Create the debug renderer
-        renderer = new Box2DDebugRenderer();
+        //renderer = new Box2DDebugRenderer();
 
         // Start the memory game
         game = new MemoryGame();
@@ -152,7 +155,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         camera.update();
 
         // Render the world using the debug renderer to view bodies and joints
-        renderer.render(world, camera.combined);
+        //renderer.render(world, camera.combined);
 
         tweenManager.update(Gdx.graphics.getDeltaTime());
 
@@ -174,9 +177,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             // width, height: width and height of the box
             // scaleX, scaleY: Scale on the x- and y-axis
             // Draw the front side
-            batch.draw(backSideTexture, position.x - halfBoxSize, position.y - halfBoxSize,
-                    halfBoxSize, halfBoxSize,
-                    halfBoxSize * 2, halfBoxSize * 2,
+            batch.draw(backSideTexture, position.x - halfBoxSizes[difficulty], position.y - halfBoxSizes[difficulty],
+                    halfBoxSizes[difficulty], halfBoxSizes[difficulty],
+                    halfBoxSizes[difficulty] * 2, halfBoxSizes[difficulty] * 2,
                     (float) Math.max(-Math.cos(box.getScaleX() * Math.PI), 0), 1f,
                     angle);
         }
@@ -192,9 +195,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             // To make it set textures from the game logic, do frontSideTextures[card.getIndex] or something
             //System.out.println("i: " + Integer.toString(i));
             //System.out.println("cards.get(i).getValue()): " + cards.get(i).getValue());
-            batch.draw(frontSideTextures[Integer.parseInt(cards.get(i).getValue())], position.x - halfBoxSize, position.y - halfBoxSize,
-                    halfBoxSize, halfBoxSize,
-                    halfBoxSize * 2, halfBoxSize * 2,
+            batch.draw(frontSideTextures[Integer.parseInt(cards.get(i).getValue())], position.x - halfBoxSizes[difficulty], position.y - halfBoxSizes[difficulty],
+                    halfBoxSizes[difficulty], halfBoxSizes[difficulty],
+                    halfBoxSizes[difficulty] * 2, halfBoxSizes[difficulty] * 2,
                     (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), 1f,
                     angle);
         }
@@ -277,8 +280,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             motorJoints.add(null);
         }
         cards = game.getCards();
+        difficulty = game.getDifficulty();
         currentNumOfCards = 0;
-        float spacing = updateBoxes(game.getDifficulty());
 
         float halfWidth = toMeters(Gdx.graphics.getWidth()) / 2f;
         float halfHeight = toMeters(Gdx.graphics.getHeight()) / 2f;
@@ -301,9 +304,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             angle = k * goldenAngle;// * 0.367f;
             radius = scalingFactor * (float) Math.sqrt(k);
             scalingFactor = (float) (maxRadius / Math.sqrt(k)) - 1f;
-            xPosition = (float) (radius * Math.cos(angle) * spacing - 0.2f);
-            yPosition = (float) (radius * Math.sin(angle) * spacing);
-            farFromAxis = xPosition > halfBoxSize && yPosition > halfBoxSize;
+            xPosition = (float) (radius * Math.cos(angle) * xyBoxSpacing[difficulty][0] - 0.2f);
+            yPosition = (float) (radius * Math.sin(angle) * xyBoxSpacing[difficulty][1]);
+            farFromAxis = xPosition > halfBoxSizes[difficulty] && yPosition > halfBoxSizes[difficulty];
             xPointInRange = xPosition < halfWidth && xPosition > 0;
             yPointInRange = yPosition < halfHeight && yPosition > 0;
             inRange = (30 < k && 33 > k) | 34 < k;
@@ -319,27 +322,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             }
             k++;
         }
-    }
-
-    // Returns a value that would be multiplied by the x/y coordinates to space out the boxes
-    private float updateBoxes(int difficulty) {
-        if (difficulty == 8) {
-            halfBoxSize = 2f;
-            return 1.5f;
-        } else if (difficulty == 16) {
-            halfBoxSize = 0.8f;
-            return 1.5f;
-        } else if (difficulty == 24) {
-            halfBoxSize = 0.6f;
-            return 1.4f;
-        } else if (difficulty == 40) {
-            halfBoxSize = 0.5f;
-            return 1.3f;
-        } else if (difficulty == 52) {
-            halfBoxSize = 0.5f;
-            return 1.1f;
-        }
-        return 1f;
     }
 
     public void clearLevel() {
@@ -365,15 +347,18 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         }
         if (game.isRoundOver() && roundInProgress) {
             roundInProgress = false;
-            // Round over
-            // Destroy bodies and joints
-            // Then start next round
-            destroyAll();
-            game.nextDiff();
-            game.gameStart();
-            createGame();
-            // Lets pretend i started the next round.
+            nextLevel();
         }
+    }
+
+    void nextLevel(){
+        // Round over
+        // Destroy bodies and joints
+        // Then start next round
+        destroyAll();
+        game.nextDiff();
+        game.gameStart();
+        createGame();
     }
 
     void destroyAll() {
@@ -427,10 +412,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     public void createBox(float xPosition, float yPosition, float angle, Card card) {
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(halfBoxSize, halfBoxSize);
+        shape.setAsBox(halfBoxSizes[difficulty], halfBoxSizes[difficulty]);
 
         PolygonShape body = new PolygonShape();
-        body.setAsBox(halfBoxSize, halfBoxSize);
+        body.setAsBox(halfBoxSizes[difficulty], halfBoxSizes[difficulty]);
 
         FixtureDef fd = new FixtureDef();
         fd.shape = shape;
@@ -489,23 +474,18 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     @Override
     public void dispose() {
-        renderer.dispose();
+        //renderer.dispose();
         world.dispose();
         backSideTexture.getTexture().dispose();
 
-        renderer = null;
+        //renderer = null;
         world = null;
         mouseJoints = null;
         hitBodies = null;
     }
 
     public float toMeters(float pixels) {
-        return pixels * 0.018f;
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        return false;
+        return pixels * 0.013f; // DEFAULT: 0.018f
     }
 
     // Instantiate vector and the callback here to avoid errors from the GC
@@ -550,7 +530,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
                     Card boxCard = box.getCard();
                     if (boxCard.getState() == State.HIDDEN) {
                         tweenHelpingHand(box, 0);
-                        System.out.println("Flipping card at index: " + boxCard.getKey());
+                        //System.out.println("Flipping card at index: " + boxCard.getKey());
                         game.flipUp(boxCard.getKey());
                         box.setID(pointer);
                     }
@@ -598,7 +578,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         //System.out.println("mouseJoint null: " + (mouseJoint[pointer] != null));
 
         // if a mouse joint exists we simply destroy it
-        System.out.println(pointer);
         if (mouseJoints.get(pointer) != null) {
             MouseJoint targetMouseJoint = mouseJoints.get(pointer);
             for (Box box : boxes) {
@@ -619,8 +598,31 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
+        if (keycode == Input.Keys.RIGHT){
+            nextLevel();
+        }
+        else if(keycode == Input.Keys.LEFT){
+            prevLevel();
+        }
         return false;
     }
+
+    // FOR TESTING/DEMOING PURPOSES ONLY
+    private void prevLevel() {
+        // Round over
+        // Destroy bodies and joints
+        // Then start next round
+        destroyAll();
+        game.prevDiff();
+        game.gameStart();
+        createGame();
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
 
     @Override
     public boolean keyTyped(char character) {
