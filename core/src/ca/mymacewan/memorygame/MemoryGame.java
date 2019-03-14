@@ -14,7 +14,7 @@ import static ca.mymacewan.memorygame.State.REVEALED;
 public class MemoryGame {
     private int numOfCards; // How many cards in the game. it be increased when difficulty increase.
     private ArrayList<Card> cards;
-    private short [] difficulty = {4, 8, 16, 24, 40, 52};
+    private short [] difficulty = {8, 16, 24, 40, 52};
     private short diffLevel;
     private int score;
     private int combo;
@@ -194,7 +194,14 @@ public class MemoryGame {
 
     public void nextDiff() {
         if (diffLevel < 4) {
-            diffLevel += 1;
+            diffLevel++;
+        }
+    }
+
+    // FOR TESTING/DEMOING PURPOSES ONLY
+    public void prevDiff(){
+        if (diffLevel > 0){
+            diffLevel--;
         }
     }
 
