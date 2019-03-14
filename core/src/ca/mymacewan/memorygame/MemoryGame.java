@@ -21,16 +21,16 @@ public class MemoryGame {
     private long startTime;
     private long comboTime;
     private long idleStartTime;
-    private static long isIdleTime = 90000000000L; //90 seconds;
-    private static long comboInterval = 10000000000L;
+    private static long isIdleTime = 90000L; //90 seconds;
+    private static long comboInterval = 10000L;
 
     /**
      * Starts the game after numOfCards had been set
      */
     void gameStart(){
         numOfCards = difficulty[diffLevel];
-        startTime = System.nanoTime();
-        combo = 1;
+        startTime = System.currentTimeMillis();
+        combo = 2;
         cards = new ArrayList<Card>(numOfCards);
         for (int i = 0; i < numOfCards; i++) {
             Card tempCard = new Card();
@@ -52,7 +52,7 @@ public class MemoryGame {
         if (!(isLegalMove(card))) {
             return;
         }
-        idleStartTime = System.nanoTime();
+        idleStartTime = System.currentTimeMillis();
         card.setState(REVEALED);
         for (Card currentCard : cards) {
             if (!(currentCard.equals(card)) && (Integer.parseInt(currentCard.getValue()) == Integer.parseInt(card.getValue()))) {
@@ -60,7 +60,8 @@ public class MemoryGame {
                     currentCard.setState(PAIRED);
                     card.setState(PAIRED);
                     updateScore();
-                    comboTime = System.nanoTime() - startTime;
+                    comboTime = System.currentTimeMillis() - startTime;
+                    System.out.println("MATCH! comboTime:" + Long.toString(comboTime));
                     return;
                 }
             }
@@ -176,16 +177,17 @@ public class MemoryGame {
     }
 
     public void updateScore() {
-        if ((System.nanoTime() - comboTime) >= comboInterval) {
+        if (comboTime <= comboInterval) {
             score += 100;
-            combo = 1;
+            combo = 2;
+            System.out.println("NOT A COMBO");
         } else {
             score += 100 * combo;
+            System.out.println("COMBO");
             if (combo < 4) {
                 combo += 1;
             }
         }
-        return;
     }
 
     public int getScore() {
@@ -207,13 +209,13 @@ public class MemoryGame {
 
     //run this function for each touch
     public void resetIdleTime() {
-        idleStartTime = System.nanoTime();
+        idleStartTime = System.currentTimeMillis();
     }
 
     //run this function for each frame to test is idle or not
     //restart the game for returning true
     public boolean isIdle() {
-        if (System.nanoTime() - idleStartTime > isIdleTime) {
+        if (System.currentTimeMillis() - idleStartTime > isIdleTime) {
             return true;
         } else {
             return false;
