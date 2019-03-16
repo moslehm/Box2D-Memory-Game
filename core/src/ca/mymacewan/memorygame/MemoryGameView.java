@@ -36,7 +36,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     protected OrthographicCamera camera;
     final short PHYSICS_ENTITY = 0x1;    // 0001
     final short WORLD_ENTITY = 0x1 << 1; // 0010 or 0x2 in hex
-    //protected Box2DDebugRenderer renderer;
+    protected Box2DDebugRenderer renderer;
     protected World world;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     protected Body groundBody;
@@ -54,8 +54,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     private MemoryGame game;
     ArrayList<Card> cards;
     int difficulty;
-    private float halfBoxSizes[] = {1.8f, 0.9f, 0.9f, 0.7f, 0.6f};
-    private float xyBoxSpacing[][] = {{2.8f, 1.5f}, {3.6f, 1.5f}, {2.6f, 1.5f}, {2.6f, 1.2f}, {1.8f, 1.1f}};
+    private float halfBoxSizes[] = {1f, 0.9f, 0.9f, 0.7f, 0.6f};
+    private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {3.6f, 1.5f}, {2.6f, 1.5f}, {2.2f, 1.2f}, {1.8f, 1.1f}};
     int currentScore;
 
     private static TweenManager tweenManager;
@@ -89,7 +89,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         camera.position.set(0, 0, 0);
 
         // Create the debug renderer
-        //renderer = new Box2DDebugRenderer();
+        renderer = new Box2DDebugRenderer();
 
         // Start the memory game
         game = new MemoryGame();
@@ -155,7 +155,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         camera.update();
 
         // Render the world using the debug renderer to view bodies and joints
-        //renderer.render(world, camera.combined);
+        renderer.render(world, camera.combined);
 
         tweenManager.update(Gdx.graphics.getDeltaTime());
 
@@ -215,6 +215,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         float boardHeight = toMeters(Gdx.graphics.getHeight());
         float halfWidth = boardWidth / 2f;
         float halfHeight = boardHeight / 2f;
+        float littleSpaceAtTheEdge = 0.4f;
+        float cornerDist = halfHeight / 2f;
         // Ground body
         {
             BodyDef bd = new BodyDef();
@@ -233,21 +235,40 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             sd.filter.categoryBits = WORLD_ENTITY;
             sd.filter.maskBits = PHYSICS_ENTITY;
 
-            // Draws the edges around the board
+
+
+            // Draws sides around the board
             // LEFT
-            shape.set(new Vector2(-halfWidth, -halfHeight), new Vector2(-halfWidth, halfHeight));
+            shape.set(new Vector2(-halfWidth + littleSpaceAtTheEdge, -halfHeight), new Vector2(-halfWidth + littleSpaceAtTheEdge, halfHeight));
             groundBody.createFixture(sd);
 
             // RIGHT
-            shape.set(new Vector2(halfWidth, -halfHeight), new Vector2(halfWidth, halfHeight));
+            shape.set(new Vector2(halfWidth - littleSpaceAtTheEdge, -halfHeight), new Vector2(halfWidth - littleSpaceAtTheEdge, halfHeight));
             groundBody.createFixture(sd);
 
             // TOP
-            shape.set(new Vector2(-halfWidth, halfHeight), new Vector2(halfWidth, halfHeight));
+            shape.set(new Vector2(-halfWidth, halfHeight - littleSpaceAtTheEdge), new Vector2(halfWidth, halfHeight - littleSpaceAtTheEdge));
             groundBody.createFixture(sd);
 
             // BOTTOM
-            shape.set(new Vector2(-halfWidth, -halfHeight), new Vector2(halfWidth, -halfHeight));
+            shape.set(new Vector2(-halfWidth, -halfHeight + littleSpaceAtTheEdge), new Vector2(halfWidth, -halfHeight + littleSpaceAtTheEdge));
+            groundBody.createFixture(sd);
+
+            // Draws the angled sides placed in the corners of the screen
+            // BOTTOM LEFT
+            shape.set(new Vector2(-halfWidth + littleSpaceAtTheEdge, -cornerDist), new Vector2(-halfWidth + cornerDist, -halfHeight + littleSpaceAtTheEdge));
+            groundBody.createFixture(sd);
+
+            // BOTTOM RIGHT
+            shape.set(new Vector2(halfWidth - littleSpaceAtTheEdge - cornerDist, -halfHeight + littleSpaceAtTheEdge), new Vector2(halfWidth - littleSpaceAtTheEdge, -halfHeight + littleSpaceAtTheEdge + cornerDist));
+            groundBody.createFixture(sd);
+
+            // TOP LEFT
+            shape.set(new Vector2(-halfWidth + littleSpaceAtTheEdge, halfHeight - cornerDist), new Vector2(-halfWidth + cornerDist, halfHeight - littleSpaceAtTheEdge));
+            groundBody.createFixture(sd);
+
+            // TODO: TOP RIGHT
+            shape.set(new Vector2(halfWidth - littleSpaceAtTheEdge - cornerDist, halfHeight - littleSpaceAtTheEdge), new Vector2(halfWidth - littleSpaceAtTheEdge, halfHeight - littleSpaceAtTheEdge - cornerDist));
             groundBody.createFixture(sd);
 
             shape.dispose();
@@ -474,11 +495,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     @Override
     public void dispose() {
-        //renderer.dispose();
+        renderer.dispose();
         world.dispose();
         backSideTexture.getTexture().dispose();
 
-        //renderer = null;
+        renderer = null;
         world = null;
         mouseJoints = null;
         hitBodies = null;
