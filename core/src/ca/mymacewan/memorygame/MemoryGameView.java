@@ -54,8 +54,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     private MemoryGame game;
     ArrayList<Card> cards;
     int difficulty;
-    private float halfBoxSizes[] = {1f, 0.9f, 0.9f, 0.7f, 0.6f};
-    private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {3.6f, 1.5f}, {2.6f, 1.5f}, {2.2f, 1.2f}, {1.8f, 1.1f}};
+    private float halfBoxSizes[] = {1f, 0.7f, 0.6f, 0.5f, 0.4f};
+    private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {2.2f, 1.1f}, {1.8f, 0.9f}, {1.3f, 1f}, {1.2f, 1f}};
     int currentScore;
 
     private static TweenManager tweenManager;
@@ -158,6 +158,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         renderer.render(world, camera.combined);
 
         tweenManager.update(Gdx.graphics.getDeltaTime());
+
 
         // Render each box via the SpriteBatch.
         // Set the projection matrix of the SpriteBatch to the camera's combined matrix.
@@ -370,6 +371,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             roundInProgress = false;
             nextLevel();
         }
+        checkStates();
     }
 
     void nextLevel(){
@@ -469,14 +471,14 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         jointBody = world.createBody(jointBodyDef);
 
         // Motor joint
-        MotorJointDef jointDef = new MotorJointDef();
+        /*MotorJointDef jointDef = new MotorJointDef();
         jointDef.angularOffset = 0f;
         jointDef.collideConnected = false;
         jointDef.correctionFactor = 1f;
         jointDef.maxForce = 70f;
         jointDef.maxTorque = 50f;
         jointDef.initialize(jointBody, boxBody);
-        motorJoints.set(currentNumOfCards, world.createJoint(jointDef));
+        motorJoints.set(currentNumOfCards, world.createJoint(jointDef));*/
 
         // Friction joint
         // Connected between each box and the ground body
@@ -487,7 +489,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         jd.bodyA = groundBody;
         jd.bodyB = boxBody;
         jd.collideConnected = true;
-        jd.maxForce = 50;//mass * gravity;
+        jd.maxForce = 20;//mass * gravity;
         jd.maxTorque = 20;//mass * radius * gravity;
         frictionJoints.add(world.createJoint(jd));
         shape.dispose();
@@ -601,20 +603,36 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         // if a mouse joint exists we simply destroy it
         if (mouseJoints.get(pointer) != null) {
             MouseJoint targetMouseJoint = mouseJoints.get(pointer);
-            for (Box box : boxes) {
+            /*for (Box box : boxes) {
                 if (box.getBody() == targetMouseJoint.getBodyB()) {
                     Card boxCard = box.getCard();
-                    if (boxCard.getState() != State.PAIRED) {
+                    if (boxCard.getState() != State.PAIRED && !box.getBody().isAwake()) {
                         tweenHelpingHand(box, 1);
                         game.flipDown(boxCard.getKey());
                     }
                 }
-            }
+            }*/
             world.destroyJoint(targetMouseJoint);
             mouseJoints.set(pointer, null);
             targetMouseJoint = null;
         }
         return false;
+    }
+
+    void checkStates(){
+        boolean notMoving;
+        boolean notTweening;
+        boolean noMouseJoint;
+        for (Box box : boxes) {
+            Card boxCard = box.getCard();
+            notMoving =  !box.getBody().isAwake();
+            notTweening = !tweenManager.containsTarget(box);
+            noMouseJoint = box.getBody().getJointList().size <= 1;
+            if (boxCard.getState() != State.PAIRED && notMoving && notTweening && noMouseJoint) {
+                tweenHelpingHand(box, 1);
+                game.flipDown(boxCard.getKey());
+            }
+        }
     }
 
     @Override
