@@ -34,8 +34,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     // Box2D initialization
     // PHYSICS_ENTITY will always collide with WORLD_ENTITY
     protected OrthographicCamera camera;
-    final short PHYSICS_ENTITY = 0x1;    // 0001
-    final short WORLD_ENTITY = 0x1 << 1; // 0010 or 0x2 in hex
+    //final short PHYSICS_ENTITY = 0x1;    // 0001
+    //final short WORLD_ENTITY = 0x1 << 1; // 0010 or 0x2 in hex
     protected Box2DDebugRenderer renderer;
     protected World world;
     private ArrayList<Box> boxes = new ArrayList<Box>();
@@ -233,8 +233,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
             // categoryBits is what the body is (a world entity)
             // maskBits is what it collides with (a physics entity)
-            sd.filter.categoryBits = WORLD_ENTITY;
-            sd.filter.maskBits = PHYSICS_ENTITY;
+            //sd.filter.categoryBits = WORLD_ENTITY;
+            //sd.filter.maskBits = PHYSICS_ENTITY;
 
 
 
@@ -444,8 +444,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         fd.shape = shape;
         fd.density = 1.0f;
         fd.friction = 0.3f;
-        fd.filter.categoryBits = PHYSICS_ENTITY;
-        fd.filter.maskBits = WORLD_ENTITY;
+        //fd.filter.categoryBits = PHYSICS_ENTITY;
+        //fd.filter.maskBits = WORLD_ENTITY;
 
         // Create the BodyDef, set a position, and other properties.
         BodyDef boxBodyDef = new BodyDef();
