@@ -54,8 +54,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     private MemoryGame game;
     ArrayList<Card> cards;
     int difficulty;
-    private float halfBoxSizes[] = {1f, 0.7f, 0.6f, 0.5f, 0.4f};
-    private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {2.2f, 1.1f}, {1.8f, 0.9f}, {1.3f, 1f}, {1.2f, 1f}};
+    private float halfBoxSizes[] = {0.8f, 0.7f, 0.6f, 0.5f, 0.3f};
+    private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {2.2f, 1.1f}, {1.8f, 0.9f}, {1.3f, 1f}, {1.9f, 1f}};
     int currentScore;
 
     private static TweenManager tweenManager;
@@ -323,24 +323,24 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
         while (currentNumOfCards < cards.size()) {
             // Box bodies
-            angle = k * goldenAngle;// * 0.367f;
+            angle = k * goldenAngle * 0.367f;
             radius = scalingFactor * (float) Math.sqrt(k);
             scalingFactor = (float) (maxRadius / Math.sqrt(k)) - 1f;
             xPosition = (float) (radius * Math.cos(angle) * xyBoxSpacing[difficulty][0] - 0.2f);
             yPosition = (float) (radius * Math.sin(angle) * xyBoxSpacing[difficulty][1]);
             farFromAxis = xPosition > halfBoxSizes[difficulty] && yPosition > halfBoxSizes[difficulty];
-            xPointInRange = xPosition < halfWidth && xPosition > 0;
-            yPointInRange = yPosition < halfHeight && yPosition > 0;
+            xPointInRange = xPosition < halfWidth && xPosition > -halfWidth;// && xPosition > 0;
+            yPointInRange = yPosition < halfHeight && yPosition > -halfHeight;// && yPosition > 0;
             inRange = (30 < k && 33 > k) | 34 < k;
-            if (inRange && xPointInRange && yPointInRange && farFromAxis) {
+            if (xPointInRange && yPointInRange) {
                 createBox(xPosition, yPosition, angle, cards.get(currentNumOfCards));
                 currentNumOfCards++;
-                createBox(-xPosition, -yPosition, angle, cards.get(currentNumOfCards));
-                currentNumOfCards++;
-                createBox(xPosition, -yPosition, angle, cards.get(currentNumOfCards));
-                currentNumOfCards++;
-                createBox(-xPosition, yPosition, angle, cards.get(currentNumOfCards));
-                currentNumOfCards++;
+                //createBox(-xPosition, -yPosition, angle, cards.get(currentNumOfCards));
+                //currentNumOfCards++;
+                //createBox(xPosition, -yPosition, angle, cards.get(currentNumOfCards));
+                //currentNumOfCards++;
+                //createBox(-xPosition, yPosition, angle, cards.get(currentNumOfCards));
+                //currentNumOfCards++;
             }
             k++;
         }
@@ -628,9 +628,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             notMoving =  !box.getBody().isAwake();
             notTweening = !tweenManager.containsTarget(box);
             noMouseJoint = box.getBody().getJointList().size <= 1;
-            if (boxCard.getState() != State.PAIRED && notMoving && notTweening && noMouseJoint) {
-                tweenHelpingHand(box, 1);
-                game.flipDown(boxCard.getKey());
+            if (notMoving && notTweening && noMouseJoint) {
+                if (boxCard.getState() != State.PAIRED) {
+                    tweenHelpingHand(box, 1);
+                    game.flipDown(boxCard.getKey());
+                }
             }
         }
     }
