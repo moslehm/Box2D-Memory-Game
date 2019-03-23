@@ -24,9 +24,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JButton;
+//import javax.swing.JMenuItem;
+//import javax.swing.JCheckBoxMenuItem;
+//import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
@@ -45,22 +45,22 @@ class PointerInfo {
 // We may as well also store stylus and mouse information in the same array.
 // That's what this class is for.
 class PointerInfoArray {
-    public ArrayList< PointerInfo > array = new ArrayList< PointerInfo >();
+    public ArrayList<PointerInfo> array = new ArrayList<PointerInfo>();
 
     // returns -1 if none found
-    private int getIndex( int deviceType, int pointerID ) {
-        for ( int i = 0; i < array.size(); ++i ) {
-            if ( array.get(i).deviceType == deviceType && array.get(i).pointerID == pointerID )
+    private int getIndex(int deviceType, int pointerID) {
+        for (int i = 0; i < array.size(); ++i) {
+            if (array.get(i).deviceType == deviceType && array.get(i).pointerID == pointerID)
                 return i;
         }
         return -1;
     }
 
     // Finds and updates existing pointer info, or creates a pointer info instance if no existing one is found.
-    public void updatePointer( int deviceType, int pointerID, boolean inverted, int x, int y, int pressure ) {
-        int i = getIndex( deviceType, pointerID );
+    public void updatePointer(int deviceType, int pointerID, boolean inverted, int x, int y, int pressure) {
+        int i = getIndex(deviceType, pointerID);
         PointerInfo pi;
-        if ( i == -1 ) {
+        if (i == -1) {
             pi = new PointerInfo();
             pi.deviceType = deviceType;
             pi.pointerID = pointerID;
@@ -74,9 +74,9 @@ class PointerInfoArray {
         pi.pressure = pressure;
     }
 
-    public void removePointer( int deviceType, int pointerID ) {
-        int i = getIndex( deviceType, pointerID );
-        if ( i != -1 ) {
+    public void removePointer(int deviceType, int pointerID) {
+        int i = getIndex(deviceType, pointerID);
+        if (i != -1) {
             array.remove(i);
         }
     }
@@ -86,7 +86,7 @@ class EventLogItem {
     public String description;
     public int count;
 
-    public EventLogItem( String d ) {
+    public EventLogItem(String d) {
         description = d;
         count = 1;
     }
@@ -96,27 +96,27 @@ class EventLogItem {
 class EventLogger {
     private static final int MAX_NUM_ITEMS = 25;
 
-    ArrayList< EventLogItem > items = new ArrayList< EventLogItem >();
+    ArrayList<EventLogItem> items = new ArrayList<EventLogItem>();
 
-    public void log( String message ) {
+    public void log(String message) {
         int N = items.size();
-        if ( N>0 && message.equals( items.get(N-1).description ) ) {
+        if (N>0 && message.equals(items.get(N-1).description)) {
             items.get(N-1).count ++;
         }
         else {
-            items.add( new EventLogItem( message ) );
-            while ( items.size() > MAX_NUM_ITEMS )
+            items.add(new EventLogItem(message));
+            while (items.size() > MAX_NUM_ITEMS)
                 items.remove(0);
         }
     }
 
-    /*public void draw( Graphics2D g2, int fontHeight, int viewportHeight ) {
-        for ( int row = 0; row < items.size(); ++row ) {
+    /*public void draw(Graphics2D g2, int fontHeight, int viewportHeight) {
+        for (int row = 0; row < items.size(); ++row) {
             String d = items.get(row).description;
             int c = items.get(row).count;
-            if ( c > 1 )
+            if (c > 1)
                 d = d + "(x"+c+")";
-            g2.drawString( d, 10, viewportHeight-10-(items.size()-1-row)*fontHeight *//*for debugging*//* - fontHeight);
+            g2.drawString(d, 10, viewportHeight-10-(items.size()-1-row)*fontHeight *//*for debugging*//* - fontHeight);
         }
     }*/
 }
@@ -127,56 +127,56 @@ class MyCanvas extends JPanel implements PointerEventListener, MouseListener, Mo
     private Line2D line2D = new Line2D.Float();
     private Ellipse2D.Float ellipse2D = new Ellipse2D.Float();
     private int fontHeight = 20;
-    private Font font = new Font( "Sans-serif", Font.BOLD, fontHeight );
+    private Font font = new Font("Sans-serif", Font.BOLD, fontHeight);
 
     private Component rootComponent = null; // used to convert between coordinate systems
     private PointerInfoArray pointerInfoArray = new PointerInfoArray();
     private EventLogger logger = new EventLogger();
 
-    public MyCanvas(
-            // The coordinates we receive for pointer events are with respect to this component.
-            // We use this component to convert to the coordinate system of the canvas.
-            Component root
-    ) {
+    // The coordinates we receive for pointer events are with respect to this component.
+    // We use this component to convert to the coordinate system of the canvas.
+    public MyCanvas(Component root) {
         rootComponent = root;
-        setBorder( BorderFactory.createLineBorder( Color.black ) );
-        setBackground( Color.white );
+        this.setBorder(BorderFactory.createLineBorder(Color.black));
+        this.setBackground(Color.white);
 
         // These mouse event handlers are not necessary for retrieving pointer events.
         // They are only here for debugging, to allow for comparison of the mouse coordinates
         // and pointer coordinates.
         final boolean useMouseEventHandlers = false;
-        if ( useMouseEventHandlers ) {
-            addMouseListener( this );
-            addMouseMotionListener( this );
+        if (useMouseEventHandlers) {
+            addMouseListener(this);
+            addMouseMotionListener(this);
         }
     }
     public Dimension getPreferredSize() {
-        return new Dimension( 512, 512 );
+        return new Dimension(512, 512);
     }
-    public void paintComponent( Graphics g ) {
-        super.paintComponent( g );
+
+    // Draws circle and information around touch points
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
         g2.setFont(font);
 
-        g2.setColor( Color.GRAY );
+        g2.setColor(Color.GRAY);
         //logger.draw(g2, fontHeight, getHeight());
 
-        for ( int i = 0; i < pointerInfoArray.array.size(); ++i ) {
+        for (int i = 0; i < pointerInfoArray.array.size(); ++i) {
             int d = fontHeight;
             PointerInfo pi = pointerInfoArray.array.get(i);
 
-            if ( pi.x < 0 || pi.x >= getWidth() || pi.y < 0 || pi.y >= getHeight() ) {
+            if (pi.x < 0 || pi.x >= getWidth() || pi.y < 0 || pi.y >= getHeight()) {
                 // The pointer is outside the bounds of the canvas
-                g2.setColor( Color.RED );
+                g2.setColor(Color.RED);
             }
-            else g2.setColor( Color.BLUE );
+            else g2.setColor(Color.BLUE);
 
-            ellipse2D.setFrame( pi.x-d, pi.y-d, 2*d, 2*d );
-            g2.draw( ellipse2D );
+            ellipse2D.setFrame(pi.x-d, pi.y-d, 2*d, 2*d);
+            g2.draw(ellipse2D);
 
-            line2D.setLine( pi.x, pi.y, pi.x+d, pi.y+2*d );
-            g2.draw( line2D );
+            line2D.setLine(pi.x, pi.y, pi.x+d, pi.y+2*d);
+            g2.draw(line2D);
 
             String s1 = "dev,id,inv = " + pi.deviceType + "," + pi.pointerID + "," + pi.inverted;
             String s2 = "x,y,pressure = " + pi.x + "," + pi.y + "," + pi.pressure;
@@ -188,13 +188,13 @@ class MyCanvas extends JPanel implements PointerEventListener, MouseListener, Mo
     // These mouse event handlers are not necessary for retrieving pointer events.
     // They are only here for debugging, to allow for comparison of the mouse coordinates
     // and pointer coordinates.
-    public void mouseClicked( MouseEvent e ) { }
-    public void mouseEntered( MouseEvent e ) { }
-    public void mouseExited( MouseEvent e ) { }
-    public void mousePressed( MouseEvent e ) { }
-    public void mouseReleased( MouseEvent e ) { }
-    public void mouseMoved( MouseEvent e ) { System.out.println("Mouse coordinates  : "+e.getX()+","+e.getY()); }
-    public void mouseDragged( MouseEvent e ) { }
+    public void mouseClicked(MouseEvent e) { }
+    public void mouseEntered(MouseEvent e) { }
+    public void mouseExited(MouseEvent e) { }
+    public void mousePressed(MouseEvent e) { }
+    public void mouseReleased(MouseEvent e) { }
+    public void mouseMoved(MouseEvent e) { System.out.println("Mouse coordinates  : "+e.getX()+","+e.getY()); }
+    public void mouseDragged(MouseEvent e) { }
 
 
     private static final int EVENT_TYPE_DRAG = 1;
@@ -207,12 +207,12 @@ class MyCanvas extends JPanel implements PointerEventListener, MouseListener, Mo
     private static final int EVENT_TYPE_OUT_OF_RANGE = 8;
 
     public void pointerXYEvent(int deviceType, int pointerID, int eventType, boolean inverted, int x, int y, int pressure) {
-        //System.out.println("Pointer coordinates before conversion: "+x+","+y);
-        Point p = SwingUtilities.convertPoint(rootComponent, x, y, this);
-        x = p.x;
-        y = p.y;
+        System.out.println("Pointer coordinates before conversion: "+x+","+y);
+        //Point p = SwingUtilities.convertPoint(rootComponent, x, y, this);
+        //x = p.x;
+        //y = p.y;
         System.out.println("Pointer coordinates: "+x+","+y);
-        pointerInfoArray.updatePointer( deviceType, pointerID, inverted, x, y, pressure );
+        pointerInfoArray.updatePointer(deviceType, pointerID, inverted, x, y, pressure);
         logger.log(generateDescription(deviceType,pointerID,eventType));
         repaint();
     }
@@ -226,9 +226,9 @@ class MyCanvas extends JPanel implements PointerEventListener, MouseListener, Mo
         repaint();
     }
 
-    private String generateDescription( int deviceType, int pointerID, int eventType ) {
+    private String generateDescription(int deviceType, int pointerID, int eventType) {
         String s = "";
-        switch ( eventType ) {
+        switch (eventType) {
             case EVENT_TYPE_DRAG :
                 s = "drag";
                 break;
@@ -270,14 +270,15 @@ public class MyPointerTestApp implements ActionListener {
     Container toolPanel;
     MyCanvas canvas;
 
-    JMenuItem quitMenuItem, aboutMenuItem;
-    JCheckBoxMenuItem toolsMenuItem;
+    //JMenuItem quitMenuItem, aboutMenuItem;
+    //JCheckBoxMenuItem toolsMenuItem;
 
-    JButton button1, button2;
+    //JButton button1, button2;
 
+    // FOR CANVAS HAS NOTHING TO DO WITH MULTITOUCH
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if ( source == quitMenuItem ) {
+        /*if (source == quitMenuItem) {
             int response = JOptionPane.showConfirmDialog(
                     frame,
                     "Really quit?",
@@ -288,22 +289,22 @@ public class MyPointerTestApp implements ActionListener {
             if (response == JOptionPane.YES_OPTION) {
                 System.exit(0);
             }
-        }
-        else if ( source == toolsMenuItem ) {
+        }*/
+        /*if (source == toolsMenuItem) {
             Container pane = frame.getContentPane();
-            if ( toolsMenuItem.isSelected() ) {
+            if (toolsMenuItem.isSelected()) {
                 pane.removeAll();
-                pane.add( toolPanel );
-                pane.add( canvas );
+                pane.add(toolPanel);
+                pane.add(canvas);
             }
             else {
                 pane.removeAll();
-                pane.add( canvas );
+                pane.add(canvas);
             }
             frame.invalidate();
             frame.validate();
-        }
-        else if ( source == aboutMenuItem ) {
+        }*/
+       /* else if (source == aboutMenuItem) {
             JOptionPane.showMessageDialog(
                     frame,
                     "'" + applicationName + "' sample program\n"
@@ -311,78 +312,76 @@ public class MyPointerTestApp implements ActionListener {
                     "About",
                     JOptionPane.INFORMATION_MESSAGE
             );
-        }
-        else if ( source == button1 ) {
+        }*/
+        /*else if (source == button1) {
             System.out.println("button1");
         }
-        else if ( source == button2 ) {
+        else if (source == button2) {
             System.out.println("button2");
-        }
+        }*/
     }
 
     // For thread safety, this should be invoked
     // from the event-dispatching thread.
     //
     private void createUserInterface() {
-        if ( ! SwingUtilities.isEventDispatchThread() ) {
+        if (! SwingUtilities.isEventDispatchThread()) {
             System.out.println(
                     "Warning: UI is not being created in the Event Dispatch Thread!");
             assert false;
         }
 
-        frame = new JFrame( applicationName );
-        frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+        frame = new JFrame(applicationName);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("File");
-        quitMenuItem = new JMenuItem("Quit");
+        //JMenu menu = new JMenu("File");
+        /*quitMenuItem = new JMenuItem("Quit");
         quitMenuItem.addActionListener(this);
-        menu.add(quitMenuItem);
-        menuBar.add(menu);
-        menu = new JMenu("View");
-        toolsMenuItem = new JCheckBoxMenuItem("Show Tools");
-        toolsMenuItem.setSelected( true );
+        menu.add(quitMenuItem);*/
+        //menuBar.add(menu);
+        //menu = new JMenu("View");
+        /*toolsMenuItem = new JCheckBoxMenuItem("Show Tools");
+        toolsMenuItem.setSelected(true);
         toolsMenuItem.addActionListener(this);
-        menu.add(toolsMenuItem);
-        menuBar.add(menu);
-        menu = new JMenu("Help");
-        aboutMenuItem = new JMenuItem("About");
+        menu.add(toolsMenuItem);*/
+        //menuBar.add(menu);
+        //menu = new JMenu("Help");
+        /*aboutMenuItem = new JMenuItem("About");
         aboutMenuItem.addActionListener(this);
-        menu.add(aboutMenuItem);
-        menuBar.add(menu);
+        menu.add(aboutMenuItem);*/
+        //menuBar.add(menu);
         frame.setJMenuBar(menuBar);
 
         toolPanel = new JPanel();
-        toolPanel.setLayout( new BoxLayout( toolPanel, BoxLayout.Y_AXIS ) );
+        toolPanel.setLayout(new BoxLayout(toolPanel, BoxLayout.Y_AXIS));
 
-        canvas = new MyCanvas(
-                // For some reason, passing in the frame here doesn't work
-                menuBar
-        );
+        // For some reason, passing in the frame here doesn't work
+        canvas = new MyCanvas(menuBar);
 
         Container pane = frame.getContentPane();
-        pane.setLayout( new BoxLayout( pane, BoxLayout.X_AXIS ) );
-        pane.add( toolPanel );
-        pane.add( canvas );
+        pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
+        pane.add(toolPanel);
+        pane.add(canvas);
 
-        button1 = new JButton( "Test Button 1" );
-        button1.setAlignmentX( Component.LEFT_ALIGNMENT );
+      /*  button1 = new JButton("Test Button 1");
+        button1.setAlignmentX(Component.LEFT_ALIGNMENT);
         button1.addActionListener(this);
-        toolPanel.add( button1 );
+        toolPanel.add(button1);
 
-        button2 = new JButton( "Test Button 2" );
-        button2.setAlignmentX( Component.LEFT_ALIGNMENT );
+        button2 = new JButton("Test Button 2");
+        button2.setAlignmentX(Component.LEFT_ALIGNMENT);
         button2.addActionListener(this);
-        toolPanel.add( button2 );
+        toolPanel.add(button2);*/
 
         frame.pack();
-        frame.setVisible( true );
+        frame.setVisible(true);
 
-        jWinPointerReader = new JWinPointerReader(frame);
+        jWinPointerReader = new JWinPointerReader("placeholder");
         jWinPointerReader.addPointerEventListener(canvas);
     }
 
-    public static void main( String[] args ) {
+    public static void main(String[] args) {
         // Schedule the creation of the UI for the event-dispatching thread.
         javax.swing.SwingUtilities.invokeLater(
                 new Runnable() {
