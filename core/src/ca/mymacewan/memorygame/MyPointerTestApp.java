@@ -353,15 +353,15 @@ public class MyPointerTestApp implements ActionListener {
         //menuBar.add(menu);
         frame.setJMenuBar(menuBar);
 
-        toolPanel = new JPanel();
-        toolPanel.setLayout(new BoxLayout(toolPanel, BoxLayout.Y_AXIS));
+        //toolPanel = new JPanel();
+        //toolPanel.setLayout(new BoxLayout(toolPanel, BoxLayout.Y_AXIS));
 
         // For some reason, passing in the frame here doesn't work
         canvas = new MyCanvas(menuBar);
 
         Container pane = frame.getContentPane();
         pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
-        pane.add(toolPanel);
+        //pane.add(toolPanel);
         pane.add(canvas);
 
       /*  button1 = new JButton("Test Button 1");
@@ -377,7 +377,7 @@ public class MyPointerTestApp implements ActionListener {
         frame.pack();
         frame.setVisible(true);
 
-        jWinPointerReader = new JWinPointerReader("placeholder");
+        jWinPointerReader = new JWinPointerReader("Pointer Test App");
         jWinPointerReader.addPointerEventListener(canvas);
     }
 
