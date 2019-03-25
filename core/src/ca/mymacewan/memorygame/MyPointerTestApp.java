@@ -178,7 +178,7 @@ class MyCanvas extends JPanel implements PointerEventListener, MouseListener, Mo
             line2D.setLine(pi.x, pi.y, pi.x+d, pi.y+2*d);
             g2.draw(line2D);
 
-            String s1 = "dev,id,inv = " + pi.deviceType + "," + pi.pointerID + "," + pi.inverted;
+            String s1 = "deviceType,pointerId,inverted = " + pi.deviceType + "," + pi.pointerID + "," + pi.inverted;
             String s2 = "x,y,pressure = " + pi.x + "," + pi.y + "," + pi.pressure;
             g2.drawString(s1,pi.x+d,pi.y+2*d);
             g2.drawString(s2,pi.x+d,pi.y+3*d);
