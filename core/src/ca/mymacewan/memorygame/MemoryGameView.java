@@ -408,7 +408,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             }
             // One more for loop to remove the last kind of joint, motor joints
             // Use the motorJoints array
-            // TODO: Brayden
             Joint motorJointToDestroy;
             for (int i = 0; i < motorJoints.size; i++) {
                 motorJointToDestroy = motorJoints.get(i);
@@ -533,6 +532,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     public boolean touchDown(int x, int y, int pointer, int button) {
         System.out.println("touchDown: " + x + ", " + y);
 
+        return realTouchDown(x, y, pointer);
+    }
+
+    private boolean realTouchDown(int x, int y, int pointer) {
         roundInProgress = true;
         game.resetIdleTime();
 
@@ -564,8 +567,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                     }
                 }
             }
-
-
             // Create mouse joint because hitBodies is a box, even if it's not flipping
             MouseJointDef def = new MouseJointDef();
             def.bodyA = groundBody;
@@ -577,15 +578,17 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             mouseJoints.insert(pointer, (MouseJoint) world.createJoint(def));
             hitBody.setAwake(true);
         }
-
         return false;
     }
-
     //another temporary vector
     Vector2 target = new Vector2();
 
     @Override
     public boolean touchDragged(int x, int y, int pointer) {
+        return realTouchDragged(x, y, pointer);
+    }
+
+    private boolean realTouchDragged(int x, int y, int pointer) {
         game.resetIdleTime();
 
         // if a mouse joint exists we simply update
@@ -601,6 +604,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     @Override
     public boolean touchUp(int x, int y, int pointer, int button) {
+        return realTouchUp(x, y, pointer);
+    }
+
+    private boolean realTouchUp(int x, int y, int pointer) {
         game.resetIdleTime();
         //System.out.println("Pointer up: " + pointer);
         //System.out.println("mouseJoint null: " + (mouseJoint[pointer] != null));
@@ -697,9 +704,31 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     }
 
+    private static final int EVENT_TYPE_DRAG = 1;
+    private static final int EVENT_TYPE_HOVER = 2;
+    private static final int EVENT_TYPE_DOWN = 3;
+    private static final int EVENT_TYPE_UP = 4;
+    private static final int EVENT_TYPE_BUTTON_DOWN = 5;
+    private static final int EVENT_TYPE_BUTTON_UP = 6;
+    private static final int EVENT_TYPE_IN_RANGE = 7;
+    private static final int EVENT_TYPE_OUT_OF_RANGE = 8;
+
     @Override
     public void pointerXYEvent(int deviceType, int pointerID, int eventType, boolean inverted, int x, int y, int pressure) {
         System.out.println("pointerXYEvent: " + x + ", " + y);
+        if (deviceType == 2){
+            switch (eventType) {
+                case EVENT_TYPE_DOWN :
+                    realTouchDown(x, y, pointerID);
+                    break;
+                case EVENT_TYPE_DRAG :
+                    realTouchDragged(x, y, pointerID);
+                    break;
+                case EVENT_TYPE_UP :
+                    realTouchUp(x, y, pointerID);
+                    break;
+            }
+        }
         //Point p = SwingUtilities.convertPoint(rootComponent, x, y, this);
         //x = p.x;
         //y = p.y;
@@ -715,21 +744,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     public void pointerEvent(int i, int i1, int i2, boolean b) {
 
     }
-
-    /*@Override
-    public void pointerXYEvent(int i, int i1, int i2, boolean b, int i3, int i4, int i5) {
-
-    }
-
-    @Override
-    public void pointerButtonEvent(int i, int i1, int i2, boolean b, int i3) {
-
-    }
-
-    @Override
-    public void pointerEvent(int i, int i1, int i2, boolean b) {
-
-    }*/
 
 	/*public boolean keyDown(int keyCode) {
 		if (keyCode == Keys.W) {
