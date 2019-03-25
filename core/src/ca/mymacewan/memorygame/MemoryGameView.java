@@ -30,7 +30,7 @@ import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 
 import java.util.ArrayList;
 
-public class MemoryGameView implements ApplicationListener, InputProcessor {
+public class MemoryGameView implements ApplicationListener, InputProcessor, PointerEventListener {
     // Box2D initialization
     // PHYSICS_ENTITY will always collide with WORLD_ENTITY
     protected OrthographicCamera camera;
@@ -61,7 +61,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     private static TweenManager tweenManager;
 
     // == Test Start ==
-    //private static JWinPointerReader jWinPointerReader;
+    private static JWinPointerReader jWinPointerReader;
     // == Test End ==
     @Override
     public void create() {
@@ -133,8 +133,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
 
         // == Windows multi touch test Start ==
-        //jWinPointerReader = new JWinPointerReader(world);
-        //jWinPointerReader.addPointerEventListener();
+        jWinPointerReader = new JWinPointerReader("MemoryGameView");
+        jWinPointerReader.addPointerEventListener(this);
         // == Windows multi touch test End ==
     }
 
@@ -268,7 +268,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             shape.set(new Vector2(-halfWidth + littleSpaceAtTheEdge, halfHeight - cornerDist), new Vector2(-halfWidth + cornerDist, halfHeight - littleSpaceAtTheEdge));
             groundBody.createFixture(sd);
 
-            // TODO: TOP RIGHT
+            // TOP RIGHT
             shape.set(new Vector2(halfWidth - littleSpaceAtTheEdge - cornerDist, halfHeight - littleSpaceAtTheEdge), new Vector2(halfWidth - littleSpaceAtTheEdge, halfHeight - littleSpaceAtTheEdge - cornerDist));
             groundBody.createFixture(sd);
 
@@ -371,7 +371,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
             roundInProgress = false;
             nextLevel();
         }
-        checkStates();
+        updateCards();
     }
 
     void nextLevel(){
@@ -528,6 +528,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
 
     @Override
     public boolean touchDown(int x, int y, int pointer, int button) {
+        System.out.println("touchDown: " + x + ", " + y);
+
         roundInProgress = true;
         game.resetIdleTime();
 
@@ -619,7 +621,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
         return false;
     }
 
-    void checkStates(){
+    void updateCards(){
         boolean notMoving;
         boolean notTweening;
         boolean noMouseJoint;
@@ -689,6 +691,25 @@ public class MemoryGameView implements ApplicationListener, InputProcessor {
     }
 
     public void resize(int width, int height) {
+
+    }
+
+    @Override
+    public void pointerXYEvent(int deviceType, int pointerID, int eventType, boolean inverted, int x, int y, int pressure) {
+        System.out.println("pointerXYEvent: " + x + ", " + y);
+        //Point p = SwingUtilities.convertPoint(rootComponent, x, y, this);
+        //x = p.x;
+        //y = p.y;
+        //System.out.println("Pointer coordinates: "+x+","+y);
+    }
+
+    @Override
+    public void pointerButtonEvent(int i, int i1, int i2, boolean b, int i3) {
+
+    }
+
+    @Override
+    public void pointerEvent(int i, int i1, int i2, boolean b) {
 
     }
 
