@@ -119,7 +119,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
 
         // Set the input processor as the ones overridden in here
-        Gdx.input.setInputProcessor(this);
+        //Gdx.input.setInputProcessor(this);
 
         backSideTexture = new TextureRegion(new Texture(Gdx.files.internal("cardBack.png")));
         Texture textureSheet = new Texture(Gdx.files.internal("AlphabetSheet.png"));
@@ -326,7 +326,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
         while (currentNumOfCards < cards.size()) {
             // Box bodies
-            angle = k * goldenAngle * 0.367f;
+            angle = k * goldenAngle;// * 0.367f;
             radius = scalingFactor * (float) Math.sqrt(k);
             scalingFactor = (float) (maxRadius / Math.sqrt(k)) - 1f;
             xPosition = (float) (radius * Math.cos(angle) * xyBoxSpacing[difficulty][0] - 0.2f);
@@ -715,8 +715,15 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     @Override
     public void pointerXYEvent(int deviceType, int pointerID, int eventType, boolean inverted, int x, int y, int pressure) {
-        System.out.println("pointerXYEvent: " + x + ", " + y);
-        if (deviceType == 2){
+        System.out.println("deviceType: " + deviceType);
+        System.out.println("pointerID: " + pointerID);
+        System.out.println("eventType: " + eventType);
+        System.out.println("inverted: " + inverted);
+        System.out.println("x, y: " + x + ", " + y);
+        System.out.println("pressure: " + pressure);
+        System.out.println();
+
+        if (deviceType == 0){
             switch (eventType) {
                 case EVENT_TYPE_DOWN :
                     realTouchDown(x, y, pointerID);
