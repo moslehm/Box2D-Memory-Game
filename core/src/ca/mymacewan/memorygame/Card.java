@@ -3,14 +3,14 @@ package ca.mymacewan.memorygame;
 class Card {
 
     private State state;
-    private String value;
+    private int value;
     private int key;
 
     Card() {
         state = State.HIDDEN;
     }
 
-    String getValue() {
+    int getValue() {
         return value;
     }
 
@@ -22,7 +22,7 @@ class Card {
         this.state = state;
     }
 
-    void setValue(String value) {
+    void setValue(int value) {
         this.value = value;
     }
 

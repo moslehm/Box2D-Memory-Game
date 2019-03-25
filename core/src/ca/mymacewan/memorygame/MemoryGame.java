@@ -14,7 +14,7 @@ import static ca.mymacewan.memorygame.State.REVEALED;
 public class MemoryGame {
     private int numOfCards; // How many cards in the game. it be increased when difficulty increase.
     private ArrayList<Card> cards;
-    private short [] difficulty = {8, 16, 24, 40, 52};
+    private short [] difficulty = {4, 8, 16, 24, 40, 52};
     private short diffLevel;
     private int score;
     private int combo;
@@ -36,7 +36,7 @@ public class MemoryGame {
             Card tempCard = new Card();
 
             int cardValue = i / 2;
-            tempCard.setValue(Integer.toString(cardValue));
+            tempCard.setValue(cardValue);
             tempCard.setKey(i);
             cards.add(tempCard);
         }
@@ -55,7 +55,7 @@ public class MemoryGame {
         idleStartTime = System.currentTimeMillis();
         card.setState(REVEALED);
         for (Card currentCard : cards) {
-            if (!(currentCard.equals(card)) && (Integer.parseInt(currentCard.getValue()) == Integer.parseInt(card.getValue()))) {
+            if (!(currentCard.equals(card)) && currentCard.getValue() == card.getValue()) {
                 if (currentCard.getState() == REVEALED) {
                     currentCard.setState(PAIRED);
                     card.setState(PAIRED);

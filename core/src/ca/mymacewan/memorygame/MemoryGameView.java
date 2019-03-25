@@ -3,6 +3,7 @@ package ca.mymacewan.memorygame;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import jwinpointer.JWinPointerReader;
 import jwinpointer.JWinPointerReader.PointerEventListener;
@@ -178,9 +179,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             // width, height: width and height of the box
             // scaleX, scaleY: Scale on the x- and y-axis
             // Draw the front side
-            batch.draw(backSideTexture, position.x - halfBoxSizes[difficulty], position.y - halfBoxSizes[difficulty],
-                    halfBoxSizes[difficulty], halfBoxSizes[difficulty],
-                    halfBoxSizes[difficulty] * 2, halfBoxSizes[difficulty] * 2,
+            float halfSize = halfBoxSizes[difficulty];
+            batch.draw(backSideTexture,
+                    position.x - halfSize, position.y - halfSize,
+                    halfSize, halfSize,
+                    halfSize * 2, halfSize * 2,
                     (float) Math.max(-Math.cos(box.getScaleX() * Math.PI), 0), 1f,
                     angle);
         }
@@ -196,7 +199,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             // To make it set textures from the game logic, do frontSideTextures[card.getIndex] or something
             //System.out.println("i: " + Integer.toString(i));
             //System.out.println("cards.get(i).getValue()): " + cards.get(i).getValue());
-            batch.draw(frontSideTextures[Integer.parseInt(cards.get(i).getValue())], position.x - halfBoxSizes[difficulty], position.y - halfBoxSizes[difficulty],
+            batch.draw(frontSideTextures[cards.get(i).getValue()], position.x - halfBoxSizes[difficulty], position.y - halfBoxSizes[difficulty],
                     halfBoxSizes[difficulty], halfBoxSizes[difficulty],
                     halfBoxSizes[difficulty] * 2, halfBoxSizes[difficulty] * 2,
                     (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), 1f,
