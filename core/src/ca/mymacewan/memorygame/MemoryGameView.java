@@ -714,7 +714,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     private static final int EVENT_TYPE_OUT_OF_RANGE = 8;
 
     @Override
-    public void pointerXYEvent(int deviceType, int pointerID, int eventType, boolean inverted, int x, int y, int pressure) {
+    public void pointerXYEvent(int deviceType, final int pointerID, int eventType, boolean inverted, final int x, final int y, int pressure) {
         System.out.println("deviceType: " + deviceType);
         System.out.println("pointerID: " + pointerID);
         System.out.println("eventType: " + eventType);
@@ -726,13 +726,31 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         if (deviceType == 0){
             switch (eventType) {
                 case EVENT_TYPE_DOWN :
-                    realTouchDown(x, y, pointerID);
+                            Gdx.app.postRunnable(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // process the result, e.g. add it to an Array<Result> field of the ApplicationListener.
+                                    realTouchDown(x, y, pointerID);
+                                }
+                            });
                     break;
                 case EVENT_TYPE_DRAG :
-                    realTouchDragged(x, y, pointerID);
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            // process the result, e.g. add it to an Array<Result> field of the ApplicationListener.
+                            realTouchDragged(x, y, pointerID);
+                        }
+                    });
                     break;
                 case EVENT_TYPE_UP :
-                    realTouchUp(x, y, pointerID);
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            // process the result, e.g. add it to an Array<Result> field of the ApplicationListener.
+                            realTouchUp(x, y, pointerID);
+                        }
+                    });
                     break;
             }
         }
