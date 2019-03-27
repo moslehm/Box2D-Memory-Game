@@ -44,7 +44,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     protected Array<MouseJoint> mouseJoints = new Array<MouseJoint>();
     protected Array<Joint> frictionJoints = new Array<Joint>();
     protected Array<Joint> motorJoints = new Array<Joint>();
-    protected Body hitBodies[] = new Body[80];
+    protected Body hitBodies[] = new Body[200];
     protected Body hitBody = null;
 
     SpriteBatch batch;
@@ -294,7 +294,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     int currentNumOfCards;
 
     private void createGame() {
-            hitBodies = new Body[80];
+            hitBodies = new Body[200];
             mouseJoints = new Array<MouseJoint>();
             frictionJoints = new Array<Joint>();
             motorJoints = new Array<Joint>();
@@ -435,7 +435,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
 
     public void createBox(float xPosition, float yPosition, float angle, Card card) {
-
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(halfBoxSizes[difficulty], halfBoxSizes[difficulty]);
 
@@ -491,7 +490,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         jd.bodyA = groundBody;
         jd.bodyB = boxBody;
         jd.collideConnected = true;
-        jd.maxForce = 20;//mass * gravity;
+        jd.maxForce = boxBody.getMass();//mass * gravity;
         jd.maxTorque = 20;//mass * radius * gravity;
         frictionJoints.add(world.createJoint(jd));
         shape.dispose();
@@ -723,7 +722,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         System.out.println("pressure: " + pressure);
         System.out.println();
 
-        if (deviceType == 0){
+        if (deviceType == 2 || deviceType == 0){
             switch (eventType) {
                 case EVENT_TYPE_DOWN :
                             Gdx.app.postRunnable(new Runnable() {
