@@ -5,6 +5,8 @@ import aurelienribon.tweenengine.TweenAccessor;
 public class BoxAccessor implements TweenAccessor<Box> {
 
     public static final int SCALE_X = 1;
+    public static final int ALPHA = 2;
+
 
     @Override
     public int getValues(Box target, int tweenType, float[] returnValues) {
@@ -12,7 +14,9 @@ public class BoxAccessor implements TweenAccessor<Box> {
             case SCALE_X:
                 returnValues[0] = target.getScaleX();
                 return 1;
-
+            case ALPHA:
+                returnValues[0] = target.getAlpha();
+                return 1;
             default:
                 assert false;
                 return -1;

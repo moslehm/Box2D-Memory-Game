@@ -7,6 +7,7 @@ public class Box {
     private float scaleX;
     private Card card;
     private int id;
+    private int alpha;
 
     Box(Body boxBody, float scaleX, Card card){
         this.boxBody = boxBody;
@@ -36,5 +37,13 @@ public class Box {
 
     public int getID() {
         return id;
+    }
+
+    public int getAlpha() {
+        return alpha;
+    }
+
+    public void setAlpha(int alpha) {
+        this.alpha = alpha;
     }
 }

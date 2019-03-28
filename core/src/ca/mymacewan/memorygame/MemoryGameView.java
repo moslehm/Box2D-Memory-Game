@@ -41,7 +41,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     protected World world;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     protected Body groundBody;
-    protected Array<MouseJoint> mouseJoints = new Array<MouseJoint>();
+    public ArrayList<TouchInfo> arrayOfTouchInfo = new ArrayList<TouchInfo>();
+    //protected Array<MouseJoint> mouseJoints = new Array<MouseJoint>();
     protected Array<Joint> frictionJoints = new Array<Joint>();
     protected Array<Joint> motorJoints = new Array<Joint>();
     protected Body hitBodies[] = new Body[200];
@@ -60,10 +61,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     int currentScore;
 
     private static TweenManager tweenManager;
-
-    // == Test Start ==
     private static JWinPointerReader jWinPointerReader;
-    // == Test End ==
+
     @Override
     public void create() {
 
@@ -119,7 +118,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
 
         // Set the input processor as the ones overridden in here
-        //Gdx.input.setInputProcessor(this);
+        Gdx.input.setInputProcessor(this);
 
         backSideTexture = new TextureRegion(new Texture(Gdx.files.internal("cardBack.png")));
         Texture textureSheet = new Texture(Gdx.files.internal("AlphabetSheet.png"));
@@ -295,12 +294,12 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     private void createGame() {
             hitBodies = new Body[200];
-            mouseJoints = new Array<MouseJoint>();
+            //mouseJoints = new Array<MouseJoint>();
             frictionJoints = new Array<Joint>();
             motorJoints = new Array<Joint>();
         for (int i = 0; i < hitBodies.length; i++) {
             hitBodies[i] = null;
-            mouseJoints.add(null);
+            //mouseJoints.add(null);
             frictionJoints.add(null);
             motorJoints.add(null);
         }
@@ -323,6 +322,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         boolean xPointInRange;
         boolean yPointInRange;
         boolean inRange;
+        float littleSpaceAtTheEdge = 0.4f;
 
         while (currentNumOfCards < cards.size()) {
             // Box bodies
@@ -332,10 +332,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             xPosition = (float) (radius * Math.cos(angle) * xyBoxSpacing[difficulty][0] - 0.2f);
             yPosition = (float) (radius * Math.sin(angle) * xyBoxSpacing[difficulty][1]);
             farFromAxis = xPosition > halfBoxSizes[difficulty] && yPosition > halfBoxSizes[difficulty];
-            xPointInRange = xPosition < halfWidth && xPosition > -halfWidth;// && xPosition > 0;
-            yPointInRange = yPosition < halfHeight && yPosition > -halfHeight;// && yPosition > 0;
+            xPointInRange = xPosition < halfWidth - littleSpaceAtTheEdge && xPosition > -halfWidth + littleSpaceAtTheEdge;// && xPosition > 0;
+            yPointInRange = yPosition < halfHeight - littleSpaceAtTheEdge && yPosition > -halfHeight + littleSpaceAtTheEdge;// && yPosition > 0;
             inRange = (30 < k && 33 > k) | 34 < k;
-            if (xPointInRange && yPointInRange) {
+            if (xPointInRange && yPointInRange && k > 3) {
                 createBox(xPosition, yPosition, angle, cards.get(currentNumOfCards));
                 currentNumOfCards++;
                 //createBox(-xPosition, -yPosition, angle, cards.get(currentNumOfCards));
@@ -397,13 +397,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 }
             }
 
-            MouseJoint mouseJointToDestroy;
-            for (int i = 0; i < mouseJoints.size; i++) {
-                mouseJointToDestroy = mouseJoints.get(i);
-                if (mouseJoints.get(i) != null) {
-                    world.destroyJoint(mouseJointToDestroy);
-                    mouseJoints.set(i, null);
-                    mouseJointToDestroy = null;
+            for (TouchInfo touchPoint: arrayOfTouchInfo) {
+                if (touchPoint.mouseJoint != null) {
+                    world.destroyJoint(touchPoint.mouseJoint);
+                    touchPoint.mouseJoint = null;
                 }
             }
             // One more for loop to remove the last kind of joint, motor joints
@@ -504,7 +501,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
         renderer = null;
         world = null;
-        mouseJoints = null;
+        //mouseJoints = null;
         hitBodies = null;
     }
 
@@ -533,6 +530,15 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
         return realTouchDown(x, y, pointer);
     }
+
+    class TouchInfo {
+        public int pointer;
+        public MouseJoint mouseJoint;
+        TouchInfo(int pointer, MouseJoint mouseJoint){
+            this.pointer = pointer;
+            this.mouseJoint = mouseJoint;
+        }
+}
 
     private boolean realTouchDown(int x, int y, int pointer) {
         roundInProgress = true;
@@ -574,7 +580,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             def.target.set(testPoint.x, testPoint.y);
             def.maxForce = 1000000.0f * hitBody.getMass();
 
-            mouseJoints.insert(pointer, (MouseJoint) world.createJoint(def));
+            //mouseJoints.insert(pointer, (MouseJoint) world.createJoint(def));
+            TouchInfo newTouchInfo = new TouchInfo(pointer, (MouseJoint) world.createJoint(def));
+            arrayOfTouchInfo.add(newTouchInfo);
             hitBody.setAwake(true);
         }
         return false;
@@ -593,7 +601,13 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         // if a mouse joint exists we simply update
         // the target of the joint based on the new
         // mouse coordinates
-        MouseJoint targetMouseJoint = mouseJoints.get(pointer);
+        MouseJoint targetMouseJoint = null;
+        for (TouchInfo touchPoint: arrayOfTouchInfo){
+            if (touchPoint.pointer == pointer){
+                targetMouseJoint = touchPoint.mouseJoint;
+            }
+        }
+        //MouseJoint targetMouseJoint = mouseJoints.get(pointer);
         if (targetMouseJoint != null) {
             camera.unproject(testPoint.set(x, y, 0));
             targetMouseJoint.setTarget(target.set(testPoint.x, testPoint.y));
@@ -611,10 +625,17 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         //System.out.println("Pointer up: " + pointer);
         //System.out.println("mouseJoint null: " + (mouseJoint[pointer] != null));
 
+        for (TouchInfo touchPoint: arrayOfTouchInfo){
+            if (touchPoint.pointer == pointer && touchPoint.mouseJoint != null){
+                world.destroyJoint(touchPoint.mouseJoint);
+                touchPoint.mouseJoint = null;
+            }
+        }
+        /*MouseJoint targetMouseJoint = null;
         // if a mouse joint exists we simply destroy it
-        if (mouseJoints.get(pointer) != null) {
-            MouseJoint targetMouseJoint = mouseJoints.get(pointer);
-            /*for (Box box : boxes) {
+        if (targetMouseJoint != null) {
+            //MouseJoint targetMouseJoint = mouseJoints.get(pointer);
+            *//*for (Box box : boxes) {
                 if (box.getBody() == targetMouseJoint.getBodyB()) {
                     Card boxCard = box.getCard();
                     if (boxCard.getState() != State.PAIRED && !box.getBody().isAwake()) {
@@ -622,11 +643,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                         game.flipDown(boxCard.getKey());
                     }
                 }
-            }*/
-            world.destroyJoint(targetMouseJoint);
-            mouseJoints.set(pointer, null);
-            targetMouseJoint = null;
-        }
+            }*//*
+            *//*world.destroyJoint(targetMouseJoint);
+            targetMouseJoint.set(pointer, null);
+            targetMouseJoint = null;*//*
+        }*/
         return false;
     }
 
