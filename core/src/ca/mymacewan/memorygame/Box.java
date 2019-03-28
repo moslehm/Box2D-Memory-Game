@@ -5,13 +5,14 @@ import com.badlogic.gdx.physics.box2d.Body;
 public class Box {
     private Body boxBody;
     private float scaleX;
+    private float scaleY;
     private Card card;
-    private int id;
-    private int alpha;
+    private float alpha;
 
-    Box(Body boxBody, float scaleX, Card card){
+    Box(Body boxBody, Card card){
         this.boxBody = boxBody;
-        this.scaleX = scaleX;
+        this.scaleX = 1f;
+        this.scaleY = 1f;
         this.card = card;
     }
 
@@ -31,19 +32,20 @@ public class Box {
         return card;
     }
 
-    public void setID(int id) {
-        this.id = id;
-    }
 
-    public int getID() {
-        return id;
-    }
-
-    public int getAlpha() {
+    public float getAlpha() {
         return alpha;
     }
 
-    public void setAlpha(int alpha) {
+    public void setAlpha(float alpha) {
         this.alpha = alpha;
+    }
+
+    public float getScaleY() {
+        return scaleY;
+    }
+
+    public void setScaleY(float scaleY) {
+        this.scaleY = scaleY;
     }
 }

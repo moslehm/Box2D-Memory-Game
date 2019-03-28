@@ -50,7 +50,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     BitmapFont font;
     GlyphLayout textLayout = new GlyphLayout();
     private TextureRegion backSideTexture;
-    private TextureRegion[] frontSideTextures;
+    private Sprite[] frontSideSprites;
     private MemoryGame game;
     ArrayList<Card> cards;
     int difficulty;
@@ -121,11 +121,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         backSideTexture = new TextureRegion(new Texture(Gdx.files.internal("cardBack.png")));
         Texture textureSheet = new Texture(Gdx.files.internal("AlphabetSheet.png"));
         TextureRegion[][] tmpRegions = TextureRegion.split(textureSheet, 150, 150);
-        frontSideTextures = new TextureRegion[7 * 4];
+        frontSideSprites = new Sprite[7 * 4];
         int index = 0;
         for (int y = 0; y < 7; y++) {
             for (int x = 0; x < 4; x++) {
-                frontSideTextures[index++] = tmpRegions[x][y];
+                frontSideSprites[index++] = new Sprite(tmpRegions[x][y]);
             }
         }
 
@@ -162,10 +162,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         // Set the projection matrix of the SpriteBatch to the camera's combined matrix.
         // This will make the SpriteBatch work in world coordinates (meters)
         batch.getProjectionMatrix().set(camera.combined);
+        batch.enableBlending();
         batch.begin();
 
         // Draw backside first to make the front side of the cards on top
-        for (int i = 0; i < boxes.size(); i++){
+        for (int i = 0; i < boxes.size(); i++) {
             Box box = boxes.get(i);
             Body boxBody = box.getBody();
             Vector2 position = boxBody.getPosition(); // Get the box's center position
@@ -184,32 +185,36 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                     (float) Math.max(-Math.cos(box.getScaleX() * Math.PI), 0), 1f,
                     angle);
         }
+        batch.end();
 
-        Sprite textureWrapper;
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.begin();
         // Draw front
         for (int i = 0; i < boxes.size(); i++) {
             Box box = boxes.get(i);
             Body boxBody = box.getBody();
             Vector2 position = boxBody.getPosition(); // Get the box's center position
             float angle = MathUtils.radiansToDegrees * boxBody.getAngle(); // Get the box's rotation angle around the center
-            textureWrapper = new Sprite(frontSideTextures[cards.get(i).getValue()]);
-            Color textureColour = textureWrapper.getColor();
-            textureColour.a = box.getAlpha();
-
+            Sprite currentSprite = frontSideSprites[cards.get(i).getValue()];
+            /*Color textureColour = currentSprite.getColor();
+            textureColour.a = box.getAlpha();*/
+            //currentSprite.setAlpha(box.getAlpha());
+            currentSprite.setX(Gdx.graphics.getWidth() / 2f + toPixels(position.x - halfBoxSizes[difficulty]));
+            currentSprite.setY(Gdx.graphics.getHeight() / 2f + toPixels(position.y - halfBoxSizes[difficulty]));
+            currentSprite.setOrigin(halfBoxSizes[difficulty], halfBoxSizes[difficulty]);
+            currentSprite.setScale((float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), box.getScaleY());
+            currentSprite.setRotation(angle);
+            currentSprite.draw(batch);
             // Draw the back side
             // To make it set textures from the game logic, do frontSideTextures[card.getIndex] or something
             //System.out.println("i: " + Integer.toString(i));
             //System.out.println("cards.get(i).getValue()): " + cards.get(i).getValue());
-            batch.draw(textureWrapper, position.x - halfBoxSizes[difficulty], position.y - halfBoxSizes[difficulty],
+           /* batch.draw(currentSprite, position.x - halfBoxSizes[difficulty], position.y - halfBoxSizes[difficulty],
                     halfBoxSizes[difficulty], halfBoxSizes[difficulty],
                     halfBoxSizes[difficulty] * 2, halfBoxSizes[difficulty] * 2,
-                    (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), 1f,
-                    angle);
+                    (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), box.getScaleY(),
+                    angle);*/
         }
-        batch.end();
-
-        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.begin();
         // Display score
         font.draw(batch, Integer.toString(currentScore), Gdx.graphics.getWidth() / 2f - textLayout.width / 2f, Gdx.graphics.getHeight() / 2f + textLayout.height / 2f);
         batch.end();
@@ -239,7 +244,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             // maskBits is what it collides with (a physics entity)
             //sd.filter.categoryBits = WORLD_ENTITY;
             //sd.filter.maskBits = PHYSICS_ENTITY;
-
 
 
             // Draws sides around the board
@@ -280,7 +284,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         }
     }
 
-    private void tweenHelpingHand(Box box, int targetValue) {
+    private void animateFlippingCard(Box box, int targetValue) {
         // Kill current tween - or pre-existing
         tweenManager.killTarget(box);
 
@@ -289,16 +293,33 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 .target(targetValue)
                 .ease(TweenEquations.easeInOutSine)
                 .start(tweenManager);
+    }
 
+    private void removeMatchingCard(Box box){
+        /*// Scale X down
+        Tween.to(box, BoxAccessor.SCALE_X, 0.3f)
+                .target(2f)
+                .ease(TweenEquations.easeOutQuad)
+                .start(tweenManager);
+        // Scale X down
+        Tween.to(box, BoxAccessor.SCALE_Y, 0.3f)
+                .target(2f)
+                .ease(TweenEquations.easeOutQuad)
+                .start(tweenManager);*/
+        // Scale X down
+        Tween.to(box, BoxAccessor.ALPHA, 0.3f)
+                .target(0)
+                .ease(TweenEquations.easeOutQuad)
+                .start(tweenManager);
     }
 
     int currentNumOfCards;
 
     private void createGame() {
-            hitBodies = new Body[200];
-            //mouseJoints = new Array<MouseJoint>();
-            frictionJoints = new Array<Joint>();
-            motorJoints = new Array<Joint>();
+        hitBodies = new Body[200];
+        //mouseJoints = new Array<MouseJoint>();
+        frictionJoints = new Array<Joint>();
+        motorJoints = new Array<Joint>();
         for (int i = 0; i < hitBodies.length; i++) {
             hitBodies[i] = null;
             //mouseJoints.add(null);
@@ -366,10 +387,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     }
 
     boolean roundInProgress = true;
+
     void update() {
         currentScore = game.getScore();
         textLayout.setText(font, Integer.toString(currentScore));
-        if(game.isIdle()){
+        if (game.isIdle()) {
             destroyAll();
             game.gameStart();
             createGame();
@@ -381,7 +403,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         updateCards();
     }
 
-    void nextLevel(){
+    void nextLevel() {
         // Round over
         // Destroy bodies and joints
         // Then start next round
@@ -401,7 +423,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 }
             }
 
-            for (TouchInfo touchPoint: arrayOfTouchInfo) {
+            for (TouchInfo touchPoint : arrayOfTouchInfo) {
                 if (touchPoint.mouseJoint != null) {
                     world.destroyJoint(touchPoint.mouseJoint);
                     touchPoint.mouseJoint = null;
@@ -420,7 +442,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             }
             Body bod;
             int size = boxes.size();
-            while(boxes.size() > 0) {
+            while (boxes.size() > 0) {
                 Box box = boxes.get(0);
                 bod = box.getBody();
                 if (bod != null) {
@@ -458,7 +480,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         Body boxBody = world.createBody(boxBodyDef);
         boxBody.createFixture(fd);
 
-        Box box = new Box(boxBody, 1f, card);
+        Box box = new Box(boxBody, card);
 
         // Add the box to our list of boxes
         boxes.add(box);
@@ -513,6 +535,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         return pixels * 0.013f; // DEFAULT: 0.018f
     }
 
+    public float toPixels(float meters) {
+        return meters / 0.013f; // DEFAULT: 0.018f
+    }
+
     // Instantiate vector and the callback here to avoid errors from the GC
     Vector3 testPoint = new Vector3();
     QueryCallback callback = new QueryCallback() {
@@ -538,11 +564,12 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     class TouchInfo {
         public int pointer;
         public MouseJoint mouseJoint;
-        TouchInfo(int pointer, MouseJoint mouseJoint){
+
+        TouchInfo(int pointer, MouseJoint mouseJoint) {
             this.pointer = pointer;
             this.mouseJoint = mouseJoint;
         }
-}
+    }
 
     private boolean realTouchDown(int x, int y, int pointer) {
         roundInProgress = true;
@@ -569,10 +596,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 if (box.getBody() == hitBody) {
                     Card boxCard = box.getCard();
                     if (boxCard.getState() == State.HIDDEN) {
-                        tweenHelpingHand(box, 0);
+                        animateFlippingCard(box, 0);
                         //System.out.println("Flipping card at index: " + boxCard.getKey());
                         game.flipUp(boxCard.getKey());
-                        box.setID(pointer);
                     }
                 }
             }
@@ -591,6 +617,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         }
         return false;
     }
+
     //another temporary vector
     Vector2 target = new Vector2();
 
@@ -606,8 +633,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         // the target of the joint based on the new
         // mouse coordinates
         MouseJoint targetMouseJoint = null;
-        for (TouchInfo touchPoint: arrayOfTouchInfo){
-            if (touchPoint.pointer == pointer){
+        for (TouchInfo touchPoint : arrayOfTouchInfo) {
+            if (touchPoint.pointer == pointer) {
                 targetMouseJoint = touchPoint.mouseJoint;
             }
         }
@@ -629,8 +656,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         //System.out.println("Pointer up: " + pointer);
         //System.out.println("mouseJoint null: " + (mouseJoint[pointer] != null));
 
-        for (TouchInfo touchPoint: arrayOfTouchInfo){
-            if (touchPoint.pointer == pointer && touchPoint.mouseJoint != null){
+        for (TouchInfo touchPoint : arrayOfTouchInfo) {
+            if (touchPoint.pointer == pointer && touchPoint.mouseJoint != null) {
                 world.destroyJoint(touchPoint.mouseJoint);
                 touchPoint.mouseJoint = null;
             }
@@ -648,26 +675,28 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                     }
                 }
             }*//*
-            *//*world.destroyJoint(targetMouseJoint);
+         *//*world.destroyJoint(targetMouseJoint);
             targetMouseJoint.set(pointer, null);
             targetMouseJoint = null;*//*
         }*/
         return false;
     }
 
-    void updateCards(){
+    void updateCards() {
         boolean notMoving;
         boolean notTweening;
         boolean noMouseJoint;
         for (Box box : boxes) {
             Card boxCard = box.getCard();
-            notMoving =  !box.getBody().isAwake();
+            notMoving = !box.getBody().isAwake();
             notTweening = !tweenManager.containsTarget(box);
             noMouseJoint = box.getBody().getJointList().size <= 1;
             if (notMoving && notTweening && noMouseJoint) {
                 if (boxCard.getState() != State.PAIRED) {
-                    tweenHelpingHand(box, 1);
+                    animateFlippingCard(box, 1);
                     game.flipDown(boxCard.getKey());
+                } else {
+                    removeMatchingCard(box);
                 }
             }
         }
@@ -675,10 +704,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.RIGHT){
+        if (keycode == Input.Keys.RIGHT) {
             nextLevel();
-        }
-        else if(keycode == Input.Keys.LEFT){
+        } else if (keycode == Input.Keys.LEFT) {
             prevLevel();
         }
         return false;
@@ -747,18 +775,18 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         System.out.println("pressure: " + pressure);
         System.out.println();
 
-        if (deviceType == 2 || deviceType == 0){
+        if (deviceType == 2 || deviceType == 0) {
             switch (eventType) {
-                case EVENT_TYPE_DOWN :
-                            Gdx.app.postRunnable(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // process the result, e.g. add it to an Array<Result> field of the ApplicationListener.
-                                    realTouchDown(x, y, pointerID);
-                                }
-                            });
+                case EVENT_TYPE_DOWN:
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            // process the result, e.g. add it to an Array<Result> field of the ApplicationListener.
+                            realTouchDown(x, y, pointerID);
+                        }
+                    });
                     break;
-                case EVENT_TYPE_DRAG :
+                case EVENT_TYPE_DRAG:
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run() {
@@ -767,7 +795,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                         }
                     });
                     break;
-                case EVENT_TYPE_UP :
+                case EVENT_TYPE_UP:
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run() {
