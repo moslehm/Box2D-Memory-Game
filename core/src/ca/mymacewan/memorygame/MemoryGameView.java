@@ -1,8 +1,8 @@
 package ca.mymacewan.memorygame;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import jwinpointer.JWinPointerReader;
@@ -16,8 +16,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -187,18 +185,22 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                     angle);
         }
 
+        Sprite textureWrapper;
         // Draw front
         for (int i = 0; i < boxes.size(); i++) {
             Box box = boxes.get(i);
             Body boxBody = box.getBody();
             Vector2 position = boxBody.getPosition(); // Get the box's center position
             float angle = MathUtils.radiansToDegrees * boxBody.getAngle(); // Get the box's rotation angle around the center
+            textureWrapper = new Sprite(frontSideTextures[cards.get(i).getValue()]);
+            Color textureColour = textureWrapper.getColor();
+            textureColour.a = box.getAlpha();
 
             // Draw the back side
             // To make it set textures from the game logic, do frontSideTextures[card.getIndex] or something
             //System.out.println("i: " + Integer.toString(i));
             //System.out.println("cards.get(i).getValue()): " + cards.get(i).getValue());
-            batch.draw(frontSideTextures[cards.get(i).getValue()], position.x - halfBoxSizes[difficulty], position.y - halfBoxSizes[difficulty],
+            batch.draw(textureWrapper, position.x - halfBoxSizes[difficulty], position.y - halfBoxSizes[difficulty],
                     halfBoxSizes[difficulty], halfBoxSizes[difficulty],
                     halfBoxSizes[difficulty] * 2, halfBoxSizes[difficulty] * 2,
                     (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), 1f,
@@ -278,13 +280,13 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         }
     }
 
-    private void tweenHelpingHand(Box box, int targetX) {
+    private void tweenHelpingHand(Box box, int targetValue) {
         // Kill current tween - or pre-existing
         tweenManager.killTarget(box);
 
         // Scale X down
         Tween.to(box, BoxAccessor.SCALE_X, 0.3f)
-                .target(targetX)
+                .target(targetValue)
                 .ease(TweenEquations.easeInOutSine)
                 .start(tweenManager);
 
