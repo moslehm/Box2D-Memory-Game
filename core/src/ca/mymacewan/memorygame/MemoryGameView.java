@@ -368,7 +368,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         currentScore = game.getScore();
         textLayout.setText(font, Integer.toString(currentScore));
         if(game.isIdle()){
-            //restart game here;
+            destroyAll();
+            game.gameStart();
+            createGame();
         }
         if (game.isRoundOver() && roundInProgress) {
             roundInProgress = false;
