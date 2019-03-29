@@ -34,7 +34,7 @@ public class BoxAccessor implements TweenAccessor<Box> {
                 target.setScaleX(newValues[0]);
                 break;
             case SCALE_Y:
-                target.setScaleX(newValues[0]);
+                target.setScaleY(newValues[0]);
                 break;
             case ALPHA:
                 target.setAlpha(newValues[0]);

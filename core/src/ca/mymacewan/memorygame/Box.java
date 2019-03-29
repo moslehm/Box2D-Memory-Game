@@ -13,6 +13,7 @@ public class Box {
         this.boxBody = boxBody;
         this.scaleX = 1f;
         this.scaleY = 1f;
+        this.alpha = 1f;
         this.card = card;
     }
 

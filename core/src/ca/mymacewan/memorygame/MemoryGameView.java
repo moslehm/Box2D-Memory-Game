@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
 import jwinpointer.JWinPointerReader;
 import jwinpointer.JWinPointerReader.PointerEventListener;
 import aurelienribon.tweenengine.Tween;
@@ -57,13 +58,13 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     private float halfBoxSizes[] = {0.8f, 0.7f, 0.6f, 0.5f, 0.3f};
     private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {2.2f, 1.1f}, {1.8f, 0.9f}, {1.3f, 1f}, {1.9f, 1f}};
     int currentScore;
+    ArrayList<Box> boxPairs;
 
     private static TweenManager tweenManager;
     private static JWinPointerReader jWinPointerReader;
 
     @Override
     public void create() {
-
         // "Meters" are the units of Box2D
         // 1 pixel = 0.018 meters
         // 1 meter = 55.556 pixels
@@ -123,9 +124,12 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         TextureRegion[][] tmpRegions = TextureRegion.split(textureSheet, 150, 150);
         frontSideSprites = new Sprite[7 * 4];
         int index = 0;
+        Sprite tempSprite;
         for (int y = 0; y < 7; y++) {
             for (int x = 0; x < 4; x++) {
-                frontSideSprites[index++] = new Sprite(tmpRegions[x][y]);
+                tempSprite = new Sprite(tmpRegions[x][y]);
+                //System.out.println(tempSprite.getColor().a);
+                frontSideSprites[index++] = tempSprite;
             }
         }
 
@@ -162,7 +166,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         // Set the projection matrix of the SpriteBatch to the camera's combined matrix.
         // This will make the SpriteBatch work in world coordinates (meters)
         batch.getProjectionMatrix().set(camera.combined);
-        batch.enableBlending();
+        //batch.enableBlending();
         batch.begin();
 
         // Draw backside first to make the front side of the cards on top
@@ -187,7 +191,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         }
         batch.end();
 
-        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.getProjectionMatrix().setToOrtho2D(0,  0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.begin();
         // Draw front
         for (int i = 0; i < boxes.size(); i++) {
@@ -198,11 +202,13 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             Sprite currentSprite = frontSideSprites[cards.get(i).getValue()];
             /*Color textureColour = currentSprite.getColor();
             textureColour.a = box.getAlpha();*/
-            //currentSprite.setAlpha(box.getAlpha());
-            currentSprite.setX(Gdx.graphics.getWidth() / 2f + toPixels(position.x - halfBoxSizes[difficulty]));
-            currentSprite.setY(Gdx.graphics.getHeight() / 2f + toPixels(position.y - halfBoxSizes[difficulty]));
-            currentSprite.setOrigin(halfBoxSizes[difficulty], halfBoxSizes[difficulty]);
-            currentSprite.setScale((float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), box.getScaleY());
+            //System.out.println("ALPHA: " + box.getAlpha());
+            currentSprite.setAlpha(box.getAlpha());
+            currentSprite.setX(Gdx.graphics.getWidth()/2f + toPixels(position.x) - currentSprite.getWidth()/2f);
+            currentSprite.setY(Gdx.graphics.getHeight()/2f + toPixels(position.y) - currentSprite.getHeight()/2f);
+            //currentSprite.setOrigin(-currentSprite.getWidth()/2f, currentSprite.getHeight()/2f);
+            // ScaleX: (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0))
+            currentSprite.setScale(halfBoxSizes[difficulty] * (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), halfBoxSizes[difficulty] * box.getScaleY());
             currentSprite.setRotation(angle);
             currentSprite.draw(batch);
             // Draw the back side
@@ -215,6 +221,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                     (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), box.getScaleY(),
                     angle);*/
         }
+        batch.end();
+
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.begin();
         // Display score
         font.draw(batch, Integer.toString(currentScore), Gdx.graphics.getWidth() / 2f - textLayout.width / 2f, Gdx.graphics.getHeight() / 2f + textLayout.height / 2f);
         batch.end();
@@ -296,16 +306,16 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     }
 
     private void removeMatchingCard(Box box){
-        /*// Scale X down
+        // Scale X down
         Tween.to(box, BoxAccessor.SCALE_X, 0.3f)
                 .target(2f)
                 .ease(TweenEquations.easeOutQuad)
                 .start(tweenManager);
-        // Scale X down
+        // Scale Y down
         Tween.to(box, BoxAccessor.SCALE_Y, 0.3f)
                 .target(2f)
                 .ease(TweenEquations.easeOutQuad)
-                .start(tweenManager);*/
+                .start(tweenManager);
         // Scale X down
         Tween.to(box, BoxAccessor.ALPHA, 0.3f)
                 .target(0)
@@ -371,21 +381,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             k++;
         }
     }
-
-    public void clearLevel() {
-        Body bod;
-        com.badlogic.gdx.utils.Array<JointEdge> Jlist;
-        for (Box box : boxes) {
-            bod = box.getBody();
-            Jlist = bod.getJointList();
-            for (JointEdge j : Jlist) {
-                world.destroyJoint(j.joint);
-            }
-            world.destroyBody(bod);
-
-        }
-    }
-
     boolean roundInProgress = true;
 
     void update() {
@@ -398,7 +393,12 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         }
         if (game.isRoundOver() && roundInProgress) {
             roundInProgress = false;
-            nextLevel();
+            Timer.schedule(new Timer.Task(){
+                @Override
+                public void run() {
+                    nextLevel();
+                }
+            }, 2);
         }
         updateCards();
     }
@@ -556,7 +556,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     @Override
     public boolean touchDown(int x, int y, int pointer, int button) {
-        System.out.println("touchDown: " + x + ", " + y);
+        //System.out.println("touchDown: " + x + ", " + y);
 
         return realTouchDown(x, y, pointer);
     }
@@ -695,7 +695,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 if (boxCard.getState() != State.PAIRED) {
                     animateFlippingCard(box, 1);
                     game.flipDown(boxCard.getKey());
-                } else {
+                } else if (boxCard.getState() == State.PAIRED) {
                     removeMatchingCard(box);
                 }
             }
@@ -767,13 +767,13 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     @Override
     public void pointerXYEvent(int deviceType, final int pointerID, int eventType, boolean inverted, final int x, final int y, int pressure) {
-        System.out.println("deviceType: " + deviceType);
+        /*System.out.println("deviceType: " + deviceType);
         System.out.println("pointerID: " + pointerID);
         System.out.println("eventType: " + eventType);
         System.out.println("inverted: " + inverted);
         System.out.println("x, y: " + x + ", " + y);
         System.out.println("pressure: " + pressure);
-        System.out.println();
+        System.out.println();*/
 
         if (deviceType == 2 || deviceType == 0) {
             switch (eventType) {
