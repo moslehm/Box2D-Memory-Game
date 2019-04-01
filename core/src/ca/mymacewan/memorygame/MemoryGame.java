@@ -1,7 +1,5 @@
 package ca.mymacewan.memorygame;
 
-
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Collections;
@@ -47,25 +45,24 @@ public class MemoryGame {
      * Sets the card at index to REVEALED if isLegalMove returns true
      * @param index of card in cards
      */
-    void flipUp(int index) {
+    Card[] flipUp(int index) {
         Card card = getCard(index);
         if (!(isLegalMove(card))) {
-            return;
+            return null;
         }
         idleStartTime = System.currentTimeMillis();
         card.setState(REVEALED);
         for (Card currentCard : cards) {
             if (!(currentCard.equals(card)) && currentCard.getValue() == card.getValue()) {
                 if (currentCard.getState() == REVEALED) {
+                    Card[] pair = {currentCard, card};
                     //currentCard.setState(PAIRED);
                     //card.setState(PAIRED);
-                    updateScore();
-                    comboTime = System.currentTimeMillis() - startTime;
-                    System.out.println("MATCH! comboTime:" + Long.toString(comboTime));
-                    return;
+                    return pair;
                 }
             }
         }
+        return null;
         // Commented out because the code above has the same functionality but for multiple cards
         /*Iterator<Card> itr = cards.iterator();
         while (itr.hasNext()) {
@@ -108,6 +105,15 @@ public class MemoryGame {
         }
     }
 
+    void setToPaired(Card firstCard, Card secondCard){
+        if (secondCard.getState() == State.REVEALED && firstCard.getState() == State.REVEALED) {
+            firstCard.setState(State.PAIRED);
+            secondCard.setState(State.PAIRED);
+            updateScore();
+            comboTime = System.currentTimeMillis() - startTime;
+            System.out.println("MATCH! comboTime:" + Long.toString(comboTime));
+        }
+    }
 
     /**
      * @return false if any of the cards are not PAIRED, returns true otherwise
