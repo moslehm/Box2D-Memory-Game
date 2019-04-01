@@ -3,6 +3,7 @@ package ca.mymacewan.memorygame;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
@@ -58,6 +59,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     private float halfBoxSizes[] = {0.8f, 0.7f, 0.6f, 0.5f, 0.3f};
     private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {2.2f, 1.1f}, {1.8f, 0.9f}, {1.3f, 1f}, {1.9f, 1f}};
     int currentScore;
+    ShapeRenderer shapeRenderer;
     ArrayList<Box> boxPairs;
 
     private static TweenManager tweenManager;
@@ -65,6 +67,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     @Override
     public void create() {
+        shapeRenderer = new ShapeRenderer();
         // "Meters" are the units of Box2D
         // 1 pixel = 0.018 meters
         // 1 meter = 55.556 pixels
@@ -228,6 +231,33 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         // Display score
         font.draw(batch, Integer.toString(currentScore), Gdx.graphics.getWidth() / 2f - textLayout.width / 2f, Gdx.graphics.getHeight() / 2f + textLayout.height / 2f);
         batch.end();
+
+        batch.getProjectionMatrix().setToOrtho2D(0,  0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        drawDottedLine(shapeRenderer, 10, 0, 0, 50, 50);
+    }
+
+    void getPairs(){
+        ArrayList<Box> copyOfBoxes = boxes;
+        for (int i = 0; i < copyOfBoxes.size(); i++){
+            Box firstBox = copyOfBoxes.remove(i);
+            for (int index2 = 0; i < copyOfBoxes.size(); i++){
+                Box secondBox = copyOfBoxes.remove(index2);
+                // TODO: IF BOXES MATCH AND ARE BOTH FACE UP
+             }
+        }
+    }
+
+    private void drawDottedLine(ShapeRenderer shapeRenderer, int dotDist, float x1, float y1, float x2, float y2) {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Point);
+
+        Vector2 vec2 = new Vector2(x2, y2).sub(new Vector2(x1, y1));
+        float length = vec2.len();
+        for(int i = 0; i < length; i += dotDist) {
+            vec2.clamp(length - i, length - i);
+            shapeRenderer.point(x1 + vec2.x, y1 + vec2.y, 0);
+        }
+
+        shapeRenderer.end();
     }
 
     protected void createWorld(World world) {
@@ -695,9 +725,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 if (boxCard.getState() != State.PAIRED) {
                     animateFlippingCard(box, 1);
                     game.flipDown(boxCard.getKey());
-                } else if (boxCard.getState() == State.PAIRED) {
+                } /*else if (boxCard.getState() == State.PAIRED) {
                     removeMatchingCard(box);
-                }
+                }*/
             }
         }
     }

@@ -57,8 +57,8 @@ public class MemoryGame {
         for (Card currentCard : cards) {
             if (!(currentCard.equals(card)) && currentCard.getValue() == card.getValue()) {
                 if (currentCard.getState() == REVEALED) {
-                    currentCard.setState(PAIRED);
-                    card.setState(PAIRED);
+                    //currentCard.setState(PAIRED);
+                    //card.setState(PAIRED);
                     updateScore();
                     comboTime = System.currentTimeMillis() - startTime;
                     System.out.println("MATCH! comboTime:" + Long.toString(comboTime));
