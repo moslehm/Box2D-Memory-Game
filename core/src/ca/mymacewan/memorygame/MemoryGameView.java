@@ -47,7 +47,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     public ArrayList<TouchInfo> arrayOfTouchInfo = new ArrayList<TouchInfo>();
     //protected Array<MouseJoint> mouseJoints = new Array<MouseJoint>();
     protected Array<Joint> frictionJoints = new Array<Joint>();
-    protected Array<Joint> motorJoints = new Array<Joint>();
+    //protected Array<Joint> motorJoints = new Array<Joint>();
     protected Body hitBodies[] = new Body[200];
     protected Body hitBody = null;
 
@@ -418,13 +418,13 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         hitBodies = new Body[200];
         //mouseJoints = new Array<MouseJoint>();
         frictionJoints = new Array<Joint>();
-        motorJoints = new Array<Joint>();
+        /*motorJoints = new Array<Joint>();
         for (int i = 0; i < hitBodies.length; i++) {
             hitBodies[i] = null;
             //mouseJoints.add(null);
             frictionJoints.add(null);
             motorJoints.add(null);
-        }
+        }*/
         cards = game.getCards();
         difficulty = game.getDifficulty();
         currentNumOfCards = 0;
@@ -503,6 +503,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         game.nextDiff();
         game.gameStart();
         createGame();
+        roundInProgress = true;
     }
 
     void destroyAll() {
@@ -523,7 +524,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             }
             // One more for loop to remove the last kind of joint, motor joints
             // Use the motorJoints array
-            Joint motorJointToDestroy;
+            /*Joint motorJointToDestroy;
             for (int i = 0; i < motorJoints.size; i++) {
                 motorJointToDestroy = motorJoints.get(i);
                 if (motorJoints.get(i) != null) {
@@ -531,7 +532,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                     motorJoints.set(i, null);
 
                 }
-            }
+            }*/
             Body bod;
             int size = boxes.size();
             while (boxes.size() > 0) {
@@ -665,7 +666,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     }
 
     private boolean realTouchDown(int x, int y, int pointer) {
-        roundInProgress = true;
         game.resetIdleTime();
 
         // Converts the mouse coordinates to meters (world coordinates)

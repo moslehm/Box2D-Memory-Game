@@ -111,7 +111,7 @@ public class MemoryGame {
             secondCard.setState(State.PAIRED);
             updateScore();
             comboTime = System.currentTimeMillis() - startTime;
-            System.out.println("MATCH! comboTime:" + Long.toString(comboTime));
+            //System.out.println("MATCH! comboTime:" + Long.toString(comboTime));
         }
     }
 
@@ -124,7 +124,7 @@ public class MemoryGame {
                 return false;
             }
         }
-        System.out.println("Congratulation!");
+        //System.out.println("Congratulation!");
         return true;
     }
 
@@ -186,10 +186,10 @@ public class MemoryGame {
         if (comboTime <= comboInterval) {
             score += 100;
             combo = 2;
-            System.out.println("NOT A COMBO");
+            //System.out.println("NOT A COMBO");
         } else {
             score += 100 * combo;
-            System.out.println("COMBO");
+            //System.out.println("COMBO");
             if (combo < 4) {
                 combo += 1;
             }
