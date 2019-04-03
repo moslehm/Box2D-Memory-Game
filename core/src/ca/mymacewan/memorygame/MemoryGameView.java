@@ -1,14 +1,11 @@
 package ca.mymacewan.memorygame;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
-import com.sun.org.apache.regexp.internal.RE;
-import javafx.util.Pair;
 import jwinpointer.JWinPointerReader;
 import jwinpointer.JWinPointerReader.PointerEventListener;
 import aurelienribon.tweenengine.Tween;
@@ -26,13 +23,11 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
-import com.badlogic.gdx.physics.box2d.joints.MotorJointDef;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 public class MemoryGameView implements ApplicationListener, InputProcessor, PointerEventListener {
     // Box2D initialization
@@ -40,7 +35,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     protected OrthographicCamera camera;
     //final short PHYSICS_ENTITY = 0x1;    // 0001
     //final short WORLD_ENTITY = 0x1 << 1; // 0010 or 0x2 in hex
-    protected Box2DDebugRenderer renderer;
+    protected Box2DDebugRenderer box2DDebugRenderer;
     protected World world;
     private ArrayList<Box> boxes = new ArrayList<Box>();
     protected Body groundBody;
@@ -59,11 +54,12 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     private MemoryGame game;
     ArrayList<Card> cards;
     int difficulty;
-    private float halfBoxSizes[] = {0.8f, 0.7f, 0.6f, 0.5f, 0.3f};
-    private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {2.2f, 1.1f}, {1.8f, 0.9f}, {1.3f, 1f}, {1.9f, 1f}};
+    private float halfBoxSizes[] = {0.8f, 0.7f, 0.6f, 0.5f, 0.4f};
+    private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {2.2f, 1.1f}, {1.8f, 0.9f}, {1.3f, 1f}, {2f, 2f}};
     int currentScore;
     ShapeRenderer shapeRenderer;
     ArrayList<Box[]> boxPairs;
+    ArrayList<Box[]> boxesInContact;
     ParticleEffect particleEffect;
 
     private static TweenManager tweenManager;
@@ -73,6 +69,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     public void create() {
         shapeRenderer = new ShapeRenderer();
         boxPairs = new ArrayList<Box[]>();
+        boxesInContact = new ArrayList<Box[]>();
         particleEffect = new ParticleEffect();
         particleEffect.load(Gdx.files.internal("explosion.p"), Gdx.files.internal(""));
 
@@ -98,8 +95,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         camera = new OrthographicCamera(CAMERA_WIDTH_METERS, CAMERA_HEIGHT_METERS);
         camera.position.set(0, 0, 0);
 
-        // Create the debug renderer
-        renderer = new Box2DDebugRenderer();
+        // Create the debug box2DDebugRenderer
+        box2DDebugRenderer = new Box2DDebugRenderer();
 
         // Start the memory game
         game = new MemoryGame();
@@ -150,26 +147,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 Body firstBody = contact.getFixtureA().getBody();
                 Body secondBody = contact.getFixtureB().getBody();
                 if (firstBody.getUserData() != null && secondBody.getUserData() != null) {
-                    Box firstBox = (Box) firstBody.getUserData();
-                    Box secondBox = (Box) secondBody.getUserData();
-                    Card firstCard = firstBox.getCard();
-                    Card secondCard = secondBox.getCard();
-                    if (firstCard.getValue() == secondCard.getValue() &&
-                            firstCard.getState() == State.REVEALED && secondCard.getState() == State.REVEALED) {
-                        game.setToPaired(firstCard, secondCard);
-                        for (Box[] pair : boxPairs) {
-                            if (pair[0] == firstBox || pair[0] == secondBox) {
-                                if (pair[1] == firstBox || pair[1] == secondBox) {
-                                    boxPairs.remove(pair);
-                                    break;
-                                }
-                            }
-                        }
-                        particleEffect.getEmitters().first().setPosition(
-                                Gdx.graphics.getWidth() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].x),
-                                Gdx.graphics.getHeight() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].y));
-                        particleEffect.start();
-                    }
+                    boxesInContact.add(new Box[]{(Box) firstBody.getUserData(), (Box) secondBody.getUserData()});
                 }
             }
 
@@ -212,8 +190,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
 
-        // Render the world using the debug renderer to view bodies and joints
-        renderer.render(world, camera.combined);
+        // Render the world using the debug box2DDebugRenderer to view bodies and joints
+        box2DDebugRenderer.render(world, camera.combined);
 
         tweenManager.update(Gdx.graphics.getDeltaTime());
 
@@ -297,7 +275,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         shapeRenderer.line(
                 Gdx.graphics.getWidth() / 2f + toPixels(p1.x), Gdx.graphics.getHeight() / 2f + toPixels(p1.y),
                 Gdx.graphics.getWidth() / 2f + toPixels(p2.x), Gdx.graphics.getHeight() / 2f + toPixels(p2.y));
-        System.out.println("BIG: " + (Gdx.graphics.getWidth() / 2f + toPixels(p1.x)) + ", " + (Gdx.graphics.getHeight() / 2f + toPixels(p1.y)));
+        //System.out.println("BIG: " + (Gdx.graphics.getWidth() / 2f + toPixels(p1.x)) + ", " + (Gdx.graphics.getHeight() / 2f + toPixels(p1.y)));
         shapeRenderer.end();
 
         /*
@@ -310,16 +288,70 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         drawLine(midSegmentStartPoint, midSegmentEndPoint)
         */
 
-        Vector2 lineMidPoint = (p1.add(p2)).scl(0.5f);
-        Vector2 lineUnitVector = (p1.sub(p2)).nor();
-        Vector2 midSegmentStartPoint = lineMidPoint.sub(lineUnitVector.scl(2f));
-        Vector2 midSegmentEndPoint = lineMidPoint.add(lineUnitVector.scl(2f));
+        Vector2 lineMidPoint = (p2.cpy().sub(p1)).cpy().scl(0.5f).cpy().add(p1);
+        Vector2 lineUnitVector = (p2.cpy().sub(p1)).cpy().nor();
+        Vector2 midSegmentStartPoint = lineMidPoint.cpy().sub(lineUnitVector.cpy().scl(0.5f));
+        Vector2 midSegmentEndPoint = lineMidPoint.cpy().add(lineUnitVector.cpy().scl(0.5f));
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1, 0, 0, 1);
+        shapeRenderer.setColor(0, 1, 0, 1);
         shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(midSegmentStartPoint.x), Gdx.graphics.getHeight() / 2f + toPixels(midSegmentStartPoint.y),
                 Gdx.graphics.getWidth() / 2f + toPixels(midSegmentEndPoint.x), Gdx.graphics.getHeight() / 2f + toPixels(midSegmentEndPoint.y));
-        System.out.println("LITTLE: " + (Gdx.graphics.getWidth() / 2f + toPixels(midSegmentStartPoint.x)) + ", " + (Gdx.graphics.getHeight() / 2f + toPixels(midSegmentStartPoint.y)));
+        //System.out.println("LITTLE: " + (Gdx.graphics.getWidth() / 2f + toPixels(midSegmentStartPoint.x)) + ", " + (Gdx.graphics.getHeight() / 2f + toPixels(midSegmentStartPoint.y)));
+        shapeRenderer.end();
 
+        DrawArrow(midSegmentStartPoint, midSegmentEndPoint);
+        DrawArrow(midSegmentEndPoint, midSegmentStartPoint);
+
+        /*Vector2 phiVec = p2.cpy().sub(p1);
+        float phi = (float) Math.atan2(phiVec.x, phiVec.y);
+        float angle1 = (float) (phi - Math.PI / 6);
+        float angle2 = (float) (phi + Math.PI / 6);
+
+        float x3 = (float) (midSegmentEndPoint.x * Math.cos(angle1));
+        float x4 = (float) (midSegmentEndPoint.x * Math.cos(angle2));
+        float y3 = (float) (midSegmentEndPoint.y * Math.sin(angle1));
+        float y4 = (float) (midSegmentEndPoint.y * Math.sin(angle2));
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(x3), Gdx.graphics.getHeight() / 2f + toPixels(y3),
+                Gdx.graphics.getWidth() / 2f + toPixels(x4), Gdx.graphics.getHeight() / 2f + toPixels(y4));
+        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(midSegmentEndPoint.x), Gdx.graphics.getHeight() / 2f + toPixels(midSegmentEndPoint.y),
+                Gdx.graphics.getWidth() / 2f + toPixels(x3), Gdx.graphics.getHeight() / 2f + toPixels(y3));
+        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(midSegmentEndPoint.x), Gdx.graphics.getHeight() / 2f + toPixels(midSegmentEndPoint.y),
+                Gdx.graphics.getWidth() / 2f + toPixels(x4), Gdx.graphics.getHeight() / 2f + toPixels(y4));
+        shapeRenderer.end();*/
+    }
+    public void DrawArrow(Vector2 origin, Vector2 endpoint) {
+        // Draw arrowhead so we can see direction
+        Vector2 arrowDirection = origin.cpy().sub(endpoint);
+        DebugDrawArrowhead(endpoint, arrowDirection.cpy().nor(), 0.2f); //GetArrowSizeForLine(arrowDirection)
+    }
+
+    /*private float GetArrowSizeForLine(Vector2 line)
+    {
+        float defaultArrowPercentage = 0.05f;
+        return (line.cpy().scl(defaultArrowPercentage)).;
+    }*/
+
+    private void DebugDrawArrowhead(Vector2 origin, Vector2 direction, float size)
+    {
+        float theta = 30.0f;
+        // Theta angle is the acute angle of the arrow, so flip direction or else arrow will be pointing "backwards"
+        Vector2 arrowheadHandle = direction.cpy().scl(-1f).cpy().scl(size);
+
+        Quaternion arrowRotationR = new Quaternion(new Vector3(0, 0, 1), theta);
+        Quaternion arrowRotationL = new Quaternion(new Vector3(0, 0, 1), -theta);
+        Vector2 arrowheadR = arrowheadHandle.cpy().rotate(arrowRotationR.getAngle());
+        Vector2 arrowheadL = arrowheadHandle.cpy().rotate(arrowRotationL.getAngle());
+        Vector2 rightSide = origin.cpy().add(arrowheadR);
+        Vector2 leftSide = origin.cpy().add(arrowheadL);
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        /*shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(origin.x), Gdx.graphics.getHeight() / 2f + toPixels(origin.y),
+                Gdx.graphics.getWidth() / 2f + toPixels(rightSide.x), Gdx.graphics.getHeight() / 2f + toPixels(rightSide.y));
+        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(origin.x), Gdx.graphics.getHeight() / 2f + toPixels(origin.y),
+                Gdx.graphics.getWidth() / 2f + toPixels(leftSide.x), Gdx.graphics.getHeight() / 2f + toPixels(leftSide.y));*/
+        shapeRenderer.rectLine(vectorToPixels(origin), vectorToPixels(rightSide), 2f);
+        shapeRenderer.rectLine(vectorToPixels(origin), vectorToPixels(leftSide), 2f);
         shapeRenderer.end();
     }
 
@@ -397,6 +429,29 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             groundBody.createFixture(sd);
 
             shape.dispose();
+        }
+    }
+
+    private void checkForMatches() {
+        for (Box[] boxPairInContact: boxesInContact) {
+            Card firstCard = boxPairInContact[0].getCard();
+            Card secondCard = boxPairInContact[1].getCard();
+            if (firstCard.getState() == State.REVEALED && secondCard.getState() == State.REVEALED) {
+                game.setToPaired(firstCard, secondCard);
+                for (Box[] pair : boxPairs) {
+                    if (pair[0] == boxPairInContact[0] || pair[0] == boxPairInContact[1]) {
+                        if (pair[1] == boxPairInContact[0] || pair[1] == boxPairInContact[1]) {
+                            boxPairs.remove(pair);
+                            break;
+                        }
+                    }
+                }
+               /* particleEffect.getEmitters().first().setPosition(
+                        Gdx.graphics.getWidth() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].x),
+                        Gdx.graphics.getHeight() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].y));
+                particleEffect.start();*/
+
+            }
         }
     }
 
@@ -632,20 +687,33 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     @Override
     public void dispose() {
-        renderer.dispose();
+        box2DDebugRenderer.dispose();
         world.dispose();
         backSideTexture.getTexture().dispose();
+        batch.dispose();
+        font.dispose();
+        shapeRenderer.dispose();
+        particleEffect.dispose();
 
-        renderer = null;
+
+        box2DDebugRenderer = null;
         world = null;
         //mouseJoints = null;
         hitBodies = null;
     }
 
+
+    public Vector2 vectorToMeters(Vector2 vectorInPixels) {
+        return new Vector2(Gdx.graphics.getWidth()/2f + toMeters(vectorInPixels.x), Gdx.graphics.getWidth()/2f + toMeters(vectorInPixels.y)); // DEFAULT: 0.018f
+    }
+
+    public Vector2 vectorToPixels(Vector2 vectorInMeters) {
+        return new Vector2(toPixels(vectorInMeters.x) - Gdx.graphics.getWidth()/2f, toPixels(vectorInMeters.y) - Gdx.graphics.getWidth()/2f); // DEFAULT: 0.018f
+    }
+
     public float toMeters(float pixels) {
         return pixels * 0.013f; // DEFAULT: 0.018f
     }
-
     public float toPixels(float meters) {
         return meters / 0.013f; // DEFAULT: 0.018f
     }
