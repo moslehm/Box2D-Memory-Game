@@ -297,12 +297,29 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         shapeRenderer.line(
                 Gdx.graphics.getWidth() / 2f + toPixels(p1.x), Gdx.graphics.getHeight() / 2f + toPixels(p1.y),
                 Gdx.graphics.getWidth() / 2f + toPixels(p2.x), Gdx.graphics.getHeight() / 2f + toPixels(p2.y));
+        System.out.println("BIG: " + (Gdx.graphics.getWidth() / 2f + toPixels(p1.x)) + ", " + (Gdx.graphics.getHeight() / 2f + toPixels(p1.y)));
         shapeRenderer.end();
 
-        Vector2 halfWayVector = p1.add(p2);
+        /*
+        let lineUnitVector = (lineEndPoint - lineStartPoint).normalized()
+        let lineMidPoint = (lineStartPoint + lineEndPoint) * 0..5
+        let someWidthConstant;
+        let midSegmentStartPoint = lineMidPoint - lineUnitVector * someWidthConstant;
+        let midSegmentEndPoint = lineMidPoint + lineUnitVector * someWidthConstant:
+        drawLine(lineStartPoint, lineEndPoint)
+        drawLine(midSegmentStartPoint, midSegmentEndPoint)
+        */
+
+        Vector2 lineMidPoint = (p1.add(p2)).scl(0.5f);
+        Vector2 lineUnitVector = (p1.sub(p2)).nor();
+        Vector2 midSegmentStartPoint = lineMidPoint.sub(lineUnitVector.scl(2f));
+        Vector2 midSegmentEndPoint = lineMidPoint.add(lineUnitVector.scl(2f));
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(1, 0, 0, 1);
-        shapeRenderer.line(halfWayVector.x / 2f, halfWayVector.y / 2f, halfWayVector.x / 2f, halfWayVector.y / 2f);
+        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(midSegmentStartPoint.x), Gdx.graphics.getHeight() / 2f + toPixels(midSegmentStartPoint.y),
+                Gdx.graphics.getWidth() / 2f + toPixels(midSegmentEndPoint.x), Gdx.graphics.getHeight() / 2f + toPixels(midSegmentEndPoint.y));
+        System.out.println("LITTLE: " + (Gdx.graphics.getWidth() / 2f + toPixels(midSegmentStartPoint.x)) + ", " + (Gdx.graphics.getHeight() / 2f + toPixels(midSegmentStartPoint.y)));
+
         shapeRenderer.end();
     }
 
