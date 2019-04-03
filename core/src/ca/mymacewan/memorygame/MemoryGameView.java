@@ -668,8 +668,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     @Override
     public boolean touchDown(int x, int y, int pointer, int button) {
         //System.out.println("touchDown: " + x + ", " + y);
-
-        return realTouchDown(x, y, pointer);
+        return false;
+        //return realTouchDown(x, y, pointer);
     }
 
     class TouchInfo {
@@ -743,7 +743,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     @Override
     public boolean touchDragged(int x, int y, int pointer) {
-        return realTouchDragged(x, y, pointer);
+        return false;
+        //return realTouchDragged(x, y, pointer);
     }
 
     private boolean realTouchDragged(int x, int y, int pointer) {
@@ -768,7 +769,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     @Override
     public boolean touchUp(int x, int y, int pointer, int button) {
-        return realTouchUp(x, y, pointer);
+        return false;
+        //return realTouchUp(x, y, pointer);
     }
 
     private boolean realTouchUp(int x, int y, int pointer) {
