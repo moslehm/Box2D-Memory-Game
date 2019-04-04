@@ -6,5 +6,12 @@ package ca.mymacewan.memorygame;
  */
 
 public enum State {
-    HIDDEN, REVEALED, PAIRED;
+    HIDDEN(0), REVEALED(0), PAIRED(1);
+    private final int value;
+    private State(int value) {
+        this.value = value;
+    }
+    public int getValue() {
+        return value;
+    }
 }

@@ -50,12 +50,12 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     BitmapFont font;
     GlyphLayout textLayout = new GlyphLayout();
     private TextureRegion backSideTexture;
-    private Sprite[] frontSideSprites;
+    private Sprite[][] frontSideSprites;
     private MemoryGame game;
     ArrayList<Card> cards;
     int difficulty;
-    private float halfBoxSizes[] = {0.8f, 0.7f, 0.6f, 0.5f, 0.4f};
-    private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {2.2f, 1.1f}, {1.8f, 0.9f}, {1.3f, 1f}, {2f, 2f}};
+    private float halfBoxSizes[] = {2f, 0.7f, 0.6f, 0.5f, 0.4f, 0.4f};
+    private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {2.2f, 1.1f}, {1.8f, 0.9f}, {1.3f, 1f}, {2f, 2f}, {1.9f, 1.9f}};
     int currentScore;
     ShapeRenderer shapeRenderer;
     ArrayList<Box[]> boxPairs;
@@ -95,6 +95,32 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         camera = new OrthographicCamera(CAMERA_WIDTH_METERS, CAMERA_HEIGHT_METERS);
         camera.position.set(0, 0, 0);
 
+        backSideTexture = new TextureRegion(new Texture(Gdx.files.internal("cardBack.png")));
+        Texture unmatchedTextureSheet = new Texture(Gdx.files.internal("unmatched.png"));
+        Texture matchedTextureSheet = new Texture(Gdx.files.internal("matched.png"));
+        TextureRegion[][] unmatchedTextureRegions = TextureRegion.split(unmatchedTextureSheet, 276, 276);
+        TextureRegion[][] matchedTextureRegions = TextureRegion.split(matchedTextureSheet, 276, 276);
+        Sprite[] unmatchedFrontSideSprites = new Sprite[7 * 4];
+        Sprite[] matchedFrontSideSprites = new Sprite[7 * 4];
+        int index = 0;
+        Sprite tempSprite;
+        for (int y = 0; y < 7; y++) {
+            for (int x = 0; x < 4; x++) {
+                tempSprite = new Sprite(unmatchedTextureRegions[x][y]);
+                //tempSprite.setSize(toPixels(halfBoxSizes[difficulty] * 2f) - 4, toPixels(halfBoxSizes[difficulty] * 2f) - 4);
+                tempSprite.setOrigin(toPixels(halfBoxSizes[difficulty]), toPixels(halfBoxSizes[difficulty]));
+                unmatchedFrontSideSprites[index] = tempSprite;
+
+                tempSprite = new Sprite(matchedTextureRegions[x][y]);
+                //tempSprite.setSize(toPixels(halfBoxSizes[difficulty] * 2f), toPixels(halfBoxSizes[difficulty] * 2f));
+                tempSprite.setOrigin(toPixels(halfBoxSizes[difficulty]), toPixels(halfBoxSizes[difficulty]));
+                matchedFrontSideSprites[index] = tempSprite;
+
+                index++;
+            }
+        }
+        frontSideSprites = new Sprite[][]{unmatchedFrontSideSprites, matchedFrontSideSprites};
+
         // Create the debug box2DDebugRenderer
         box2DDebugRenderer = new Box2DDebugRenderer();
 
@@ -127,20 +153,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         // Set the input processor as the ones overridden in here
         Gdx.input.setInputProcessor(this);
 
-        backSideTexture = new TextureRegion(new Texture(Gdx.files.internal("cardBack.png")));
-        Texture textureSheet = new Texture(Gdx.files.internal("AlphabetSheet.png"));
-        TextureRegion[][] tmpRegions = TextureRegion.split(textureSheet, 150, 150);
-        frontSideSprites = new Sprite[7 * 4];
-        int index = 0;
-        Sprite tempSprite;
-        for (int y = 0; y < 7; y++) {
-            for (int x = 0; x < 4; x++) {
-                tempSprite = new Sprite(tmpRegions[x][y]);
-                //System.out.println(tempSprite.getColor().a);
-                frontSideSprites[index++] = tempSprite;
-            }
-        }
-
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
@@ -149,14 +161,32 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 if (firstBody.getUserData() != null && secondBody.getUserData() != null) {
                     Box firstBox = (Box) firstBody.getUserData();
                     Box secondBox = (Box) secondBody.getUserData();
-                    if (firstBox.getCard().getValue() == secondBox.getCard().getValue()) {
-                        boxesInContact.add(new Box[]{firstBox, secondBox});
-                    }
+                    boxesInContact.add(new Box[]{firstBox, secondBox});
+                    firstBox.setPointOfContact(new Vector2(Gdx.graphics.getWidth() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].x),
+                            Gdx.graphics.getHeight() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].y)));
+                    secondBox.setPointOfContact(new Vector2(Gdx.graphics.getWidth() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].x),
+                            Gdx.graphics.getHeight() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].y)));
                 }
             }
 
             @Override
             public void endContact(Contact contact) {
+                Body firstBody = contact.getFixtureA().getBody();
+                Body secondBody = contact.getFixtureB().getBody();
+                if (firstBody.getUserData() != null && secondBody.getUserData() != null) {
+                    Box firstBox = (Box) firstBody.getUserData();
+                    Box secondBox = (Box) secondBody.getUserData();
+                    for (Box currentBoxesInContact[]: boxesInContact){
+                        if (currentBoxesInContact[0] == firstBox || currentBoxesInContact[0] == secondBox){
+                            if (currentBoxesInContact[1] == firstBox || currentBoxesInContact[1] == secondBox){
+                                boxesInContact.remove(currentBoxesInContact);
+                                currentBoxesInContact[0].resetPointOfContact();
+                                currentBoxesInContact[1].resetPointOfContact();
+                                break;
+                            }
+                        }
+                    }
+                }
 
             }
 
@@ -172,9 +202,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         });
 
         // == Windows multi touch test Start ==
-        jWinPointerReader = new
-
-                JWinPointerReader("MemoryGameView");
+        jWinPointerReader = new JWinPointerReader("MemoryGameView");
         jWinPointerReader.addPointerEventListener(this);
         // == Windows multi touch test End ==
     }
@@ -195,9 +223,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         // Clear the screen and setup the projection matrix
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
-
-        // Render the world using the debug box2DDebugRenderer to view bodies and joints
-        box2DDebugRenderer.render(world, camera.combined);
 
         tweenManager.update(Gdx.graphics.getDeltaTime());
 
@@ -243,7 +268,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             Body boxBody = box.getBody();
             Vector2 position = boxBody.getPosition(); // Get the box's center position
             float angle = MathUtils.radiansToDegrees * boxBody.getAngle(); // Get the box's rotation angle around the center
-            Sprite currentSprite = frontSideSprites[cards.get(i).getValue()];
+            Sprite currentSprite = frontSideSprites[cards.get(i).getState().getValue()][cards.get(i).getValue()];
             /*Color textureColour = currentSprite.getColor();
             textureColour.a = box.getAlpha();*/
             //System.out.println("ALPHA: " + box.getAlpha());
@@ -252,7 +277,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             currentSprite.setY(Gdx.graphics.getHeight() / 2f + toPixels(position.y) - currentSprite.getHeight() / 2f);
             //currentSprite.setOrigin(-currentSprite.getWidth()/2f, currentSprite.getHeight()/2f);
             // ScaleX: (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0))
-            currentSprite.setScale(halfBoxSizes[difficulty] * (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), halfBoxSizes[difficulty] * box.getScaleY());
+            currentSprite.setScale((float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), box.getScaleY());
             currentSprite.setRotation(angle);
             currentSprite.draw(batch);
             // Draw the back side
@@ -273,6 +298,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         font.draw(batch, Integer.toString(currentScore), ((toMeters(Gdx.graphics.getWidth()) / 2f) / 2f) + (Gdx.graphics.getWidth() * 0.05f), (((toMeters(Gdx.graphics.getHeight()) / 2f) / 2f)) + (Gdx.graphics.getHeight() / 2f) * 0.25f);
         particleEffect.draw(batch);
         batch.end();
+
+        // Render the world using the debug box2DDebugRenderer to view bodies and joints
+        box2DDebugRenderer.render(world, camera.combined);
     }
 
     public void drawLine(Vector2 p1, Vector2 p2) {
@@ -438,25 +466,26 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     }
 
     private void checkForMatches() {
+        int index = 0;
         for (Box[] boxPairInContact : boxesInContact) {
             Card firstCard = boxPairInContact[0].getCard();
             Card secondCard = boxPairInContact[1].getCard();
             if (firstCard.getState() == State.REVEALED && secondCard.getState() == State.REVEALED) {
-                game.setToPaired(firstCard, secondCard);
-                for (Box[] pair : boxPairs) {
-                    if (pair[0] == boxPairInContact[0] || pair[0] == boxPairInContact[1]) {
-                        if (pair[1] == boxPairInContact[0] || pair[1] == boxPairInContact[1]) {
-                            boxPairs.remove(pair);
-                            break;
+                if (firstCard.getValue() == secondCard.getValue()) {
+                    game.setToPaired(firstCard, secondCard);
+                    for (Box[] pair : boxPairs) {
+                        if (pair[0] == boxPairInContact[0] || pair[0] == boxPairInContact[1]) {
+                            if (pair[1] == boxPairInContact[0] || pair[1] == boxPairInContact[1]) {
+                                boxPairs.remove(pair);
+                                break;
+                            }
                         }
                     }
+                    particleEffect.getEmitters().first().setPosition(boxPairInContact[0].getPointOfContact().x, boxPairInContact[0].getPointOfContact().y);
+                    particleEffect.start();
                 }
-               /* particleEffect.getEmitters().first().setPosition(
-                        Gdx.graphics.getWidth() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].x),
-                        Gdx.graphics.getHeight() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].y));
-                particleEffect.start();*/
-
             }
+            index++;
         }
     }
 
@@ -492,6 +521,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     int currentNumOfCards;
 
     private void createGame() {
+        boxPairs = new ArrayList<Box[]>();
+        boxesInContact = new ArrayList<Box[]>();
         hitBodies = new Body[200];
         //mouseJoints = new Array<MouseJoint>();
         frictionJoints = new Array<Joint>();
@@ -505,6 +536,13 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         cards = game.getCards();
         difficulty = game.getDifficulty();
         currentNumOfCards = 0;
+
+        for (Sprite[] frontSideSpriteArray: frontSideSprites){
+            for (Sprite frontSideSprite: frontSideSpriteArray){
+                frontSideSprite.setSize(toPixels(halfBoxSizes[difficulty] * 2f), toPixels(halfBoxSizes[difficulty] * 2f));
+                frontSideSprite.setOrigin(toPixels(halfBoxSizes[difficulty]), toPixels(halfBoxSizes[difficulty]));
+            }
+        }
 
         float halfWidth = toMeters(Gdx.graphics.getWidth()) / 2f;
         float halfHeight = toMeters(Gdx.graphics.getHeight()) / 2f;

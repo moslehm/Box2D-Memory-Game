@@ -1,5 +1,6 @@
 package ca.mymacewan.memorygame;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 public class Box {
@@ -8,6 +9,7 @@ public class Box {
     private float scaleY;
     private Card card;
     private float alpha;
+    private Vector2 pointOfContact = null;
 
     Box(Body boxBody, Card card){
         this.boxBody = boxBody;
@@ -48,5 +50,17 @@ public class Box {
 
     public void setScaleY(float scaleY) {
         this.scaleY = scaleY;
+    }
+
+    public Vector2 getPointOfContact() {
+        return pointOfContact;
+    }
+
+    public void setPointOfContact(Vector2 pointOfContact) {
+        this.pointOfContact = pointOfContact;
+    }
+
+    public void resetPointOfContact() {
+        this.pointOfContact = null;
     }
 }
