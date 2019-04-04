@@ -1,12 +1,17 @@
 package ca.mymacewan.memorygame;
 
-import com.badlogic.gdx.Input;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import jwinpointer.JWinPointerReader;
@@ -14,9 +19,6 @@ import jwinpointer.JWinPointerReader.PointerEventListener;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenEquations;
 import aurelienribon.tweenengine.TweenManager;
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -65,6 +67,8 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     ArrayList<Box[]> boxPairs;
     ArrayList<Box[]> boxesInContact;
     ParticleEffect particleEffect;
+    public Color worldColor;
+    InputMultiplexer plex;
     Stage stage;
 
     private static TweenManager tweenManager;
@@ -78,6 +82,15 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         boxesInContact = new ArrayList<Box[]>();
         particleEffect = new ParticleEffect();
         particleEffect.load(Gdx.files.internal("explosion.p"), Gdx.files.internal(""));
+
+        plex =  new InputMultiplexer();
+        createTopButtons();
+        createBottomButtons();
+        worldColor = new Color();
+        worldColor.r = 44 / 255f;
+        worldColor.g = 135 / 255f;
+        worldColor.b = 209 / 255f;
+        worldColor.a = 1;
 
         // "Meters" are the units of Box2D
         // 1 pixel = 0.018 meters
@@ -197,7 +210,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         stage.addActor(container);
 
         // Set the input processor as the ones overridden in here
-        Gdx.input.setInputProcessor(this);
+        plex.addProcessor(this);
+        plex.addProcessor(stage);
+        Gdx.input.setInputProcessor(plex);
 
         world.setContactListener(new ContactListener() {
             @Override
@@ -207,11 +222,13 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 if (firstBody.getUserData() != null && secondBody.getUserData() != null) {
                     Box firstBox = (Box) firstBody.getUserData();
                     Box secondBox = (Box) secondBody.getUserData();
-                    boxesInContact.add(new Box[]{firstBox, secondBox});
-                    firstBox.setPointOfContact(new Vector2(Gdx.graphics.getWidth() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].x),
-                            Gdx.graphics.getHeight() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].y)));
-                    secondBox.setPointOfContact(new Vector2(Gdx.graphics.getWidth() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].x),
-                            Gdx.graphics.getHeight() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].y)));
+                    if (firstBox.getCard().getValue() == secondBox.getCard().getValue()) {
+                        boxesInContact.add(new Box[]{firstBox, secondBox});
+                        firstBox.setPointOfContact(new Vector2(Gdx.graphics.getWidth() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].x),
+                                Gdx.graphics.getHeight() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].y)));
+                        secondBox.setPointOfContact(new Vector2(Gdx.graphics.getWidth() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].x),
+                                Gdx.graphics.getHeight() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].y)));
+                    }
                 }
             }
 
@@ -260,7 +277,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         particleEffect.update(Gdx.graphics.getDeltaTime());
 
         // Background colour
-        Gdx.gl.glClearColor(44 / 255f, 135 / 255f, 209 / 255f, 1);
+        Gdx.gl.glClearColor(worldColor.r, worldColor.g, worldColor.b, worldColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // Update the world with a fixed time step
@@ -565,8 +582,176 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 .start(tweenManager);
     }
 
-    int currentNumOfCards;
+    private void createTopButtons() {
+        Image yellowImage = new Image(new Texture("yellow.png"));
+        Image greenImage = new Image(new Texture("green.png"));
+        Image pinkImage = new Image(new Texture("pink.png"));
+        Image purpleImage = new Image(new Texture("purple.png"));
+        Image blueImage = new Image(new Texture("blue.png"));
 
+        float xPosition = Gdx.graphics.getWidth()/8f;
+
+        Container wrapper = new Container(yellowImage);
+        wrapper.setTransform(true);
+        wrapper.setTouchable(Touchable.enabled);
+        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
+        wrapper.setPosition(Gdx.graphics.getWidth()/2f - xPosition*2f - wrapper.getWidth()/2f, Gdx.graphics.getHeight() - wrapper.getHeight());
+        wrapper.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                worldColor.r = 255 / 255f;
+                worldColor.g = 183 / 255f;
+                worldColor.b = 24 / 255f;
+                return true;
+            }
+        });
+        stage.addActor(wrapper);
+
+        wrapper = new Container(greenImage);
+        wrapper.setTransform(true);
+        wrapper.setTouchable(Touchable.enabled);
+        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
+        wrapper.setPosition(Gdx.graphics.getWidth()/2f - xPosition - wrapper.getWidth()/2f, Gdx.graphics.getHeight() - wrapper.getHeight());
+        wrapper.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                worldColor.r = 118 / 255f;
+                worldColor.g = 189 / 255f;
+                worldColor.b = 29 / 255f;
+                return true;
+            }
+        });
+        stage.addActor(wrapper);
+
+        wrapper = new Container(pinkImage);
+        wrapper.setTransform(true);
+        wrapper.setTouchable(Touchable.enabled);
+        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
+        wrapper.setPosition(Gdx.graphics.getWidth()/2f - wrapper.getWidth()/2f, Gdx.graphics.getHeight() - wrapper.getHeight());
+        wrapper.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                worldColor.r = 215 / 255f;
+                worldColor.g = 0 / 255f;
+                worldColor.b = 53 / 255f;
+                return true;
+            }
+        });
+        stage.addActor(wrapper);
+
+        wrapper = new Container(purpleImage);
+        wrapper.setTransform(true);
+        wrapper.setTouchable(Touchable.enabled);
+        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
+        wrapper.setPosition(Gdx.graphics.getWidth()/2f + xPosition - wrapper.getWidth()/2f, Gdx.graphics.getHeight() - wrapper.getHeight());
+        wrapper.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                worldColor.r = 135 / 255f;
+                worldColor.g = 49 / 255f;
+                worldColor.b = 154 / 255f;
+                return true;
+            }
+        });
+        stage.addActor(wrapper);
+
+        wrapper = new Container(blueImage);
+        wrapper.setTransform(true);
+        wrapper.setTouchable(Touchable.enabled);
+        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
+        wrapper.setPosition(Gdx.graphics.getWidth()/2f + xPosition*2f - wrapper.getWidth()/2f, Gdx.graphics.getHeight() - wrapper.getHeight());
+        wrapper.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                worldColor.r = 0 / 255f;
+                worldColor.g = 161 / 255f;
+                worldColor.b = 206 / 255f;
+                return true;
+            }
+        });
+        stage.addActor(wrapper);
+    }
+    private void createBottomButtons() {
+        Image yellowImage = new Image(new Texture("yellow.png"));
+        Image greenImage = new Image(new Texture("green.png"));
+        Image pinkImage = new Image(new Texture("pink.png"));
+        Image purpleImage = new Image(new Texture("purple.png"));
+        Image blueImage = new Image(new Texture("blue.png"));
+
+        float xPosition = Gdx.graphics.getWidth()/8f;
+
+        Container wrapper = new Container(yellowImage);
+        wrapper.setTransform(true);
+        wrapper.setTouchable(Touchable.enabled);
+        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
+        wrapper.setPosition(Gdx.graphics.getWidth()/2f - xPosition*2f - wrapper.getWidth()/2f, 0);
+        wrapper.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                worldColor.r = 255 / 255f;
+                worldColor.g = 183 / 255f;
+                worldColor.b = 24 / 255f;
+                return true;
+            }
+        });
+        stage.addActor(wrapper);
+
+        wrapper = new Container(greenImage);
+        wrapper.setTransform(true);
+        wrapper.setTouchable(Touchable.enabled);
+        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
+        wrapper.setPosition(Gdx.graphics.getWidth()/2f - xPosition - wrapper.getWidth()/2f, 0);
+        wrapper.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                worldColor.r = 118 / 255f;
+                worldColor.g = 189 / 255f;
+                worldColor.b = 29 / 255f;
+                return true;
+            }
+        });
+        stage.addActor(wrapper);
+
+        wrapper = new Container(pinkImage);
+        wrapper.setTransform(true);
+        wrapper.setTouchable(Touchable.enabled);
+        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
+        wrapper.setPosition(Gdx.graphics.getWidth()/2f - wrapper.getWidth()/2f, 0);
+        wrapper.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                worldColor.r = 215 / 255f;
+                worldColor.g = 0 / 255f;
+                worldColor.b = 53 / 255f;
+                return true;
+            }
+        });
+        stage.addActor(wrapper);
+
+        wrapper = new Container(purpleImage);
+        wrapper.setTransform(true);
+        wrapper.setTouchable(Touchable.enabled);
+        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
+        wrapper.setPosition(Gdx.graphics.getWidth()/2f + xPosition - wrapper.getWidth()/2f, 0);
+        wrapper.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                worldColor.r = 135 / 255f;
+                worldColor.g = 49 / 255f;
+                worldColor.b = 154 / 255f;
+                return true;
+            }
+        });
+        stage.addActor(wrapper);
+
+        wrapper = new Container(blueImage);
+        wrapper.setTransform(true);
+        wrapper.setTouchable(Touchable.enabled);
+        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
+        wrapper.setPosition(Gdx.graphics.getWidth()/2f + xPosition*2f - wrapper.getWidth()/2f, 0);
+        wrapper.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                worldColor.r = 0 / 255f;
+                worldColor.g = 161 / 255f;
+                worldColor.b = 206 / 255f;
+                return true;
+            }
+        });
+        stage.addActor(wrapper);
+    }
+
+    int currentNumOfCards;
     private void createGame() {
         boxPairs = new ArrayList<Box[]>();
         boxesInContact = new ArrayList<Box[]>();
