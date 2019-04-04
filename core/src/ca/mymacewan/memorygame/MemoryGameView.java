@@ -60,7 +60,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     private MemoryGame game;
     ArrayList<Card> cards;
     int difficulty;
-    private float halfBoxSizes[] = {2f, 1.5f, 1f, 0.8f, 0.8f, 0.36f};
+    private float halfBoxSizes[] = {1.5f, 1.5f, 1f, 0.8f, 0.8f, 0.36f};
     private float xyBoxSpacing[][] = {{3.1f, 1.9f}, {3.7f, 1.9f}, {5f, 2f}, {3.7f, 2.5f}, {4.5f, 2f}, {3.5f, 1.9f}};
     int currentScore;
     ShapeRenderer shapeRenderer;
@@ -87,9 +87,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         createTopButtons();
         createBottomButtons();
         worldColor = new Color();
-        worldColor.r = 44 / 255f;
-        worldColor.g = 135 / 255f;
-        worldColor.b = 209 / 255f;
+        worldColor.r = 0 / 255f;
+        worldColor.g = 161 / 255f;
+        worldColor.b = 206 / 255f;
         worldColor.a = 1;
 
         // "Meters" are the units of Box2D
@@ -181,7 +181,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         Vector2 topRightCornerPos = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         // define this
-        float scoreDistanceFromCorner = 130;
+        float scoreDistanceFromCorner = Gdx.graphics.getHeight()/8f - 10f;
 
         Vector2 bottomLeftScorePos = bottomLeftCornerPos.cpy().add(new Vector2(1, 1).cpy().scl(scoreDistanceFromCorner));
         Vector2 topLeftScorePos = topLeftCornerPos.cpy().add(new Vector2(1, -1).cpy().scl(scoreDistanceFromCorner));
@@ -364,7 +364,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         stage.draw();
 
         // Render the world using the debug box2DDebugRenderer to view bodies and joints
-        box2DDebugRenderer.render(world, camera.combined);
+        //box2DDebugRenderer.render(world, camera.combined);
     }
 
     public void drawLine(Vector2 p1, Vector2 p2) {

@@ -222,6 +222,8 @@ public class MemoryGame {
     //restart the game for returning true
     public boolean isIdle() {
         if (System.currentTimeMillis() - idleStartTime > isIdleTime) {
+            diffLevel = 0;
+            score = 0;
             return true;
         } else {
             return false;
