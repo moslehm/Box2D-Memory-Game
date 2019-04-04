@@ -147,7 +147,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 Body firstBody = contact.getFixtureA().getBody();
                 Body secondBody = contact.getFixtureB().getBody();
                 if (firstBody.getUserData() != null && secondBody.getUserData() != null) {
-                    boxesInContact.add(new Box[]{(Box) firstBody.getUserData(), (Box) secondBody.getUserData()});
+                    Box firstBox = (Box) firstBody.getUserData();
+                    Box secondBox = (Box) secondBody.getUserData();
+                    if (firstBox.getCard().getValue() == secondBox.getCard().getValue()) {
+                        boxesInContact.add(new Box[]{firstBox, secondBox});
+                    }
                 }
             }
 
@@ -168,7 +172,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         });
 
         // == Windows multi touch test Start ==
-        jWinPointerReader = new JWinPointerReader("MemoryGameView");
+        jWinPointerReader = new
+
+                JWinPointerReader("MemoryGameView");
         jWinPointerReader.addPointerEventListener(this);
         // == Windows multi touch test End ==
     }
@@ -264,7 +270,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         batch.begin();
         batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         // Display score
-        font.draw(batch, Integer.toString(currentScore), Gdx.graphics.getWidth() / 2f - textLayout.width / 2f, Gdx.graphics.getHeight() / 2f + textLayout.height / 2f);
+        font.draw(batch, Integer.toString(currentScore), ((toMeters(Gdx.graphics.getWidth()) / 2f) / 2f) + (Gdx.graphics.getWidth() * 0.05f), (((toMeters(Gdx.graphics.getHeight()) / 2f) / 2f)) + (Gdx.graphics.getHeight() / 2f) * 0.25f);
         particleEffect.draw(batch);
         batch.end();
     }
@@ -320,6 +326,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                 Gdx.graphics.getWidth() / 2f + toPixels(x4), Gdx.graphics.getHeight() / 2f + toPixels(y4));
         shapeRenderer.end();*/
     }
+
     public void DrawArrow(Vector2 origin, Vector2 endpoint) {
         // Draw arrowhead so we can see direction
         Vector2 arrowDirection = origin.cpy().sub(endpoint);
@@ -332,8 +339,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         return (line.cpy().scl(defaultArrowPercentage)).;
     }*/
 
-    private void DebugDrawArrowhead(Vector2 origin, Vector2 direction, float size)
-    {
+    private void DebugDrawArrowhead(Vector2 origin, Vector2 direction, float size) {
         float theta = 30.0f;
         // Theta angle is the acute angle of the arrow, so flip direction or else arrow will be pointing "backwards"
         Vector2 arrowheadHandle = direction.cpy().scl(-1f).cpy().scl(size);
@@ -346,12 +352,12 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         Vector2 leftSide = origin.cpy().add(arrowheadL);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        /*shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(origin.x), Gdx.graphics.getHeight() / 2f + toPixels(origin.y),
+        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(origin.x), Gdx.graphics.getHeight() / 2f + toPixels(origin.y),
                 Gdx.graphics.getWidth() / 2f + toPixels(rightSide.x), Gdx.graphics.getHeight() / 2f + toPixels(rightSide.y));
         shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(origin.x), Gdx.graphics.getHeight() / 2f + toPixels(origin.y),
-                Gdx.graphics.getWidth() / 2f + toPixels(leftSide.x), Gdx.graphics.getHeight() / 2f + toPixels(leftSide.y));*/
-        shapeRenderer.rectLine(vectorToPixels(origin), vectorToPixels(rightSide), 2f);
-        shapeRenderer.rectLine(vectorToPixels(origin), vectorToPixels(leftSide), 2f);
+                Gdx.graphics.getWidth() / 2f + toPixels(leftSide.x), Gdx.graphics.getHeight() / 2f + toPixels(leftSide.y));
+        /*shapeRenderer.rectLine(vectorToPixels(origin), vectorToPixels(rightSide), 2f);
+        shapeRenderer.rectLine(vectorToPixels(origin), vectorToPixels(leftSide), 2f);*/
         shapeRenderer.end();
     }
 
@@ -361,7 +367,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             Box firstBox = copyOfBoxes.remove(i);
             for (int index2 = 0; i < copyOfBoxes.size(); i++){
                 Box secondBox = copyOfBoxes.remove(index2);
-                // TODO: IF BOXES MATCH AND ARE BOTH FACE UP
                 if (firstBox.getCard())
              }
         }
@@ -433,7 +438,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     }
 
     private void checkForMatches() {
-        for (Box[] boxPairInContact: boxesInContact) {
+        for (Box[] boxPairInContact : boxesInContact) {
             Card firstCard = boxPairInContact[0].getCard();
             Card secondCard = boxPairInContact[1].getCard();
             if (firstCard.getState() == State.REVEALED && secondCard.getState() == State.REVEALED) {
@@ -548,6 +553,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     void update() {
         currentScore = game.getScore();
         textLayout.setText(font, Integer.toString(currentScore));
+        checkForMatches();
         if (game.isIdle()) {
             destroyAll();
             boxPairs = new ArrayList<Box[]>();
@@ -704,16 +710,17 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
 
     public Vector2 vectorToMeters(Vector2 vectorInPixels) {
-        return new Vector2(Gdx.graphics.getWidth()/2f + toMeters(vectorInPixels.x), Gdx.graphics.getWidth()/2f + toMeters(vectorInPixels.y)); // DEFAULT: 0.018f
+        return new Vector2(Gdx.graphics.getWidth() / 2f + toMeters(vectorInPixels.x), Gdx.graphics.getWidth() / 2f + toMeters(vectorInPixels.y)); // DEFAULT: 0.018f
     }
 
     public Vector2 vectorToPixels(Vector2 vectorInMeters) {
-        return new Vector2(toPixels(vectorInMeters.x) - Gdx.graphics.getWidth()/2f, toPixels(vectorInMeters.y) - Gdx.graphics.getWidth()/2f); // DEFAULT: 0.018f
+        return new Vector2(toPixels(vectorInMeters.x) - Gdx.graphics.getWidth() / 2f, toPixels(vectorInMeters.y) - Gdx.graphics.getWidth() / 2f); // DEFAULT: 0.018f
     }
 
     public float toMeters(float pixels) {
         return pixels * 0.013f; // DEFAULT: 0.018f
     }
+
     public float toPixels(float meters) {
         return meters / 0.013f; // DEFAULT: 0.018f
     }
@@ -748,6 +755,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
             this.pointer = pointer;
             this.mouseJoint = mouseJoint;
         }
+
     }
 
     private boolean realTouchDown(int x, int y, int pointer) {
