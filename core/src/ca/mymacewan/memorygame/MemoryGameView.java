@@ -4,6 +4,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import jwinpointer.JWinPointerReader;
@@ -28,6 +31,7 @@ import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class MemoryGameView implements ApplicationListener, InputProcessor, PointerEventListener {
     // Box2D initialization
@@ -47,26 +51,28 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
     protected Body hitBody = null;
 
     SpriteBatch batch;
-    BitmapFont font;
+    Label[] label;
     GlyphLayout textLayout = new GlyphLayout();
     private TextureRegion backSideTexture;
     private Sprite[][] frontSideSprites;
     private MemoryGame game;
     ArrayList<Card> cards;
     int difficulty;
-    private float halfBoxSizes[] = {2f, 0.7f, 0.6f, 0.5f, 0.4f, 0.4f};
-    private float xyBoxSpacing[][] = {{2.3f, 1.3f}, {2.2f, 1.1f}, {1.8f, 0.9f}, {1.3f, 1f}, {2f, 2f}, {1.9f, 1.9f}};
+    private float halfBoxSizes[] = {2f, 1.5f, 1f, 0.8f, 0.8f, 0.36f};
+    private float xyBoxSpacing[][] = {{3.1f, 1.9f}, {3.7f, 1.9f}, {5f, 2f}, {3.7f, 2.5f}, {4.5f, 2f}, {3.5f, 1.9f}};
     int currentScore;
     ShapeRenderer shapeRenderer;
     ArrayList<Box[]> boxPairs;
     ArrayList<Box[]> boxesInContact;
     ParticleEffect particleEffect;
+    Stage stage;
 
     private static TweenManager tweenManager;
     private static JWinPointerReader jWinPointerReader;
 
     @Override
     public void create() {
+        stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         boxPairs = new ArrayList<Box[]>();
         boxesInContact = new ArrayList<Box[]>();
@@ -107,12 +113,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         for (int y = 0; y < 7; y++) {
             for (int x = 0; x < 4; x++) {
                 tempSprite = new Sprite(unmatchedTextureRegions[x][y]);
-                //tempSprite.setSize(toPixels(halfBoxSizes[difficulty] * 2f) - 4, toPixels(halfBoxSizes[difficulty] * 2f) - 4);
                 tempSprite.setOrigin(toPixels(halfBoxSizes[difficulty]), toPixels(halfBoxSizes[difficulty]));
                 unmatchedFrontSideSprites[index] = tempSprite;
 
                 tempSprite = new Sprite(matchedTextureRegions[x][y]);
-                //tempSprite.setSize(toPixels(halfBoxSizes[difficulty] * 2f), toPixels(halfBoxSizes[difficulty] * 2f));
                 tempSprite.setOrigin(toPixels(halfBoxSizes[difficulty]), toPixels(halfBoxSizes[difficulty]));
                 matchedFrontSideSprites[index] = tempSprite;
 
@@ -147,8 +151,50 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         batch = new SpriteBatch();
 
         // Load font
-        font = new BitmapFont(Gdx.files.internal("ArialFont.fnt"));
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        BitmapFont font = new BitmapFont(Gdx.files.internal("ArialFont.fnt"));
+        labelStyle.font = font;
+        label = new Label[4];
+        label[0] = new Label(Integer.toString(currentScore), labelStyle);
+        label[1] = new Label(Integer.toString(currentScore), labelStyle);
+        label[2] = new Label(Integer.toString(currentScore), labelStyle);
+        label[3] = new Label(Integer.toString(currentScore), labelStyle);
+        // Display score
+        //float distanceFromCorner = Gdx.graphics.getHeight()/8f;
+        // get these
+        Vector2 bottomLeftCornerPos = new Vector2(0, 0);
+        Vector2 bottomRightCornerPos = new Vector2(Gdx.graphics.getWidth(), 0);
+        Vector2 topLeftCornerPos = new Vector2(0, Gdx.graphics.getHeight());
+        Vector2 topRightCornerPos = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+        // define this
+        float scoreDistanceFromCorner = 130;
+
+        Vector2 bottomLeftScorePos = bottomLeftCornerPos.cpy().add(new Vector2(1, 1).cpy().scl(scoreDistanceFromCorner));
+        Vector2 topLeftScorePos = topLeftCornerPos.cpy().add(new Vector2(1, -1).cpy().scl(scoreDistanceFromCorner));
+        Vector2 bottomRightScorePos = bottomRightCornerPos.cpy().add(new Vector2(-1, 1).cpy().scl(scoreDistanceFromCorner + 15));
+        Vector2 topRightScorePos = topRightCornerPos.cpy().add(new Vector2(-1, -1).cpy().scl(scoreDistanceFromCorner + 15));
+
+        Container container = new Container(label[0]);
+        container.setTransform(true);
+        container.setPosition(bottomLeftScorePos.x, bottomLeftScorePos.y);
+        container.setRotation(315);
+        stage.addActor(container);
+        container = new Container(label[1]);
+        container.setTransform(true);
+        container.setPosition(topLeftScorePos.x, topLeftScorePos.y);
+        container.setRotation(225);
+        stage.addActor(container);
+        container = new Container(label[2]);
+        container.setTransform(true);
+        container.setPosition(bottomRightScorePos.x, bottomRightScorePos.y);
+        container.setRotation(135 - 90);
+        stage.addActor(container);
+        container = new Container(label[3]);
+        container.setTransform(true);
+        container.setPosition(topRightScorePos.x, topRightScorePos.y);
+        container.setRotation(45 + 90);
+        stage.addActor(container);
 
         // Set the input processor as the ones overridden in here
         Gdx.input.setInputProcessor(this);
@@ -294,10 +340,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
         batch.begin();
         batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        // Display score
-        font.draw(batch, Integer.toString(currentScore), ((toMeters(Gdx.graphics.getWidth()) / 2f) / 2f) + (Gdx.graphics.getWidth() * 0.05f), (((toMeters(Gdx.graphics.getHeight()) / 2f) / 2f)) + (Gdx.graphics.getHeight() / 2f) * 0.25f);
         particleEffect.draw(batch);
         batch.end();
+
+        stage.act();
+        stage.draw();
 
         // Render the world using the debug box2DDebugRenderer to view bodies and joints
         box2DDebugRenderer.render(world, camera.combined);
@@ -590,7 +637,10 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     void update() {
         currentScore = game.getScore();
-        textLayout.setText(font, Integer.toString(currentScore));
+        label[0].setText(currentScore);
+        label[1].setText(currentScore);
+        label[2].setText(currentScore);
+        label[3].setText(currentScore);
         checkForMatches();
         if (game.isIdle()) {
             destroyAll();
@@ -735,7 +785,6 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         world.dispose();
         backSideTexture.getTexture().dispose();
         batch.dispose();
-        font.dispose();
         shapeRenderer.dispose();
         particleEffect.dispose();
 
