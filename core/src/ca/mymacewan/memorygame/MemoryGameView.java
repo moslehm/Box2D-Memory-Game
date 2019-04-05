@@ -1,6 +1,7 @@
 package ca.mymacewan.memorygame;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -73,6 +74,11 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
 
     private static TweenManager tweenManager;
     private static JWinPointerReader jWinPointerReader;
+
+    private Sound impactSound;
+    private Sound pairSound;
+    private Sound turnOverSound;
+    private Sound winSound;
 
     @Override
     public void create() {
@@ -160,6 +166,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         // Creates the boxes and joints
         createGame();
 
+        //load sound effects
+        loadSound();
+
         // Batch to draw textures
         batch = new SpriteBatch();
 
@@ -217,6 +226,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
+                impactSound.play(0.5f);
                 Body firstBody = contact.getFixtureA().getBody();
                 Body secondBody = contact.getFixtureB().getBody();
                 if (firstBody.getUserData() != null && secondBody.getUserData() != null) {
@@ -268,6 +278,9 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         jWinPointerReader = new JWinPointerReader("MemoryGameView");
         jWinPointerReader.addPointerEventListener(this);
         // == Windows multi touch test End ==
+
+
+
     }
 
 
@@ -545,6 +558,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                             }
                         }
                     }
+                    pairSound.play(1.0f);
                     particleEffect.getEmitters().first().setPosition(boxPairInContact[0].getPointOfContact().x, boxPairInContact[0].getPointOfContact().y);
                     particleEffect.start();
                 }
@@ -849,6 +863,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         // Round over
         // Destroy bodies and joints
         // Then start next round
+        winSound.play(1.0f);
         destroyAll();
         boxPairs = new ArrayList<Box[]>();
         game.nextDiff();
@@ -900,6 +915,12 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         }
     }
 
+    void loadSound() {
+        Sound impactSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/impact.wav"));
+        Sound pairSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/pair.mp3"));
+        Sound turnOverSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/turnOver.mp3"));
+        Sound winSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/Winning&nextLevel.mp3"));
+    }
 
     public void createBox(float xPosition, float yPosition, float angle, Card card) {
         PolygonShape shape = new PolygonShape();
@@ -978,6 +999,12 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         world = null;
         //mouseJoints = null;
         hitBodies = null;
+
+        //dispose sound effects
+        impactSound.dispose();
+        pairSound.dispose();
+        turnOverSound.dispose();
+        winSound.dispose();
     }
 
 
@@ -1057,6 +1084,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
                         animateFlippingCard(box, 0);
                         //System.out.println("Flipping card at index: " + boxCard.getKey());
                         Card[] newPair = game.flipUp(boxCard.getKey());
+                        turnOverSound.play(1.0f);
                         if (newPair != null) {
                             int numOfBoxes = 0;
                             boxPairs.add(new Box[2]);
@@ -1129,6 +1157,7 @@ public class MemoryGameView implements ApplicationListener, InputProcessor, Poin
         for (TouchInfo touchPoint : arrayOfTouchInfo) {
             if (touchPoint.pointer == pointer && touchPoint.mouseJoint != null) {
                 world.destroyJoint(touchPoint.mouseJoint);
+                turnOverSound.play(1.0f);
                 touchPoint.mouseJoint = null;
             }
         }
