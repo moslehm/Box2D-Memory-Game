@@ -68,12 +68,13 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     Stage stage;
 
     private static TweenManager tweenManager;
-    private static JWinPointerReader jWinPointerReader;
+    private JWinPointerReader jWinPointerReader;
 
     private Game parentGame;
 
-    public GameScreen(Game parent) {
+    public GameScreen(Game parent, JWinPointerReader jWinPointerReader) {
         this.parentGame = parent;
+        this.jWinPointerReader = jWinPointerReader;
     }
 
     @Override
@@ -266,10 +267,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             }
         });
 
-        // == Windows multi touch test Start ==
-        jWinPointerReader = new JWinPointerReader("MemoryGameView");
         jWinPointerReader.addPointerEventListener(this);
-        // == Windows multi touch test End ==
     }
 
     @Override
@@ -863,7 +861,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                 @Override
                 public void run() {
                     //nextLevel();
-                    parentGame.setScreen(new ScoreboardScreen(parentGame, worldColor));
+                    parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor));
                 }
             }, 2);
         }

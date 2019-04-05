@@ -1,12 +1,16 @@
 package ca.mymacewan.memorygame;
 
 import com.badlogic.gdx.*;
+import jwinpointer.JWinPointerReader;
 
 public class MemoryGameView extends Game implements ApplicationListener {
+    JWinPointerReader jWinPointerReader;
 
     @Override
     public void create() {
-        this.setScreen(new GameScreen(this));
+        jWinPointerReader = new JWinPointerReader("MemoryGameView");
+
+        this.setScreen(new GameScreen(this, jWinPointerReader));
     }
 
     @Override
