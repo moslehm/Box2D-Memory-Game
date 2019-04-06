@@ -6,33 +6,69 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import jwinpointer.JWinPointerReader;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class ScoreboardScreen implements Screen {
+    private final int playerScore;
     private Game parent;
     private Color worldColor;
     private Stage stage;
     private JWinPointerReader jWinPointerReader;
+    private boolean screenIsTouched;
+    private ArrayList<Integer> highScores;
 
 
-    public ScoreboardScreen(Game parent, JWinPointerReader jWinPointerReader, Color worldColor) {
+
+    public ScoreboardScreen(Game parent, JWinPointerReader jWinPointerReader, Color worldColor, int playerScore) {
         this.parent = parent;
         this.jWinPointerReader = jWinPointerReader;
         this.worldColor = worldColor;
+        this.playerScore = playerScore;
     }
 
     @Override
     public void show() {
         stage = new Stage();
-        Texture texture = new Texture(Gdx.files.internal("returnButton.png"));
-        Image returnButton = new Image(texture);
+        screenIsTouched = false;
+        highScores = new ArrayList<Integer>();
 
+        getScores();
+        highScores.add(playerScore);
+        Collections.sort(highScores);
+        if (highScores.size() > 10){
+            highScores.remove(10);
+        }
+
+        for (int score: highScores){
+
+        }
+
+        GameScreen.addScoreActors(stage, playerScore);
+
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        BitmapFont font = new BitmapFont(Gdx.files.internal("ArialFont.fnt"));
+        labelStyle.font = font;
+        Label label = new Label("High scores", labelStyle);
+        label.setAlignment(Align.center);
+        label.setPosition(Gdx.graphics.getWidth()/2f - label.getWidth()/2f, Gdx.graphics.getHeight() - Gdx.graphics.getHeight()/7f);
+        stage.addActor(label);
+
+
+
+        /*Texture texture = new Texture(Gdx.files.internal("returnButton.png"));
+        Image returnButton = new Image(texture);
         Container wrapper = new Container(returnButton);
         wrapper.setTransform(true);
         wrapper.setSize(returnButton.getWidth() - 20, returnButton.getHeight() - 20);
@@ -48,7 +84,7 @@ public class ScoreboardScreen implements Screen {
         });
         stage.addActor(wrapper);
 
-        Gdx.input.setInputProcessor(stage);
+        Gdx.input.setInputProcessor(stage);*/
     }
 
     @Override
@@ -57,6 +93,13 @@ public class ScoreboardScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act();
         stage.draw();
+
+        if (Gdx.input.isTouched()){
+            screenIsTouched = true;
+        }
+        if (!Gdx.input.isTouched() && screenIsTouched){
+            parent.setScreen(new GameScreen(parent, jWinPointerReader));
+        }
     }
 
     @Override

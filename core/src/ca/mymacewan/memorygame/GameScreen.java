@@ -166,51 +166,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Batch to draw textures
         batch = new SpriteBatch();
 
-        // Load font
-        Label.LabelStyle labelStyle = new Label.LabelStyle();
-        BitmapFont font = new BitmapFont(Gdx.files.internal("ArialFont.fnt"));
-        labelStyle.font = font;
-        label = new Label[4];
-        label[0] = new Label(Integer.toString(currentScore), labelStyle);
-        label[1] = new Label(Integer.toString(currentScore), labelStyle);
-        label[2] = new Label(Integer.toString(currentScore), labelStyle);
-        label[3] = new Label(Integer.toString(currentScore), labelStyle);
-        // Display score
-        //float distanceFromCorner = Gdx.graphics.getHeight()/8f;
-        // get these
-        Vector2 bottomLeftCornerPos = new Vector2(0, 0);
-        Vector2 bottomRightCornerPos = new Vector2(Gdx.graphics.getWidth(), 0);
-        Vector2 topLeftCornerPos = new Vector2(0, Gdx.graphics.getHeight());
-        Vector2 topRightCornerPos = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-        // define this
-        float scoreDistanceFromCorner = Gdx.graphics.getHeight()/8f - 10f;
-
-        Vector2 bottomLeftScorePos = bottomLeftCornerPos.cpy().add(new Vector2(1, 1).cpy().scl(scoreDistanceFromCorner));
-        Vector2 topLeftScorePos = topLeftCornerPos.cpy().add(new Vector2(1, -1).cpy().scl(scoreDistanceFromCorner));
-        Vector2 bottomRightScorePos = bottomRightCornerPos.cpy().add(new Vector2(-1, 1).cpy().scl(scoreDistanceFromCorner + 15));
-        Vector2 topRightScorePos = topRightCornerPos.cpy().add(new Vector2(-1, -1).cpy().scl(scoreDistanceFromCorner + 15));
-
-        Container container = new Container(label[0]);
-        container.setTransform(true);
-        container.setPosition(bottomLeftScorePos.x, bottomLeftScorePos.y);
-        container.setRotation(315);
-        stage.addActor(container);
-        container = new Container(label[1]);
-        container.setTransform(true);
-        container.setPosition(topLeftScorePos.x, topLeftScorePos.y);
-        container.setRotation(225);
-        stage.addActor(container);
-        container = new Container(label[2]);
-        container.setTransform(true);
-        container.setPosition(bottomRightScorePos.x, bottomRightScorePos.y);
-        container.setRotation(135 - 90);
-        stage.addActor(container);
-        container = new Container(label[3]);
-        container.setTransform(true);
-        container.setPosition(topRightScorePos.x, topRightScorePos.y);
-        container.setRotation(45 + 90);
-        stage.addActor(container);
+       label = addScoreActors(stage, currentScore);
 
         // Set the input processor as the ones overridden in here
         plex.addProcessor(this);
@@ -268,6 +224,56 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         });
 
         jWinPointerReader.addPointerEventListener(this);
+    }
+
+    public static Label[] addScoreActors(Stage stage, int currentScore) {
+        // Load font
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        BitmapFont font = new BitmapFont(Gdx.files.internal("ArialFont.fnt"));
+        labelStyle.font = font;
+        Label[] label = new Label[4];
+        label[0] = new Label(Integer.toString(currentScore), labelStyle);
+        label[1] = new Label(Integer.toString(currentScore), labelStyle);
+        label[2] = new Label(Integer.toString(currentScore), labelStyle);
+        label[3] = new Label(Integer.toString(currentScore), labelStyle);
+        // Display score
+        //float distanceFromCorner = Gdx.graphics.getHeight()/8f;
+        // get these
+        Vector2 bottomLeftCornerPos = new Vector2(0, 0);
+        Vector2 bottomRightCornerPos = new Vector2(Gdx.graphics.getWidth(), 0);
+        Vector2 topLeftCornerPos = new Vector2(0, Gdx.graphics.getHeight());
+        Vector2 topRightCornerPos = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        // define this
+        float scoreDistanceFromCorner = Gdx.graphics.getHeight()/8f - 10f;
+
+        Vector2 bottomLeftScorePos = bottomLeftCornerPos.cpy().add(new Vector2(1, 1).cpy().scl(scoreDistanceFromCorner));
+        Vector2 topLeftScorePos = topLeftCornerPos.cpy().add(new Vector2(1, -1).cpy().scl(scoreDistanceFromCorner));
+        Vector2 bottomRightScorePos = bottomRightCornerPos.cpy().add(new Vector2(-1, 1).cpy().scl(scoreDistanceFromCorner + 15));
+        Vector2 topRightScorePos = topRightCornerPos.cpy().add(new Vector2(-1, -1).cpy().scl(scoreDistanceFromCorner + 15));
+
+        Container container = new Container(label[0]);
+        container.setTransform(true);
+        container.setPosition(bottomLeftScorePos.x, bottomLeftScorePos.y);
+        container.setRotation(315);
+        stage.addActor(container);
+        container = new Container(label[1]);
+        container.setTransform(true);
+        container.setPosition(topLeftScorePos.x, topLeftScorePos.y);
+        container.setRotation(225);
+        stage.addActor(container);
+        container = new Container(label[2]);
+        container.setTransform(true);
+        container.setPosition(bottomRightScorePos.x, bottomRightScorePos.y);
+        container.setRotation(135 - 90);
+        stage.addActor(container);
+        container = new Container(label[3]);
+        container.setTransform(true);
+        container.setPosition(topRightScorePos.x, topRightScorePos.y);
+        container.setRotation(45 + 90);
+        stage.addActor(container);
+
+        return label;
     }
 
     @Override
@@ -861,7 +867,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                 @Override
                 public void run() {
                     //nextLevel();
-                    parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor));
+                    parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor, currentScore));
                 }
             }, 2);
         }
