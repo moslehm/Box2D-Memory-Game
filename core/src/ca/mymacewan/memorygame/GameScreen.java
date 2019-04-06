@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import jwinpointer.JWinPointerReader;
-import jwinpointer.JWinPointerReader.PointerEventListener;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenEquations;
 import aurelienribon.tweenengine.TweenManager;
@@ -49,15 +48,17 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     protected Body hitBody = null;
 
     SpriteBatch batch;
-    Label[] label;
-    GlyphLayout textLayout = new GlyphLayout();
+    Label[] scoreLabels;
+    Label[] timerLabels;
     private TextureRegion backSideTexture;
     private Sprite[][] frontSideSprites;
     private MemoryGame game;
     ArrayList<Card> cards;
     int difficulty;
-    private float halfBoxSizes[] = {1.5f, 1.5f, 1f, 0.8f, 0.8f, 0.36f};
-    private float xyBoxSpacing[][] = {{3.1f, 1.9f}, {3.7f, 1.9f}, {5f, 2f}, {3.7f, 2.5f}, {4.5f, 2f}, {3.5f, 1.9f}};
+    private float halfBoxSizes[] = {1.5f, 1.5f, 1f, 0.8f, 0.8f, 0.7f};
+    private float xyBoxSpacing[][] = {{3.1f, 1.9f}, {3.7f, 1.9f}, {5f, 2f}, {3.7f, 2.5f}, {4.5f, 2f}, {2.7f, 1.7f}};
+    private float timeLimits[] = {0f, 45f, 45f, 45f, 45f, 60f};
+    private float currentTime;
     int currentScore;
     ShapeRenderer shapeRenderer;
     ArrayList<Box[]> boxPairs;
@@ -166,7 +167,8 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Batch to draw textures
         batch = new SpriteBatch();
 
-       label = addScoreActors(stage, currentScore);
+        scoreLabels = addScoreActors(stage, currentScore);
+        setTimerLabels();
 
         // Set the input processor as the ones overridden in here
         plex.addProcessor(this);
@@ -272,14 +274,80 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         container.setPosition(topRightScorePos.x, topRightScorePos.y);
         container.setRotation(45 + 90);
         stage.addActor(container);
-
         return label;
+    }
+
+    void setTimerLabels(){
+        // Load font
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        BitmapFont font = new BitmapFont(Gdx.files.internal("ArialFont.fnt"));
+        labelStyle.font = font;
+        timerLabels = new Label[4];
+        /*float timeLeft = timeLimits[difficulty] - currentTime;
+        if (timeLeft/60f < 1){
+            for (int i = 0; i < 4; i++){
+                timerLabels[i] = new Label("00:" + timeLeft, labelStyle);
+            }
+        }
+        else{
+            float minutes = (int) (timeLeft/60f);
+            float seconds = ((timeLeft/60f) - minutes) * 60f;
+            for (int i = 0; i < 4; i++){
+                timerLabels[i] = new Label(minutes + ":" + seconds, labelStyle);
+            }
+        }*/
+        for (int i = 0; i < 4; i++){
+            timerLabels[i] = new Label("00:00", labelStyle);
+        }
+
+        // Display score
+        //float distanceFromCorner = Gdx.graphics.getHeight()/8f;
+        // get these
+        Vector2 bottomLeftCornerPos = new Vector2(0, 0);
+        Vector2 bottomRightCornerPos = new Vector2(Gdx.graphics.getWidth(), 0);
+        Vector2 topLeftCornerPos = new Vector2(0, Gdx.graphics.getHeight());
+        Vector2 topRightCornerPos = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        // define this
+        float scoreDistanceFromCorner = Gdx.graphics.getHeight()/10f - 10f;
+
+        Vector2 bottomLeftScorePos = bottomLeftCornerPos.cpy().add(new Vector2(1, 1).cpy().scl(scoreDistanceFromCorner));
+        Vector2 topLeftScorePos = topLeftCornerPos.cpy().add(new Vector2(1, -1).cpy().scl(scoreDistanceFromCorner));
+        Vector2 bottomRightScorePos = bottomRightCornerPos.cpy().add(new Vector2(-1, 1).cpy().scl(scoreDistanceFromCorner + 15));
+        Vector2 topRightScorePos = topRightCornerPos.cpy().add(new Vector2(-1, -1).cpy().scl(scoreDistanceFromCorner + 15));
+
+        Container container = new Container(timerLabels[0]);
+        container.setTransform(true);
+        container.setPosition(bottomLeftScorePos.x, bottomLeftScorePos.y);
+        container.setRotation(315);
+        stage.addActor(container);
+        container = new Container(timerLabels[1]);
+        container.setTransform(true);
+        container.setPosition(topLeftScorePos.x, topLeftScorePos.y);
+        container.setRotation(225);
+        stage.addActor(container);
+        container = new Container(timerLabels[2]);
+        container.setTransform(true);
+        container.setPosition(bottomRightScorePos.x, bottomRightScorePos.y);
+        container.setRotation(135 - 90);
+        stage.addActor(container);
+        container = new Container(timerLabels[3]);
+        container.setTransform(true);
+        container.setPosition(topRightScorePos.x, topRightScorePos.y);
+        container.setRotation(45 + 90);
+        stage.addActor(container);
     }
 
     @Override
     public void render(float delta) {
         update();
         particleEffect.update(Gdx.graphics.getDeltaTime());
+
+        currentTime += Gdx.graphics.getRawDeltaTime();
+
+        if (difficulty != 0 && currentTime > timeLimits[difficulty]){
+            parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor, currentScore));
+        }
 
         // Background colour
         Gdx.gl.glClearColor(worldColor.r, worldColor.g, worldColor.b, worldColor.a);
@@ -847,10 +915,12 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
     void update() {
         currentScore = game.getScore();
-        label[0].setText(currentScore);
-        label[1].setText(currentScore);
-        label[2].setText(currentScore);
-        label[3].setText(currentScore);
+        scoreLabels[0].setText(currentScore);
+        scoreLabels[1].setText(currentScore);
+        scoreLabels[2].setText(currentScore);
+        scoreLabels[3].setText(currentScore);
+
+        updateTimeLabels();
         checkForMatches();
         if (game.isIdle()) {
             destroyAll();
@@ -860,24 +930,41 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         }
         if (game.isRoundOver() && roundInProgress) {
             if (game.isGameOver()){
-                //parentGame.setScreen(new ScoreboardScreen(parentGame, worldColor));
+                parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor, currentScore));
             }
             roundInProgress = false;
             Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
-                    //nextLevel();
-                    parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor, currentScore));
+                    nextLevel();
                 }
             }, 2);
         }
         updateCards();
     }
 
+    private void updateTimeLabels() {
+        if (difficulty != 0) {
+            float timeLeft = timeLimits[difficulty] - currentTime;
+            if ((timeLeft / 60f) < 1) {
+                for (Label timer : timerLabels) {
+                    timer.setText("00:" + (int) timeLeft);
+                }
+            } else {
+                float minutes = (int) (timeLeft / 60f);
+                float seconds = ((timeLeft / 60f) - minutes) * 60f;
+                for (Label timer : timerLabels) {
+                    timer.setText((int) minutes + ":" + (int) seconds);
+                }
+            }
+        }
+    }
+
     void nextLevel() {
         // Round over
         // Destroy bodies and joints
         // Then start next round
+        currentTime = 0;
         destroyAll();
         boxPairs = new ArrayList<Box[]>();
         game.nextDiff();

@@ -10,6 +10,7 @@ import static ca.mymacewan.memorygame.State.REVEALED;
 
 
 public class MemoryGame {
+    private static int MAX_LEVEL = 5;
     private int numOfCards; // How many cards in the game. it be increased when difficulty increase.
     private ArrayList<Card> cards;
     private short [] difficulty = {4, 8, 16, 24, 40, 52};
@@ -140,7 +141,7 @@ public class MemoryGame {
     }
 
     boolean isGameOver() {
-        if (isRoundOver() && (diffLevel == 4)) {
+        if (isRoundOver() && (diffLevel == MAX_LEVEL)) {
             System.out.println("Congratulation!");
             return true;
         } else {
@@ -201,7 +202,7 @@ public class MemoryGame {
     }
 
     public void nextDiff() {
-        if (diffLevel < 4) {
+        if (diffLevel < MAX_LEVEL) {
             diffLevel++;
         }
     }

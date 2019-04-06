@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import jwinpointer.JWinPointerReader;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -44,18 +45,22 @@ public class ScoreboardScreen implements Screen {
         screenIsTouched = false;
         highScores = new ArrayList<Integer>();
 
-        getScores();
+        GameScreen.addScoreActors(stage, playerScore);
+
+        try {
+            getScores();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
         highScores.add(playerScore);
         Collections.sort(highScores);
+        Collections.reverse(highScores);
         if (highScores.size() > 10){
             highScores.remove(10);
         }
-
-        for (int score: highScores){
-
-        }
-
-        GameScreen.addScoreActors(stage, playerScore);
 
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         BitmapFont font = new BitmapFont(Gdx.files.internal("ArialFont.fnt"));
@@ -65,7 +70,25 @@ public class ScoreboardScreen implements Screen {
         label.setPosition(Gdx.graphics.getWidth()/2f - label.getWidth()/2f, Gdx.graphics.getHeight() - Gdx.graphics.getHeight()/7f);
         stage.addActor(label);
 
+        boolean playerScoreDisplayed = false;
+        for (int i = 0; i < highScores.size(); i++){
+            // Display scores
+            int currentScore =  highScores.get(i);
+            label = new Label((i + 1) + ". " + currentScore, labelStyle);
+            label.setAlignment(Align.center);
+            label.setPosition(Gdx.graphics.getWidth()/2f - label.getWidth()/2f, (Gdx.graphics.getHeight() - Gdx.graphics.getHeight()/7f) - Gdx.graphics.getHeight()/15f * (i + 1));
+            if (!playerScoreDisplayed && currentScore == playerScore){
+                label.setColor(Color.RED);
+                playerScoreDisplayed = true;
+            }
+            stage.addActor(label);
+        }
 
+        try {
+            saveScores();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         /*Texture texture = new Texture(Gdx.files.internal("returnButton.png"));
         Image returnButton = new Image(texture);
@@ -85,6 +108,20 @@ public class ScoreboardScreen implements Screen {
         stage.addActor(wrapper);
 
         Gdx.input.setInputProcessor(stage);*/
+    }
+
+    private void getScores() throws IOException, ClassNotFoundException {
+        FileInputStream fileInputStream = new FileInputStream("highscores.txt");
+        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        highScores = (ArrayList<Integer>) objectInputStream.readObject();
+        objectInputStream.close();
+    }
+
+    private void saveScores() throws IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream("highscores.txt");
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        objectOutputStream.writeObject(highScores);
+        objectOutputStream.close();
     }
 
     @Override
