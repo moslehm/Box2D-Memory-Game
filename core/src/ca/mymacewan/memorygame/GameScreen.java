@@ -88,13 +88,16 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         particleEffect.load(Gdx.files.internal("explosion.p"), Gdx.files.internal(""));
 
         plex =  new InputMultiplexer();
-        createTopButtons();
-        createBottomButtons();
-        worldColor = new Color();
-        worldColor.r = 0 / 255f;
+        //createTopButtons();
+        //createBottomButtons();
+        float red = 153;
+        float green =  234;
+        float blue = 255;
+        worldColor = new Color(red / 255f, green / 255f, blue / 255f, 1f);
+/*        worldColor.r = 0 / 255f;
         worldColor.g = 161 / 255f;
         worldColor.b = 206 / 255f;
-        worldColor.a = 1;
+        worldColor.a = 1;*/
 
         // "Meters" are the units of Box2D
         // 1 pixel = 0.018 meters
@@ -394,6 +397,11 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         batch.end();
 
         batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        for (Box[] pair : boxPairs) {
+            drawLine(pair[0].getBody().getPosition(), pair[1].getBody().getPosition());
+        }
+
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.begin();
         // Draw front
         for (int i = 0; i < boxes.size(); i++) {
@@ -430,10 +438,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         particleEffect.draw(batch);
         batch.end();
 
-        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        for (Box[] pair : boxPairs) {
-            drawLine(pair[0].getBody().getPosition(), pair[1].getBody().getPosition());
-        }
 
         batch.getProjectionMatrix().set(camera.combined);
         stage.act();
@@ -652,7 +656,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                 .start(tweenManager);
     }
 
-    private void createTopButtons() {
+    /*private void createTopButtons() {
         Image yellowImage = new Image(new Texture("yellow.png"));
         Image greenImage = new Image(new Texture("green.png"));
         Image pinkImage = new Image(new Texture("pink.png"));
@@ -819,7 +823,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             }
         });
         stage.addActor(wrapper);
-    }
+    }*/
 
     int currentNumOfCards;
     private void createGame() {

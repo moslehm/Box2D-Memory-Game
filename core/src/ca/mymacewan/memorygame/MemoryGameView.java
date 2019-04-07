@@ -1,6 +1,7 @@
 package ca.mymacewan.memorygame;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.Color;
 import jwinpointer.JWinPointerReader;
 
 public class MemoryGameView extends Game implements ApplicationListener {

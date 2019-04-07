@@ -30,7 +30,7 @@ public class ScoreboardScreen implements Screen {
     private boolean screenIsTouched;
     private ArrayList<Integer> highScores;
     private boolean isAlreadyTouched;
-
+    private float currentTime;
 
     public ScoreboardScreen(Game parent, JWinPointerReader jWinPointerReader, Color worldColor, int playerScore) {
         this.parent = parent;
@@ -45,6 +45,7 @@ public class ScoreboardScreen implements Screen {
         screenIsTouched = false;
         highScores = new ArrayList<Integer>();
         isAlreadyTouched = Gdx.input.isTouched();
+        currentTime = 0;
 
         GameScreen.addScoreActors(stage, playerScore);
 
@@ -90,25 +91,6 @@ public class ScoreboardScreen implements Screen {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        /*Texture texture = new Texture(Gdx.files.internal("returnButton.png"));
-        Image returnButton = new Image(texture);
-        Container wrapper = new Container(returnButton);
-        wrapper.setTransform(true);
-        wrapper.setSize(returnButton.getWidth() - 20, returnButton.getHeight() - 20);
-        wrapper.setPosition(10, Gdx.graphics.getHeight() - wrapper.getHeight() - 10f);
-        wrapper.setTouchable(Touchable.enabled);
-
-        //first option
-        wrapper.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                parent.setScreen(new GameScreen(parent, jWinPointerReader));
-            }
-        });
-        stage.addActor(wrapper);
-
-        Gdx.input.setInputProcessor(stage);*/
     }
 
     private void getScores() throws IOException, ClassNotFoundException {
@@ -129,6 +111,9 @@ public class ScoreboardScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(worldColor.r, worldColor.g, worldColor.b, worldColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        currentTime += Gdx.graphics.getRawDeltaTime();
+
         stage.act();
         stage.draw();
 
@@ -140,7 +125,7 @@ public class ScoreboardScreen implements Screen {
         else if (!Gdx.input.isTouched()){
             isAlreadyTouched = false;
         }
-        if (!Gdx.input.isTouched() && screenIsTouched){
+        if ((!Gdx.input.isTouched() && screenIsTouched) || currentTime > 30f){
             parent.setScreen(new GameScreen(parent, jWinPointerReader));
         }
     }
