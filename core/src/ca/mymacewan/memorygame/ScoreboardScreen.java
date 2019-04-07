@@ -29,7 +29,7 @@ public class ScoreboardScreen implements Screen {
     private JWinPointerReader jWinPointerReader;
     private boolean screenIsTouched;
     private ArrayList<Integer> highScores;
-
+    private boolean isAlreadyTouched;
 
 
     public ScoreboardScreen(Game parent, JWinPointerReader jWinPointerReader, Color worldColor, int playerScore) {
@@ -44,6 +44,7 @@ public class ScoreboardScreen implements Screen {
         stage = new Stage();
         screenIsTouched = false;
         highScores = new ArrayList<Integer>();
+        isAlreadyTouched = Gdx.input.isTouched();
 
         GameScreen.addScoreActors(stage, playerScore);
 
@@ -71,7 +72,7 @@ public class ScoreboardScreen implements Screen {
         stage.addActor(label);
 
         boolean playerScoreDisplayed = false;
-        for (int i = 0; i < highScores.size(); i++){
+        for (int i = 0; i < highScores.size() - 1; i++){
             // Display scores
             int currentScore =  highScores.get(i);
             label = new Label((i + 1) + ". " + currentScore, labelStyle);
@@ -131,8 +132,13 @@ public class ScoreboardScreen implements Screen {
         stage.act();
         stage.draw();
 
-        if (Gdx.input.isTouched()){
-            screenIsTouched = true;
+        if (!isAlreadyTouched) {
+            if (Gdx.input.isTouched()) {
+                screenIsTouched = true;
+            }
+        }
+        else if (!Gdx.input.isTouched()){
+            isAlreadyTouched = false;
         }
         if (!Gdx.input.isTouched() && screenIsTouched){
             parent.setScreen(new GameScreen(parent, jWinPointerReader));
