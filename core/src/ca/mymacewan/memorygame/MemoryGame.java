@@ -10,10 +10,10 @@ import static ca.mymacewan.memorygame.State.REVEALED;
 
 
 public class MemoryGame {
-    private static int MAX_LEVEL = 5;
     private int numOfCards; // How many cards in the game. it be increased when difficulty increase.
     private ArrayList<Card> cards;
-    private short [] difficulty = {4, 8, 16, 24, 40, 52};
+    private short [] difficulty = {4, 8, 16, 32, 50, 60, 70, 80, 90};
+    private int MAX_LEVEL = difficulty.length - 1;
     private short diffLevel;
     private int score;
     private int combo;

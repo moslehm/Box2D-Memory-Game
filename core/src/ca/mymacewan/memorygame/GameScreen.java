@@ -55,9 +55,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     private MemoryGame game;
     ArrayList<Card> cards;
     int difficulty;
-    private float halfBoxSizes[] = {1.5f, 1.5f, 1f, 0.8f, 0.8f, 0.7f};
-    private float xyBoxSpacing[][] = {{3.1f, 1.9f}, {3.7f, 1.9f}, {5f, 2f}, {3.7f, 2.5f}, {4.5f, 2f}, {2.7f, 1.7f}};
-    private float timeLimits[] = {0f, 45f, 45f, 45f, 45f, 60f};
+    private float halfBoxSizes[] = {1.5f, 1.5f, 1f, 0.8f, 0.8f, 0.7f, 0.6f, 0.5f, 0.5f};
+    private float xyBoxSpacing[][] = {{3.1f, 1.9f}, {3.7f, 1.9f}, {5f, 2f}, {3.7f, 2.5f}, {4.5f, 2f}, {2.7f, 1.7f}, {2.7f, 1.7f}, {2.7f, 1.7f}, {2.7f, 1.7f}};
+    private float timeLimits[] = {0f, 45f, 45f, 45f, 45f, 60f, 120f, 180f, 240f};
     private float currentTime;
     int currentScore;
     ShapeRenderer shapeRenderer;
@@ -123,12 +123,14 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         Texture matchedTextureSheet = new Texture(Gdx.files.internal("matched.png"));
         TextureRegion[][] unmatchedTextureRegions = TextureRegion.split(unmatchedTextureSheet, 276, 276);
         TextureRegion[][] matchedTextureRegions = TextureRegion.split(matchedTextureSheet, 276, 276);
-        Sprite[] unmatchedFrontSideSprites = new Sprite[7 * 4];
-        Sprite[] matchedFrontSideSprites = new Sprite[7 * 4];
+        int columns = 10;
+        int rows = 9;
+        Sprite[] unmatchedFrontSideSprites = new Sprite[columns * rows];
+        Sprite[] matchedFrontSideSprites = new Sprite[columns * rows];
         int index = 0;
         Sprite tempSprite;
-        for (int y = 0; y < 7; y++) {
-            for (int x = 0; x < 4; x++) {
+        for (int y = 0; y < columns; y++) {
+            for (int x = 0; x < rows; x++) {
                 tempSprite = new Sprite(unmatchedTextureRegions[x][y]);
                 tempSprite.setOrigin(toPixels(halfBoxSizes[difficulty]), toPixels(halfBoxSizes[difficulty]));
                 unmatchedFrontSideSprites[index] = tempSprite;
@@ -469,15 +471,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         //System.out.println("BIG: " + (Gdx.graphics.getWidth() / 2f + toPixels(p1.x)) + ", " + (Gdx.graphics.getHeight() / 2f + toPixels(p1.y)));
         shapeRenderer.end();
 
-        /*
-        let lineUnitVector = (lineEndPoint - lineStartPoint).normalized()
-        let lineMidPoint = (lineStartPoint + lineEndPoint) * 0..5
-        let someWidthConstant;
-        let midSegmentStartPoint = lineMidPoint - lineUnitVector * someWidthConstant;
-        let midSegmentEndPoint = lineMidPoint + lineUnitVector * someWidthConstant:
-        drawLine(lineStartPoint, lineEndPoint)
-        drawLine(midSegmentStartPoint, midSegmentEndPoint)
-        */
 
         Vector2 lineMidPoint = (p2.cpy().sub(p1)).cpy().scl(0.5f).cpy().add(p1);
         Vector2 lineUnitVector = (p2.cpy().sub(p1)).cpy().nor();
