@@ -463,52 +463,38 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     }
 
     public void drawLine(Vector2 p1, Vector2 p2) {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        p1 = vectorToPixels(p1);
+        p2 = vectorToPixels(p2);
+
+        float scaleBy = toPixels(0.5f);
+        Vector2 lineMidPoint = (p2.cpy().sub(p1)).cpy().scl(0.5f).cpy().add(p1);
+        Vector2 lineUnitVector = (p2.cpy().sub(p1)).cpy().nor();
+        Vector2 midSegmentStartPoint = lineMidPoint.cpy().sub(lineUnitVector.cpy().scl(scaleBy));
+        Vector2 midSegmentEndPoint = lineMidPoint.cpy().add(lineUnitVector.cpy().scl(scaleBy));
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0.195f, 0.64f, 0.94f, 1);
-        shapeRenderer.line(
-                Gdx.graphics.getWidth() / 2f + toPixels(p1.x), Gdx.graphics.getHeight() / 2f + toPixels(p1.y),
-                Gdx.graphics.getWidth() / 2f + toPixels(p2.x), Gdx.graphics.getHeight() / 2f + toPixels(p2.y));
-        //System.out.println("BIG: " + (Gdx.graphics.getWidth() / 2f + toPixels(p1.x)) + ", " + (Gdx.graphics.getHeight() / 2f + toPixels(p1.y)));
+        //shapeRenderer.line(p1.x, p1.y, p2.x, p2.y);
+        shapeRenderer.rectLine(p1, p2, 2f);
         shapeRenderer.end();
 
 
-        Vector2 lineMidPoint = (p2.cpy().sub(p1)).cpy().scl(0.5f).cpy().add(p1);
-        Vector2 lineUnitVector = (p2.cpy().sub(p1)).cpy().nor();
-        Vector2 midSegmentStartPoint = lineMidPoint.cpy().sub(lineUnitVector.cpy().scl(0.5f));
-        Vector2 midSegmentEndPoint = lineMidPoint.cpy().add(lineUnitVector.cpy().scl(0.5f));
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 1, 0, 1);
-        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(midSegmentStartPoint.x), Gdx.graphics.getHeight() / 2f + toPixels(midSegmentStartPoint.y),
-                Gdx.graphics.getWidth() / 2f + toPixels(midSegmentEndPoint.x), Gdx.graphics.getHeight() / 2f + toPixels(midSegmentEndPoint.y));
-        //System.out.println("LITTLE: " + (Gdx.graphics.getWidth() / 2f + toPixels(midSegmentStartPoint.x)) + ", " + (Gdx.graphics.getHeight() / 2f + toPixels(midSegmentStartPoint.y)));
+
+        //shapeRenderer.line(midSegmentStartPoint.x, midSegmentStartPoint.y, midSegmentEndPoint.x, midSegmentEndPoint.y);
+        shapeRenderer.rectLine(midSegmentStartPoint, midSegmentEndPoint, 4f);
+
         shapeRenderer.end();
 
         DrawArrow(midSegmentStartPoint, midSegmentEndPoint);
         DrawArrow(midSegmentEndPoint, midSegmentStartPoint);
-
-        /*Vector2 phiVec = p2.cpy().sub(p1);
-        float phi = (float) Math.atan2(phiVec.x, phiVec.y);
-        float angle1 = (float) (phi - Math.PI / 6);
-        float angle2 = (float) (phi + Math.PI / 6);
-
-        float x3 = (float) (midSegmentEndPoint.x * Math.cos(angle1));
-        float x4 = (float) (midSegmentEndPoint.x * Math.cos(angle2));
-        float y3 = (float) (midSegmentEndPoint.y * Math.sin(angle1));
-        float y4 = (float) (midSegmentEndPoint.y * Math.sin(angle2));
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(x3), Gdx.graphics.getHeight() / 2f + toPixels(y3),
-                Gdx.graphics.getWidth() / 2f + toPixels(x4), Gdx.graphics.getHeight() / 2f + toPixels(y4));
-        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(midSegmentEndPoint.x), Gdx.graphics.getHeight() / 2f + toPixels(midSegmentEndPoint.y),
-                Gdx.graphics.getWidth() / 2f + toPixels(x3), Gdx.graphics.getHeight() / 2f + toPixels(y3));
-        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(midSegmentEndPoint.x), Gdx.graphics.getHeight() / 2f + toPixels(midSegmentEndPoint.y),
-                Gdx.graphics.getWidth() / 2f + toPixels(x4), Gdx.graphics.getHeight() / 2f + toPixels(y4));
-        shapeRenderer.end();*/
     }
 
     public void DrawArrow(Vector2 origin, Vector2 endpoint) {
         // Draw arrowhead so we can see direction
         Vector2 arrowDirection = origin.cpy().sub(endpoint);
-        DebugDrawArrowhead(endpoint, arrowDirection.cpy().nor(), 0.2f); //GetArrowSizeForLine(arrowDirection)
+        DebugDrawArrowhead(endpoint, arrowDirection.cpy().nor(), toPixels(0.2f)); //GetArrowSizeForLine(arrowDirection)
     }
 
     /*private float GetArrowSizeForLine(Vector2 line)
@@ -530,12 +516,10 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         Vector2 leftSide = origin.cpy().add(arrowheadL);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(origin.x), Gdx.graphics.getHeight() / 2f + toPixels(origin.y),
-                Gdx.graphics.getWidth() / 2f + toPixels(rightSide.x), Gdx.graphics.getHeight() / 2f + toPixels(rightSide.y));
-        shapeRenderer.line(Gdx.graphics.getWidth() / 2f + toPixels(origin.x), Gdx.graphics.getHeight() / 2f + toPixels(origin.y),
-                Gdx.graphics.getWidth() / 2f + toPixels(leftSide.x), Gdx.graphics.getHeight() / 2f + toPixels(leftSide.y));
-        /*shapeRenderer.rectLine(vectorToPixels(origin), vectorToPixels(rightSide), 2f);
-        shapeRenderer.rectLine(vectorToPixels(origin), vectorToPixels(leftSide), 2f);*/
+        /*shapeRenderer.line(origin.x, origin.y, rightSide.x, rightSide.y);
+        shapeRenderer.line(origin.x, origin.y, leftSide.x, leftSide.y);*/
+        shapeRenderer.rectLine(origin, rightSide, 4f);
+        shapeRenderer.rectLine(origin, leftSide, 4f);
         shapeRenderer.end();
     }
 
@@ -1091,11 +1075,11 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
 
     public Vector2 vectorToMeters(Vector2 vectorInPixels) {
-        return new Vector2(Gdx.graphics.getWidth() / 2f + toMeters(vectorInPixels.x), Gdx.graphics.getWidth() / 2f + toMeters(vectorInPixels.y)); // DEFAULT: 0.018f
+        return new Vector2(Gdx.graphics.getWidth()/2f + toMeters(vectorInPixels.x), Gdx.graphics.getHeight()/2f + toMeters(vectorInPixels.y)); // DEFAULT: 0.018f
     }
 
     public Vector2 vectorToPixels(Vector2 vectorInMeters) {
-        return new Vector2(toPixels(vectorInMeters.x) - Gdx.graphics.getWidth() / 2f, toPixels(vectorInMeters.y) - Gdx.graphics.getWidth() / 2f); // DEFAULT: 0.018f
+        return new Vector2(Gdx.graphics.getWidth()/2f + toPixels(vectorInMeters.x), Gdx.graphics.getHeight()/2f + toPixels(vectorInMeters.y)); // DEFAULT: 0.018f
     }
 
     public float toMeters(float pixels) {
