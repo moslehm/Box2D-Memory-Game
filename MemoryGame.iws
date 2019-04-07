@@ -6,14 +6,19 @@
     </artifacts-to-build>
   </component>
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" line="15" />
+    <bookmark url="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" line="17" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a48f42b6-bdcb-492e-8b46-11ad6283a51f" name="Default Changelist" comment="Finish animation implementation and delay when all cards are matched&#10;&#10;Only the sprites fade out, so the cards are still going to be on screen.&#10;Also cleaned up some code.">
-      <change beforePath="$PROJECT_DIR$/MemoryGame.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/MemoryGame.ipr" afterDir="false" />
+    <list default="true" id="a48f42b6-bdcb-492e-8b46-11ad6283a51f" name="Default Changelist" comment="Make several changes&#10;&#10;Scoreboard is now complete, only displays top 10 scores without any&#10;names&#10;Added a timer that can be modified for each level, must be tested in &#10;order to be balanced&#10;Added a MAX_LEVEL variable to keep track of the number of levels better">
       <change beforePath="$PROJECT_DIR$/MemoryGame.iws" beforeDir="false" afterPath="$PROJECT_DIR$/MemoryGame.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/assets/highscores.txt" beforeDir="false" afterPath="$PROJECT_DIR$/android/assets/highscores.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/assets/matched.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/assets/matched.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/assets/unmatched.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/assets/unmatched.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/GameScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/GameScreen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/ScoreboardScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/ScoreboardScreen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
@@ -177,29 +182,30 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="gradle" value="5" />
-          <entry key="java" value="4007" />
-          <entry key="txt" value="149" />
+          <entry key="java" value="7028" />
+          <entry key="txt" value="617" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="Groovy" value="5" />
-          <entry key="JAVA" value="4007" />
-          <entry key="PLAIN_TEXT" value="149" />
+          <entry key="JAVA" value="7028" />
+          <entry key="PLAIN_TEXT" value="617" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="gradle" value="1" />
-          <entry key="java" value="5" />
+          <entry key="java" value="25" />
           <entry key="p" value="1" />
+          <entry key="txt" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="Groovy" value="1" />
-          <entry key="JAVA" value="5" />
-          <entry key="PLAIN_TEXT" value="1" />
+          <entry key="JAVA" value="25" />
+          <entry key="PLAIN_TEXT" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.lifecycle.project">
@@ -221,8 +227,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="561">
-              <caret line="39" column="1" selection-start-line="39" selection-start-column="1" selection-end-line="39" selection-end-column="1" />
+            <state relative-caret-position="204">
+              <caret line="13" column="29" selection-start-line="13" selection-start-column="29" selection-end-line="13" selection-end-column="29" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -231,19 +237,81 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/GameScreen.java">
+        <entry file="file://$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-233">
-              <caret line="230" column="8" selection-start-line="230" selection-start-column="8" selection-end-line="232" selection-end-column="31" />
+            <state relative-caret-position="136">
+              <caret line="10" column="28" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/GameScreen.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-197">
+              <caret line="59" column="63" selection-start-line="59" selection-start-column="63" selection-end-line="59" selection-end-column="63" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1991#2013#0" expanded="true" />
+                <element signature="e#759#766#0" expanded="true" />
+                <element signature="e#32210#32512#0" expanded="true" />
+                <element signature="e#32511#32512#0" expanded="true" />
+                <element signature="e#32904#33206#0" expanded="true" />
+                <element signature="e#33205#33206#0" expanded="true" />
+                <element signature="e#33585#33885#0" expanded="true" />
+                <element signature="e#33884#33885#0" expanded="true" />
+                <element signature="e#34278#34580#0" expanded="true" />
+                <element signature="e#34579#34580#0" expanded="true" />
+                <element signature="e#34974#35275#0" expanded="true" />
+                <element signature="e#35274#35275#0" expanded="true" />
+                <element signature="e#36058#36360#0" expanded="true" />
+                <element signature="e#36359#36360#0" expanded="true" />
+                <element signature="e#36707#37009#0" expanded="true" />
+                <element signature="e#37008#37009#0" expanded="true" />
+                <element signature="e#37343#37643#0" expanded="true" />
+                <element signature="e#37642#37643#0" expanded="true" />
+                <element signature="e#37991#38293#0" expanded="true" />
+                <element signature="e#38292#38293#0" expanded="true" />
+                <element signature="e#38642#38943#0" expanded="true" />
+                <element signature="e#38942#38943#0" expanded="true" />
+                <element signature="e#43231#43376#0" expanded="true" />
+                <element signature="e#43375#43376#0" expanded="true" />
+                <element signature="e#49117#49118#0" expanded="true" />
+                <element signature="e#49174#49175#0" expanded="true" />
+                <element signature="e#49217#49218#0" expanded="true" />
+                <element signature="e#49274#49275#0" expanded="true" />
+                <element signature="e#48621#48991#0" expanded="true" />
+                <element signature="e#48990#48991#0" expanded="true" />
+                <element signature="e#56926#56927#0" expanded="true" />
+                <element signature="e#56954#56955#0" expanded="true" />
+                <element signature="e#57016#57017#0" expanded="true" />
+                <element signature="e#57044#57045#0" expanded="true" />
+                <element signature="e#57105#57106#0" expanded="true" />
+                <element signature="e#57133#57134#0" expanded="true" />
+                <element signature="e#57190#57191#0" expanded="true" />
+                <element signature="e#57218#57219#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="15" column="48" selection-start-line="15" selection-start-column="48" selection-end-line="15" selection-end-column="48" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/ScoreboardScreen.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="253">
-              <caret line="54" column="12" selection-start-line="54" selection-start-column="12" selection-end-line="54" selection-end-column="12" />
+            <state relative-caret-position="187">
+              <caret line="74" column="48" selection-start-line="74" selection-start-column="48" selection-end-line="74" selection-end-column="48" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -255,12 +323,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>matchingcard(</find>
-      <find>animateFlippingCard</find>
-      <find>res</find>
-      <find>getwidth</find>
-      <find>- 5</find>
-      <find>Pair</find>
       <find>o</find>
       <find>removeMatchingCard</find>
       <find>dispose</find>
@@ -279,12 +341,18 @@
       <find>buttons</find>
       <find>JWinpointerreader</find>
       <find>Score</find>
-      <find>font</find>
-      <find>label</find>
       <find>Label</find>
       <find>scoreboard</find>
       <find>flipdown</find>
       <find>flipup</find>
+      <find>highScores</find>
+      <find>4</find>
+      <find>arraylist</find>
+      <find>MemoryGameView</find>
+      <find>font</find>
+      <find>label</find>
+      <find>line(</find>
+      <find>toMeter</find>
     </findStrings>
     <dirStrings>
       <dir>C:\Users\Projects\Desktop\GitHub\w19Wozniak</dir>
@@ -2469,12 +2537,12 @@
         <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MyPointerTestApp.java" />
         <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Box.java" />
         <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/BoxAccessor.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java" />
-        <option value="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" />
-        <option value="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" />
-        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/GameScreen.java" />
         <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/ScoreboardScreen.java" />
+        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java" />
+        <option value="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" />
+        <option value="$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java" />
+        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java" />
+        <option value="$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/GameScreen.java" />
       </list>
     </option>
   </component>
@@ -2506,7 +2574,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="AndroidView" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -2532,11 +2600,29 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="memorygame" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="w19Wozniak" type="b2602c69:ProjectViewProjectNode" />
+              <item name="w19Wozniak" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="desktop" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+            </path>
+            <path>
+              <item name="w19Wozniak" type="b2602c69:ProjectViewProjectNode" />
+              <item name="w19Wozniak" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="desktop" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="w19Wozniak" type="b2602c69:ProjectViewProjectNode" />
+              <item name="w19Wozniak" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="desktop" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="desktop" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -2549,7 +2635,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="android.profiler.active" value="true" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1554489051912" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1554596232005" />
     <property name="device.picker.selection" value="c253e8f40e19f7cf" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/core/src" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/android/assets" />
@@ -2559,13 +2645,13 @@
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Projects\Desktop\GitHub\w19Wozniak\libs" />
-      <recent name="C:\Users\Projects\Desktop\GitHub\w19Wozniak\core\src\ca\mymacewan\memorygame" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\PC\Desktop\GitHub\w19Wozniak\android\assets" />
       <recent name="C:\Users\Projects\Desktop\GitHub\w19Wozniak\android\assets" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Projects\Desktop\GitHub\w19Wozniak\libs" />
+      <recent name="C:\Users\Projects\Desktop\GitHub\w19Wozniak\core\src\ca\mymacewan\memorygame" />
     </key>
   </component>
   <component name="RestoreUpdateTree" date="Moments ago" ActionInfo="_Update">
@@ -2582,8 +2668,11 @@
           <option name="mySupportsDeletion" value="false" />
           <option name="myCanBeAbsent" value="false" />
           <option name="myId" value="UPDATED" />
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/MemoryGame.ipr</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/MemoryGame.iws</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/GameScreen.java</PATH>
           <PATH vcs="Git" revision="">$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/ScoreboardScreen.java</PATH>
         </FILE-GROUP>
         <FILE-GROUP>
           <option name="myUpdateName" value="Created" />
@@ -3104,7 +3193,14 @@
       <option name="project" value="LOCAL" />
       <updated>1554477752114</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Make several changes&#10;&#10;Scoreboard is now complete, only displays top 10 scores without any&#10;names. The arraylist of scores is stored in highscores.txt&#10;Added a timer that can be modified for each level, must be tested in &#10;order to be balanced&#10;Added a MAX_LEVEL variable to keep track of the number of levels better">
+      <created>1554539937674</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1554539937674</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -3113,7 +3209,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="164355000" />
+    <option name="totallyTimeSpent" value="188460000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -3125,11 +3221,11 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="754" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.48333332" visible="true" weight="0.2375189" />
-      <window_info id="Structure" order="1" sideWeight="0.51666665" side_tool="true" visible="true" weight="0.2375189" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4873016" visible="true" weight="0.19989339" />
+      <window_info id="Structure" order="1" sideWeight="0.5126984" side_tool="true" weight="0.19989339" />
       <window_info id="Designer" order="2" />
       <window_info id="Build Variants" order="3" side_tool="true" />
       <window_info id="UI Designer" order="4" />
@@ -3139,12 +3235,12 @@
       <window_info id="Image Layers" order="8" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32903227" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.48562783" visible="true" weight="0.32258064" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4977307" weight="0.3983871" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.48562783" visible="true" weight="0.32403433" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4977307" weight="0.39806867" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Android Profiler" order="6" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.51437217" side_tool="true" visible="true" weight="0.32258064" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.51437217" side_tool="true" weight="0.32258064" />
       <window_info anchor="bottom" id="TODO" order="8" sideWeight="0.49924356" weight="0.32741934" />
       <window_info anchor="bottom" id="Logcat" order="9" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
@@ -3166,8 +3262,8 @@
       <window_info anchor="right" id="Gradle" order="10" weight="0.32995737" />
     </layout>
     <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4857143" visible="true" weight="0.2375189" />
-      <window_info id="Structure" order="1" sideWeight="0.51428574" side_tool="true" visible="true" weight="0.2375189" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4873016" visible="true" weight="0.19989339" />
+      <window_info id="Structure" order="1" sideWeight="0.5126984" side_tool="true" visible="true" weight="0.19989339" />
       <window_info id="Designer" order="2" />
       <window_info id="Build Variants" order="3" side_tool="true" />
       <window_info id="UI Designer" order="4" />
@@ -3177,12 +3273,12 @@
       <window_info id="Image Layers" order="8" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32903227" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.48667377" visible="true" weight="0.32258064" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4977307" weight="0.3983871" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.48562783" visible="true" weight="0.32403433" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4977307" weight="0.39806867" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Android Profiler" order="6" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5133262" side_tool="true" weight="0.32403433" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.51437217" side_tool="true" weight="0.32258064" />
       <window_info anchor="bottom" id="TODO" order="8" sideWeight="0.49924356" weight="0.32741934" />
       <window_info anchor="bottom" id="Logcat" order="9" />
       <window_info anchor="bottom" id="Database Changes" order="10" show_stripe_button="false" />
@@ -3238,7 +3334,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
-    <MESSAGE value="Make changes" />
     <MESSAGE value="Add missing } to one of the methods" />
     <MESSAGE value="Add motorJoints array and TODO comment for Brayden" />
     <MESSAGE value="Refactor existing code and add isIdle() as an outline for the future" />
@@ -3263,58 +3358,11 @@
     <MESSAGE value="disable redundant input processing methods to avoid issues." />
     <MESSAGE value="Refactor code and add arrows to the revealed cards" />
     <MESSAGE value="Add return button and fix switching from screen to screen" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add return button and fix switching from screen to screen" />
+    <MESSAGE value="Make several changes&#10;&#10;Scoreboard is now complete, only displays top 10 scores without any&#10;names. The arraylist of scores is stored in highscores.txt&#10;Added a timer that can be modified for each level, must be tested in &#10;order to be balanced&#10;Added a MAX_LEVEL variable to keep track of the number of levels better" />
+    <option name="LAST_COMMIT_MESSAGE" value="Make several changes&#10;&#10;Scoreboard is now complete, only displays top 10 scores without any&#10;names. The arraylist of scores is stored in highscores.txt&#10;Added a timer that can be modified for each level, must be tested in &#10;order to be balanced&#10;Added a MAX_LEVEL variable to keep track of the number of levels better" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gradle.properties">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="44" lean-forward="true" selection-start-line="44" selection-end-line="44" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/scenes/scene2d/Action.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="50" column="21" selection-start-line="50" selection-start-column="21" selection-end-line="50" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-box2d/1.9.9/9b11e9ddbd49e416b37396451965412ca03021bc/gdx-box2d-1.9.9-sources.jar!/com/badlogic/gdx/physics/box2d/Body.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="123">
-          <caret line="43" column="64" lean-forward="true" selection-start-line="43" selection-start-column="14" selection-end-line="43" selection-end-column="64" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/graphics/g2d/GlyphLayout.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="33" column="13" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-box2d/1.9.9/9b11e9ddbd49e416b37396451965412ca03021bc/gdx-box2d-1.9.9-sources.jar!/com/badlogic/gdx/physics/box2d/World.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="811" selection-start-line="811" selection-end-line="811" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/graphics/g2d/SpriteBatch.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="113">
-          <caret line="894" column="84" selection-start-line="894" selection-start-column="79" selection-end-line="894" selection-end-column="84" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_201/src.zip!/javax/swing/plaf/metal/MetalMenuBarUI.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="131">
@@ -3410,13 +3458,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/utils/Array.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
-          <caret line="154" selection-start-line="154" selection-end-line="154" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MyPointerTestApp.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
@@ -3424,13 +3465,6 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="10" column="28" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
         </state>
       </provider>
     </entry>
@@ -3493,21 +3527,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/graphics/glutils/ShapeRenderer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="158">
-          <caret line="95" column="15" lean-forward="true" selection-start-line="95" selection-start-column="15" selection-end-line="95" selection-end-column="15" />
-          <folding>
-            <element signature="e#9031#9032#0" expanded="true" />
-            <element signature="e#9082#9083#0" expanded="true" />
-            <element signature="e#9195#9196#0" expanded="true" />
-            <element signature="e#9256#9257#0" expanded="true" />
-            <element signature="e#22696#22697#0" expanded="true" />
-            <element signature="e#22742#22743#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/scenes/scene2d/InputListener.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="131">
@@ -3564,16 +3583,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="47" column="11" selection-start-line="47" selection-start-column="11" selection-end-line="47" selection-end-column="11" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-box2d/1.9.9/9b11e9ddbd49e416b37396451965412ca03021bc/gdx-box2d-1.9.9-sources.jar!/com/badlogic/gdx/physics/box2d/Contact.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-379">
@@ -3581,29 +3590,176 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java">
+    <entry file="file://$PROJECT_DIR$/android/assets/highscores.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/InputMultiplexer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="39" column="1" selection-start-line="39" selection-start-column="1" selection-end-line="39" selection-end-column="1" />
+        <state relative-caret-position="178">
+          <caret line="79" selection-start-line="79" selection-end-line="79" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-lwjgl/1.9.9/222a6367453012e0da3caa48b892b5c8ecc42dc/gdx-backend-lwjgl-1.9.9-sources.jar!/com/badlogic/gdx/backends/lwjgl/LwjglInput.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="178">
+          <caret line="321" selection-start-line="321" selection-end-line="321" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-lwjgl/1.9.9/222a6367453012e0da3caa48b892b5c8ecc42dc/gdx-backend-lwjgl-1.9.9-sources.jar!/com/badlogic/gdx/backends/lwjgl/LwjglApplication.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="178">
+          <caret line="217" selection-start-line="217" selection-end-line="217" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-box2d/1.9.9/9b11e9ddbd49e416b37396451965412ca03021bc/gdx-box2d-1.9.9-sources.jar!/com/badlogic/gdx/physics/box2d/Joint.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="167" selection-start-line="167" selection-end-line="167" />
+          <folding>
+            <element signature="e#4448#4449#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/utils/LongMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="273">
+          <caret line="371" selection-start-line="371" selection-end-line="371" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-box2d/1.9.9/9b11e9ddbd49e416b37396451965412ca03021bc/gdx-box2d-1.9.9-sources.jar!/com/badlogic/gdx/physics/box2d/World.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="256">
+          <caret line="669" selection-start-line="669" selection-end-line="669" />
+          <folding>
+            <element signature="e#30974#30975#0" expanded="true" />
+            <element signature="e#31005#31006#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/utils/Array.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="35">
+          <caret line="42" selection-start-line="42" selection-end-line="42" />
+          <folding>
+            <element signature="e#1685#1686#0" expanded="true" />
+            <element signature="e#21232#21233#0" expanded="true" />
+            <element signature="e#21258#21259#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/Card.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+          <folding>
+            <element signature="e#129#130#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.9/1409aca6a4293a7ca8dbd60281c3211a195dd39a/gdx-1.9.9-sources.jar!/com/badlogic/gdx/graphics/glutils/ShapeRenderer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="194">
+          <caret line="103" column="18" selection-start-line="103" selection-start-column="18" selection-end-line="103" selection-end-column="18" />
+          <folding>
+            <element signature="e#9031#9032#0" expanded="true" />
+            <element signature="e#9082#9083#0" expanded="true" />
+            <element signature="e#9195#9196#0" expanded="true" />
+            <element signature="e#9256#9257#0" expanded="true" />
+            <element signature="e#22696#22697#0" expanded="true" />
+            <element signature="e#22742#22743#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/ScoreboardScreen.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="74" column="48" selection-start-line="74" selection-start-column="48" selection-end-line="74" selection-end-column="48" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/GameScreen.java">
+    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGameView.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-233">
-          <caret line="230" column="8" selection-start-line="230" selection-start-column="8" selection-end-line="232" selection-end-column="31" />
+        <state relative-caret-position="204">
+          <caret line="13" column="29" selection-start-line="13" selection-start-column="29" selection-end-line="13" selection-end-column="29" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/ScoreboardScreen.java">
+    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/MemoryGame.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="54" column="12" selection-start-line="54" selection-start-column="12" selection-end-line="54" selection-end-column="12" />
+        <state relative-caret-position="255">
+          <caret line="15" column="48" selection-start-line="15" selection-start-column="48" selection-end-line="15" selection-end-column="48" />
           <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/desktop/src/ca/mymacewan/memorygame/desktop/DesktopLauncher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="10" column="28" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/ca/mymacewan/memorygame/GameScreen.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-197">
+          <caret line="59" column="63" selection-start-line="59" selection-start-column="63" selection-end-line="59" selection-end-column="63" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1991#2013#0" expanded="true" />
+            <element signature="e#759#766#0" expanded="true" />
+            <element signature="e#32210#32512#0" expanded="true" />
+            <element signature="e#32511#32512#0" expanded="true" />
+            <element signature="e#32904#33206#0" expanded="true" />
+            <element signature="e#33205#33206#0" expanded="true" />
+            <element signature="e#33585#33885#0" expanded="true" />
+            <element signature="e#33884#33885#0" expanded="true" />
+            <element signature="e#34278#34580#0" expanded="true" />
+            <element signature="e#34579#34580#0" expanded="true" />
+            <element signature="e#34974#35275#0" expanded="true" />
+            <element signature="e#35274#35275#0" expanded="true" />
+            <element signature="e#36058#36360#0" expanded="true" />
+            <element signature="e#36359#36360#0" expanded="true" />
+            <element signature="e#36707#37009#0" expanded="true" />
+            <element signature="e#37008#37009#0" expanded="true" />
+            <element signature="e#37343#37643#0" expanded="true" />
+            <element signature="e#37642#37643#0" expanded="true" />
+            <element signature="e#37991#38293#0" expanded="true" />
+            <element signature="e#38292#38293#0" expanded="true" />
+            <element signature="e#38642#38943#0" expanded="true" />
+            <element signature="e#38942#38943#0" expanded="true" />
+            <element signature="e#43231#43376#0" expanded="true" />
+            <element signature="e#43375#43376#0" expanded="true" />
+            <element signature="e#49117#49118#0" expanded="true" />
+            <element signature="e#49174#49175#0" expanded="true" />
+            <element signature="e#49217#49218#0" expanded="true" />
+            <element signature="e#49274#49275#0" expanded="true" />
+            <element signature="e#48621#48991#0" expanded="true" />
+            <element signature="e#48990#48991#0" expanded="true" />
+            <element signature="e#56926#56927#0" expanded="true" />
+            <element signature="e#56954#56955#0" expanded="true" />
+            <element signature="e#57016#57017#0" expanded="true" />
+            <element signature="e#57044#57045#0" expanded="true" />
+            <element signature="e#57105#57106#0" expanded="true" />
+            <element signature="e#57133#57134#0" expanded="true" />
+            <element signature="e#57190#57191#0" expanded="true" />
+            <element signature="e#57218#57219#0" expanded="true" />
           </folding>
         </state>
       </provider>
