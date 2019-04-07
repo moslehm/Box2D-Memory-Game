@@ -64,7 +64,7 @@ public class ScoreboardScreen implements Screen {
         }
 
         Label.LabelStyle labelStyle = new Label.LabelStyle();
-        BitmapFont font = new BitmapFont(Gdx.files.internal("ArialFont.fnt"));
+        BitmapFont font = new BitmapFont(Gdx.files.internal("KenPixelBlocks.fnt"));
         labelStyle.font = font;
         Label label = new Label("High scores", labelStyle);
         label.setAlignment(Align.center);

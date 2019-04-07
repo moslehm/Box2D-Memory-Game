@@ -233,7 +233,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     public static Label[] addScoreActors(Stage stage, int currentScore) {
         // Load font
         Label.LabelStyle labelStyle = new Label.LabelStyle();
-        BitmapFont font = new BitmapFont(Gdx.files.internal("ArialFont.fnt"));
+        BitmapFont font = new BitmapFont(Gdx.files.internal("KenPixelBlocks.fnt"));
         labelStyle.font = font;
         Label[] label = new Label[4];
         label[0] = new Label(Integer.toString(currentScore), labelStyle);
@@ -282,7 +282,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     void setTimerLabels(){
         // Load font
         Label.LabelStyle labelStyle = new Label.LabelStyle();
-        BitmapFont font = new BitmapFont(Gdx.files.internal("ArialFont.fnt"));
+        BitmapFont font = new BitmapFont(Gdx.files.internal("KenPixelBlocks.fnt"));
         labelStyle.font = font;
         timerLabels = new Label[4];
         /*float timeLeft = timeLimits[difficulty] - currentTime;
@@ -394,11 +394,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         batch.end();
 
         batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        for (Box[] pair : boxPairs) {
-            drawLine(pair[0].getBody().getPosition(), pair[1].getBody().getPosition());
-        }
-
-        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.begin();
         // Draw front
         for (int i = 0; i < boxes.size(); i++) {
@@ -435,9 +430,14 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         particleEffect.draw(batch);
         batch.end();
 
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        for (Box[] pair : boxPairs) {
+            drawLine(pair[0].getBody().getPosition(), pair[1].getBody().getPosition());
+        }
+
+        batch.getProjectionMatrix().set(camera.combined);
         stage.act();
         stage.draw();
-
         // Render the world using the debug box2DDebugRenderer to view bodies and joints
         //box2DDebugRenderer.render(world, camera.combined);
     }
