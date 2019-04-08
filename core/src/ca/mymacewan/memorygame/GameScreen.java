@@ -1,6 +1,7 @@
 package ca.mymacewan.memorygame;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -72,6 +73,11 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     public Color worldColor;
     InputMultiplexer plex;
     Stage stage;
+
+    private Sound impactSound;
+    private Sound pairSound;
+    private Sound turnOverSound;
+    private Sound winSound;
 
     private static TweenManager tweenManager;
     private JWinPointerReader jWinPointerReader;
@@ -177,6 +183,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
         // Creates the boxes and joints
         createGame();
+
+        //load sound effects
+        loadSound();
 
         // Batch to draw textures
         batch = new SpriteBatch();
@@ -643,6 +652,8 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                             }
                         }
                     }
+
+                    pairSound.play(1.0f);
                     Vector2 contactPoint = (boxPairInContact[0].getPointOfContact());
                     particleEffect.getEmitters().first().setPosition(contactPoint.x, contactPoint.y);
                     particleEffect.start();
@@ -971,6 +982,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Round over
         // Destroy bodies and joints
         // Then start next round
+        winSound.play(1.0f);
         currentTime = 0;
         destroyAll();
         boxPairs = new ArrayList<Box[]>();
@@ -1023,6 +1035,12 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         }
     }
 
+    void loadSound() {
+        impactSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/impact.wav"));
+        pairSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/pair.mp3"));
+        turnOverSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/turnOver.mp3"));
+        winSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/Winning&nextLevel.mp3"));
+    }
 
     public void createBox(float xPosition, float yPosition, float angle, Card card) {
         PolygonShape shape = new PolygonShape();
@@ -1096,6 +1114,11 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         shapeRenderer.dispose();
         particleEffect.dispose();
 
+        //dispose sound effects
+        impactSound.dispose();
+        pairSound.dispose();
+        turnOverSound.dispose();
+        winSound.dispose();
 
         box2DDebugRenderer = null;
         world = null;
