@@ -58,7 +58,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     int difficulty;
     private float halfBoxSizes[] = {1.5f, 1.5f, 1f, 0.8f, 0.7f, 0.7f, 0.6f, 0.5f, 0.5f};
     private float xyBoxSpacing[][] = {{3.1f, 1.9f}, {3.7f, 1.9f}, {5f, 2f}, {3.7f, 2.5f}, {3f, 2f}, {2.7f, 1.7f}, {2f, 1.6f}, {1.9f, 1.4f}, {2f, 1.1f}};
-    private float timeLimits[] = {0f, 45f, 45f, 45f, 45f, 60f, 120f, 180f, 240f};
+    private float timeLimits[] = {0f, 45f, 90f, 120f, 120f, 160f, 190f, 240f, 300f};
     private float currentTime;
     int currentScore;
     ShapeRenderer shapeRenderer;
@@ -474,7 +474,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         stage.act();
         stage.draw();
         // Render the world using the debug box2DDebugRenderer to view bodies and joints
-        box2DDebugRenderer.render(world, camera.combined);
+        //box2DDebugRenderer.render(world, camera.combined);
     }
 
     Vector2 newCoords(Vector2 oldCoords) {
