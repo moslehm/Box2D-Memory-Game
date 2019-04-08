@@ -8,11 +8,6 @@ import jwinpointer.JWinPointerReader;
 public class MemoryGameView extends Game implements ApplicationListener {
     JWinPointerReader jWinPointerReader;
 
-    private Sound impactSound;
-    private Sound pairSound;
-    private Sound turnOverSound;
-    private Sound winSound;
-
     @Override
     public void create() {
         jWinPointerReader = new JWinPointerReader("MemoryGameView");
@@ -27,11 +22,6 @@ public class MemoryGameView extends Game implements ApplicationListener {
 
     @Override
     public void dispose() {
-        //dispose sound effects
-        impactSound.dispose();
-        pairSound.dispose();
-        turnOverSound.dispose();
-        winSound.dispose();
     }
 
     @Override
