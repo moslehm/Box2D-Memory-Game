@@ -208,7 +208,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                     Box secondBox = (Box) secondBody.getUserData();
                     if (firstBox.getCard().getValue() == secondBox.getCard().getValue()) {
                         boxesInContact.add(new Box[]{firstBox, secondBox});
-                        Vector2 contactPointInPixels = vectorToPixels(contact.getWorldManifold().getPoints()[0]);
+                        Vector2 contactPointInPixels = newCoords(contact.getWorldManifold().getPoints()[0]);
                         firstBox.setPointOfContact(contactPointInPixels);
                         secondBox.setPointOfContact(contactPointInPixels);
                     }
@@ -437,11 +437,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             textureColour.a = box.getAlpha();*/
             //System.out.println("ALPHA: " + box.getAlpha());
             currentSprite.setAlpha(box.getAlpha());
-            position.x = toPixels(position.x);
-            position.y = toPixels(position.y);
             Vector2 spritePosition = newCoords(position);
-            currentSprite.setX(Gdx.graphics.getWidth() / 2f + spritePosition.x - currentSprite.getWidth() / 2f);
-            currentSprite.setY(Gdx.graphics.getHeight() / 2f + spritePosition.y - currentSprite.getHeight() / 2f);
+            currentSprite.setX(spritePosition.x - currentSprite.getWidth() / 2f);
+            currentSprite.setY(spritePosition.y - currentSprite.getHeight() / 2f);
             //currentSprite.setOrigin(-currentSprite.getWidth()/2f, currentSprite.getHeight()/2f);
             // ScaleX: (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0))
             currentSprite.setScale((float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), box.getScaleY());
@@ -474,8 +472,10 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
     Vector2 newCoords(Vector2 oldCoords) {
         Vector2 newCoords = new Vector2();
-        newCoords.x = oldCoords.x / CAMERA_WIDTH_PIXELS * Gdx.graphics.getWidth();
-        newCoords.y = oldCoords.y / CAMERA_HEIGHT_PIXELS * Gdx.graphics.getHeight();
+        float switchToResolutionX = toPixels(oldCoords.x) / CAMERA_WIDTH_PIXELS * Gdx.graphics.getWidth();
+        float switchToResolutionY = toPixels(oldCoords.y) / CAMERA_HEIGHT_PIXELS * Gdx.graphics.getHeight();
+        newCoords.x = Gdx.graphics.getWidth() / 2f + switchToResolutionX;
+        newCoords.y = Gdx.graphics.getHeight() / 2f + switchToResolutionY;
         return newCoords;
     }
 
@@ -500,8 +500,8 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     }
 
     public void drawLine(Vector2 p1, Vector2 p2) {
-        p1 = vectorToPixels(p1);
-        p2 = vectorToPixels(p2);
+        p1 = newCoords(p1);
+        p2 = newCoords(p2);
 
         float scaleBy = toPixels(0.5f);
         Vector2 lineMidPoint = (p2.cpy().sub(p1)).cpy().scl(0.5f).cpy().add(p1);
@@ -652,8 +652,10 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                             }
                         }
                     }
+
                     pairSound.play(1.0f);
-                    particleEffect.getEmitters().first().setPosition(boxPairInContact[0].getPointOfContact().x, boxPairInContact[0].getPointOfContact().y);
+                    Vector2 contactPoint = (boxPairInContact[0].getPointOfContact());
+                    particleEffect.getEmitters().first().setPosition(contactPoint.x, contactPoint.y);
                     particleEffect.start();
                 }
             }
@@ -1130,7 +1132,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     }
 
     public Vector2 vectorToPixels(Vector2 vectorInMeters) {
-        return new Vector2(CAMERA_WIDTH_PIXELS / 2f + toPixels(vectorInMeters.x), CAMERA_HEIGHT_PIXELS / 2f + toPixels(vectorInMeters.y)); // DEFAULT: 0.018f
+        return new Vector2(Gdx.graphics.getWidth() / 2f + toPixels(vectorInMeters.x), Gdx.graphics.getHeight() / 2f + toPixels(vectorInMeters.y)); // DEFAULT: 0.018f
     }
 
     public float toMeters(float pixels) {
