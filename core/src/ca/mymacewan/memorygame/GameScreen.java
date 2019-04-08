@@ -6,13 +6,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import jwinpointer.JWinPointerReader;
@@ -29,7 +25,6 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
-
 import java.util.ArrayList;
 
 public class GameScreen implements Screen, InputProcessor, JWinPointerReader.PointerEventListener {
@@ -114,7 +109,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // 1 pixel = 0.018 meters
         // 1 meter = 55.556 pixels
         // This can be changed. The lower the meters are, the more the screen "zooms in".
-        System.out.println(Gdx.graphics.getWidth() + " " + Gdx.graphics.getHeight());
         CAMERA_WIDTH_PIXELS = 1920;
         CAMERA_HEIGHT_PIXELS = 1080;
         CAMERA_WIDTH_METERS = toMeters(CAMERA_WIDTH_PIXELS);
@@ -243,7 +237,8 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
             @Override
             public void postSolve(Contact contact, ContactImpulse impulse) {
-
+                //System.out.print(impulse.getNormalImpulses()[0]);
+                // TODO: COLLISION SOUND?
             }
         });
 
@@ -672,6 +667,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                 .target(targetValue)
                 .ease(TweenEquations.easeInOutSine)
                 .start(tweenManager);
+
     }
 
     private void removeMatchingCard(Box box) {
@@ -1203,6 +1199,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                         animateFlippingCard(box, 0);
                         //System.out.println("Flipping card at index: " + boxCard.getKey());
                         Card[] newPair = game.flipUp(boxCard.getKey());
+                        turnOverSound.play(1f);
                         if (newPair != null) {
                             int numOfBoxes = 0;
                             boxPairs.add(new Box[2]);
@@ -1305,8 +1302,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         for (Box box : boxes) {
             Card boxCard = box.getCard();
             notMoving = !box.getBody().isAwake();
-            notTweening = !tweenManager.containsTarget(box);
+            notTweening = box.getScaleX() == 0;
             noMouseJoint = box.getBody().getJointList().size <= 1;
+
             if (notMoving && notTweening && noMouseJoint) {
                 if (boxCard.getState() != State.PAIRED) {
                     animateFlippingCard(box, 1);
@@ -1317,6 +1315,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                         }
                     }
                     game.flipDown(boxCard.getKey());
+                    turnOverSound.play(1f);
                 } /*else if (boxCard.getState() == State.PAIRED) {
                     removeMatchingCard(box);
                 }*/
