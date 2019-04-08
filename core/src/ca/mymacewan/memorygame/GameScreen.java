@@ -69,10 +69,11 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     InputMultiplexer plex;
     Stage stage;
 
-    private Sound impactSound;
+    //private Sound impactSound;
     private Sound pairSound;
     private Sound turnOverSound;
     private Sound winSound;
+    //float timeAtImpact;
 
     private static TweenManager tweenManager;
     private JWinPointerReader jWinPointerReader;
@@ -96,9 +97,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         plex = new InputMultiplexer();
         //createTopButtons();
         //createBottomButtons();
-        float red = 153;
-        float green = 234;
-        float blue = 255;
+        float red = 63;
+        float green = 168;
+        float blue = 65;
         worldColor = new Color(red / 255f, green / 255f, blue / 255f, 1f);
 /*        worldColor.r = 0 / 255f;
         worldColor.g = 161 / 255f;
@@ -237,8 +238,19 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
             @Override
             public void postSolve(Contact contact, ContactImpulse impulse) {
-                //System.out.print(impulse.getNormalImpulses()[0]);
-                // TODO: COLLISION SOUND?
+                /*float normalImpulse = impulse.getNormalImpulses()[0];
+                if (normalImpulse >= 600){
+                    normalImpulse = 600;
+                }
+                float impactForce = normalImpulse / 600f;
+                System.out.println("timeAtImpact: " + timeAtImpact);
+                float timeSinceImpact = currentTime - timeAtImpact;
+                if (timeSinceImpact > 0.2f && impactForce > 0.3f) {
+                    timeAtImpact = currentTime;
+                    // From 0 to 1
+                    impactSound.play(impactForce);
+                    // TODO: COLLISION SOUND?
+                }*/
             }
         });
 
@@ -875,6 +887,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         cards = game.getCards();
         difficulty = game.getDifficulty();
         currentNumOfCards = 0;
+        //timeAtImpact = 0;
 
         for (Sprite[] frontSideSpriteArray : frontSideSprites) {
             for (Sprite frontSideSprite : frontSideSpriteArray) {
@@ -1032,7 +1045,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     }
 
     void loadSound() {
-        impactSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/impact.wav"));
+        //impactSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/impact.wav"));
         pairSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/pair.mp3"));
         turnOverSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/turnOver.mp3"));
         winSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/Winning&nextLevel.mp3"));
@@ -1111,7 +1124,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         particleEffect.dispose();
 
         //dispose sound effects
-        impactSound.dispose();
+        //impactSound.dispose();
         pairSound.dispose();
         turnOverSound.dispose();
         winSound.dispose();
