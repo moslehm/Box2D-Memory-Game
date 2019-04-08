@@ -28,12 +28,17 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
+
 import java.util.ArrayList;
 
 public class GameScreen implements Screen, InputProcessor, JWinPointerReader.PointerEventListener {
     // Box2D initialization
     // PHYSICS_ENTITY will always collide with WORLD_ENTITY
     protected OrthographicCamera camera;
+    static float CAMERA_WIDTH_PIXELS;
+    static float CAMERA_HEIGHT_PIXELS;
+    float CAMERA_WIDTH_METERS;
+    float CAMERA_HEIGHT_METERS;
     //final short PHYSICS_ENTITY = 0x1;    // 0001
     //final short WORLD_ENTITY = 0x1 << 1; // 0010 or 0x2 in hex
     protected Box2DDebugRenderer box2DDebugRenderer;
@@ -55,8 +60,8 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     private MemoryGame game;
     ArrayList<Card> cards;
     int difficulty;
-    private float halfBoxSizes[] = {1.5f, 1.5f, 1f, 0.8f, 0.8f, 0.7f, 0.6f, 0.5f, 0.5f};
-    private float xyBoxSpacing[][] = {{3.1f, 1.9f}, {3.7f, 1.9f}, {5f, 2f}, {3.7f, 2.5f}, {4.5f, 2f}, {2.7f, 1.7f}, {2.7f, 1.7f}, {2.7f, 1.7f}, {2.7f, 1.7f}};
+    private float halfBoxSizes[] = {1.5f, 1.5f, 1f, 0.8f, 0.7f, 0.7f, 0.6f, 0.5f, 0.5f};
+    private float xyBoxSpacing[][] = {{3.1f, 1.9f}, {3.7f, 1.9f}, {5f, 2f}, {3.7f, 2.5f}, {3f, 2f}, {2.7f, 1.7f}, {2f, 1.6f}, {1.9f, 1.4f}, {2f, 1.1f}};
     private float timeLimits[] = {0f, 45f, 45f, 45f, 45f, 60f, 120f, 180f, 240f};
     private float currentTime;
     int currentScore;
@@ -87,11 +92,11 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         particleEffect = new ParticleEffect();
         particleEffect.load(Gdx.files.internal("explosion.p"), Gdx.files.internal(""));
 
-        plex =  new InputMultiplexer();
+        plex = new InputMultiplexer();
         //createTopButtons();
         //createBottomButtons();
         float red = 153;
-        float green =  234;
+        float green = 234;
         float blue = 255;
         worldColor = new Color(red / 255f, green / 255f, blue / 255f, 1f);
 /*        worldColor.r = 0 / 255f;
@@ -103,8 +108,12 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // 1 pixel = 0.018 meters
         // 1 meter = 55.556 pixels
         // This can be changed. The lower the meters are, the more the screen "zooms in".
-        float CAMERA_WIDTH_METERS = toMeters(Gdx.graphics.getWidth());
-        float CAMERA_HEIGHT_METERS = toMeters(Gdx.graphics.getHeight());
+        System.out.println(Gdx.graphics.getWidth() + " " + Gdx.graphics.getHeight());
+        CAMERA_WIDTH_PIXELS = 1920;
+        CAMERA_HEIGHT_PIXELS = 1080;
+        CAMERA_WIDTH_METERS = toMeters(CAMERA_WIDTH_PIXELS);
+        CAMERA_HEIGHT_METERS = toMeters(CAMERA_HEIGHT_PIXELS);
+
 
         // Tween setup
         Tween.setCombinedAttributesLimit(1);
@@ -190,10 +199,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                     Box secondBox = (Box) secondBody.getUserData();
                     if (firstBox.getCard().getValue() == secondBox.getCard().getValue()) {
                         boxesInContact.add(new Box[]{firstBox, secondBox});
-                        firstBox.setPointOfContact(new Vector2(Gdx.graphics.getWidth() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].x),
-                                Gdx.graphics.getHeight() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].y)));
-                        secondBox.setPointOfContact(new Vector2(Gdx.graphics.getWidth() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].x),
-                                Gdx.graphics.getHeight() / 2f + toPixels(contact.getWorldManifold().getPoints()[0].y)));
+                        Vector2 contactPointInPixels = vectorToPixels(contact.getWorldManifold().getPoints()[0]);
+                        firstBox.setPointOfContact(contactPointInPixels);
+                        secondBox.setPointOfContact(contactPointInPixels);
                     }
                 }
             }
@@ -205,9 +213,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                 if (firstBody.getUserData() != null && secondBody.getUserData() != null) {
                     Box firstBox = (Box) firstBody.getUserData();
                     Box secondBox = (Box) secondBody.getUserData();
-                    for (Box currentBoxesInContact[]: boxesInContact){
-                        if (currentBoxesInContact[0] == firstBox || currentBoxesInContact[0] == secondBox){
-                            if (currentBoxesInContact[1] == firstBox || currentBoxesInContact[1] == secondBox){
+                    for (Box currentBoxesInContact[] : boxesInContact) {
+                        if (currentBoxesInContact[0] == firstBox || currentBoxesInContact[0] == secondBox) {
+                            if (currentBoxesInContact[1] == firstBox || currentBoxesInContact[1] == secondBox) {
                                 boxesInContact.remove(currentBoxesInContact);
                                 currentBoxesInContact[0].resetPointOfContact();
                                 currentBoxesInContact[1].resetPointOfContact();
@@ -252,7 +260,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         Vector2 topRightCornerPos = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         // define this
-        float scoreDistanceFromCorner = Gdx.graphics.getHeight()/8f - 10f;
+        float scoreDistanceFromCorner = Gdx.graphics.getHeight() / 8f - 10f;
 
         Vector2 bottomLeftScorePos = bottomLeftCornerPos.cpy().add(new Vector2(1, 1).cpy().scl(scoreDistanceFromCorner));
         Vector2 topLeftScorePos = topLeftCornerPos.cpy().add(new Vector2(1, -1).cpy().scl(scoreDistanceFromCorner));
@@ -261,28 +269,32 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
         Container container = new Container(label[0]);
         container.setTransform(true);
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
         container.setPosition(bottomLeftScorePos.x, bottomLeftScorePos.y);
         container.setRotation(315);
         stage.addActor(container);
         container = new Container(label[1]);
         container.setTransform(true);
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
         container.setPosition(topLeftScorePos.x, topLeftScorePos.y);
         container.setRotation(225);
         stage.addActor(container);
         container = new Container(label[2]);
         container.setTransform(true);
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
         container.setPosition(bottomRightScorePos.x, bottomRightScorePos.y);
         container.setRotation(135 - 90);
         stage.addActor(container);
         container = new Container(label[3]);
         container.setTransform(true);
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
         container.setPosition(topRightScorePos.x, topRightScorePos.y);
         container.setRotation(45 + 90);
         stage.addActor(container);
         return label;
     }
 
-    void setTimerLabels(){
+    void setTimerLabels() {
         // Load font
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         BitmapFont font = new BitmapFont(Gdx.files.internal("KenPixelBlocks.fnt"));
@@ -301,7 +313,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                 timerLabels[i] = new Label(minutes + ":" + seconds, labelStyle);
             }
         }*/
-        for (int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             timerLabels[i] = new Label("00:00", labelStyle);
         }
 
@@ -314,7 +326,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         Vector2 topRightCornerPos = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         // define this
-        float scoreDistanceFromCorner = Gdx.graphics.getHeight()/10f - 10f;
+        float scoreDistanceFromCorner = Gdx.graphics.getHeight() / 10f - 10f;
 
         Vector2 bottomLeftScorePos = bottomLeftCornerPos.cpy().add(new Vector2(1, 1).cpy().scl(scoreDistanceFromCorner));
         Vector2 topLeftScorePos = topLeftCornerPos.cpy().add(new Vector2(1, -1).cpy().scl(scoreDistanceFromCorner));
@@ -323,21 +335,25 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
         Container container = new Container(timerLabels[0]);
         container.setTransform(true);
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
         container.setPosition(bottomLeftScorePos.x, bottomLeftScorePos.y);
         container.setRotation(315);
         stage.addActor(container);
         container = new Container(timerLabels[1]);
         container.setTransform(true);
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
         container.setPosition(topLeftScorePos.x, topLeftScorePos.y);
         container.setRotation(225);
         stage.addActor(container);
         container = new Container(timerLabels[2]);
         container.setTransform(true);
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
         container.setPosition(bottomRightScorePos.x, bottomRightScorePos.y);
         container.setRotation(135 - 90);
         stage.addActor(container);
         container = new Container(timerLabels[3]);
         container.setTransform(true);
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
         container.setPosition(topRightScorePos.x, topRightScorePos.y);
         container.setRotation(45 + 90);
         stage.addActor(container);
@@ -346,11 +362,11 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     @Override
     public void render(float delta) {
         update();
-        particleEffect.update(Gdx.graphics.getDeltaTime());
 
+        particleEffect.update(Gdx.graphics.getDeltaTime());
         currentTime += Gdx.graphics.getRawDeltaTime();
 
-        if (difficulty != 0 && currentTime > timeLimits[difficulty]){
+        if (difficulty != 0 && currentTime > timeLimits[difficulty]) {
             parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor, currentScore));
         }
 
@@ -366,7 +382,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         camera.update();
 
         tweenManager.update(Gdx.graphics.getDeltaTime());
-
 
         // Render each box via the SpriteBatch.
         // Set the projection matrix of the SpriteBatch to the camera's combined matrix.
@@ -401,7 +416,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             drawLine(pair[0].getBody().getPosition(), pair[1].getBody().getPosition());
         }
 
-        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.begin();
         // Draw front
         for (int i = 0; i < boxes.size(); i++) {
@@ -414,8 +428,11 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             textureColour.a = box.getAlpha();*/
             //System.out.println("ALPHA: " + box.getAlpha());
             currentSprite.setAlpha(box.getAlpha());
-            currentSprite.setX(Gdx.graphics.getWidth() / 2f + toPixels(position.x) - currentSprite.getWidth() / 2f);
-            currentSprite.setY(Gdx.graphics.getHeight() / 2f + toPixels(position.y) - currentSprite.getHeight() / 2f);
+            position.x = toPixels(position.x);
+            position.y = toPixels(position.y);
+            Vector2 spritePosition = newCoords(position);
+            currentSprite.setX(Gdx.graphics.getWidth() / 2f + spritePosition.x - currentSprite.getWidth() / 2f);
+            currentSprite.setY(Gdx.graphics.getHeight() / 2f + spritePosition.y - currentSprite.getHeight() / 2f);
             //currentSprite.setOrigin(-currentSprite.getWidth()/2f, currentSprite.getHeight()/2f);
             // ScaleX: (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0))
             currentSprite.setScale((float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), box.getScaleY());
@@ -443,7 +460,14 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         stage.act();
         stage.draw();
         // Render the world using the debug box2DDebugRenderer to view bodies and joints
-        //box2DDebugRenderer.render(world, camera.combined);
+        box2DDebugRenderer.render(world, camera.combined);
+    }
+
+    Vector2 newCoords(Vector2 oldCoords) {
+        Vector2 newCoords = new Vector2();
+        newCoords.x = oldCoords.x / CAMERA_WIDTH_PIXELS * Gdx.graphics.getWidth();
+        newCoords.y = oldCoords.y / CAMERA_HEIGHT_PIXELS * Gdx.graphics.getHeight();
+        return newCoords;
     }
 
     @Override
@@ -540,8 +564,8 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
 
     protected void createWorld(World world) {
-        float boardWidth = toMeters(Gdx.graphics.getWidth());
-        float boardHeight = toMeters(Gdx.graphics.getHeight());
+        float boardWidth = CAMERA_WIDTH_METERS;
+        float boardHeight = CAMERA_HEIGHT_METERS;
         float halfWidth = boardWidth / 2f;
         float halfHeight = boardHeight / 2f;
         float littleSpaceAtTheEdge = 0.4f;
@@ -826,6 +850,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     }*/
 
     int currentNumOfCards;
+
     private void createGame() {
         boxPairs = new ArrayList<Box[]>();
         boxesInContact = new ArrayList<Box[]>();
@@ -843,15 +868,15 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         difficulty = game.getDifficulty();
         currentNumOfCards = 0;
 
-        for (Sprite[] frontSideSpriteArray: frontSideSprites){
-            for (Sprite frontSideSprite: frontSideSpriteArray){
-                frontSideSprite.setSize(toPixels(halfBoxSizes[difficulty] * 2f), toPixels(halfBoxSizes[difficulty] * 2f));
-                frontSideSprite.setOrigin(toPixels(halfBoxSizes[difficulty]), toPixels(halfBoxSizes[difficulty]));
+        for (Sprite[] frontSideSpriteArray : frontSideSprites) {
+            for (Sprite frontSideSprite : frontSideSpriteArray) {
+                frontSideSprite.setSize(((halfBoxSizes[difficulty] * 2f) / CAMERA_WIDTH_METERS) * Gdx.graphics.getWidth(), ((halfBoxSizes[difficulty] * 2f) / CAMERA_HEIGHT_METERS) * Gdx.graphics.getHeight());
+                frontSideSprite.setOrigin(((halfBoxSizes[difficulty]) / CAMERA_WIDTH_METERS) * Gdx.graphics.getWidth(), ((halfBoxSizes[difficulty]) / CAMERA_HEIGHT_METERS) * Gdx.graphics.getHeight());
             }
         }
 
-        float halfWidth = toMeters(Gdx.graphics.getWidth()) / 2f;
-        float halfHeight = toMeters(Gdx.graphics.getHeight()) / 2f;
+        float halfWidth = CAMERA_WIDTH_METERS / 2f;
+        float halfHeight = CAMERA_HEIGHT_METERS / 2f;
 
         float goldenAngle = (float) ((2 * Math.PI) / Math.pow((1f + Math.sqrt(5)) / 2f, 2));
         float radius = 0f;
@@ -910,7 +935,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             createGame();
         }
         if (game.isRoundOver() && roundInProgress) {
-            if (game.isGameOver()){
+            if (game.isGameOver()) {
                 parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor, currentScore));
             }
             roundInProgress = false;
@@ -1079,11 +1104,11 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
 
     public Vector2 vectorToMeters(Vector2 vectorInPixels) {
-        return new Vector2(Gdx.graphics.getWidth()/2f + toMeters(vectorInPixels.x), Gdx.graphics.getHeight()/2f + toMeters(vectorInPixels.y)); // DEFAULT: 0.018f
+        return new Vector2(CAMERA_WIDTH_PIXELS / 2f + toMeters(vectorInPixels.x), CAMERA_HEIGHT_PIXELS / 2f + toMeters(vectorInPixels.y)); // DEFAULT: 0.018f
     }
 
     public Vector2 vectorToPixels(Vector2 vectorInMeters) {
-        return new Vector2(Gdx.graphics.getWidth()/2f + toPixels(vectorInMeters.x), Gdx.graphics.getHeight()/2f + toPixels(vectorInMeters.y)); // DEFAULT: 0.018f
+        return new Vector2(CAMERA_WIDTH_PIXELS / 2f + toPixels(vectorInMeters.x), CAMERA_HEIGHT_PIXELS / 2f + toPixels(vectorInMeters.y)); // DEFAULT: 0.018f
     }
 
     public float toMeters(float pixels) {
