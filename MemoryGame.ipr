@@ -237,13 +237,6 @@
       <JAVADOC />
       <SOURCES />
     </library>
-    <library name="Gradle: __local_aars__:C.\Users\Projects\Desktop\GitHub\w19Wozniak\libs\mt4j-desktop.jar:unspecified@jar">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/libs/mt4j-desktop.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
-    </library>
     <library name="Gradle: __local_aars__:C.\Users\Projects\Desktop\GitHub\w19Wozniak\libs\tween-engine-api-sources.jar:unspecified@jar">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/libs/tween-engine-api-sources.jar!/" />
@@ -464,13 +457,6 @@
       <SOURCES>
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl_util/2.9.2/308d4ebe8d7b240d3490b6a7e0424807ea3ad98b/lwjgl_util-2.9.2-sources.jar!/" />
       </SOURCES>
-    </library>
-    <library name="Gradle: mt4j-desktop">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/libs/mt4j-desktop.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
     </library>
     <library name="Gradle: tween-engine-api">
       <CLASSES>
