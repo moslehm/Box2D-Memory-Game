@@ -639,7 +639,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             xPointInRange = xPosition < halfWidth - littleSpaceAtTheEdge && xPosition > -halfWidth + littleSpaceAtTheEdge;// && xPosition > 0;
             yPointInRange = yPosition < halfHeight - littleSpaceAtTheEdge && yPosition > -halfHeight + littleSpaceAtTheEdge;// && yPosition > 0;
             if (xPointInRange && yPointInRange && k > 3) {
-                createBox(xPosition, yPosition, angle, cards.get(currentNumOfCards));
+                createBox(xPosition, yPosition, angle - 90f, cards.get(currentNumOfCards));
                 currentNumOfCards++;
             }
             k++;
@@ -763,7 +763,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         boxBodyDef.type = BodyDef.BodyType.DynamicBody;
         boxBodyDef.position.x = xPosition;
         boxBodyDef.position.y = yPosition;
-        //boxBodyDef.angle = angle;
+        boxBodyDef.angle = angle;
         Body boxBody = world.createBody(boxBodyDef);
         boxBody.createFixture(fd);
 
