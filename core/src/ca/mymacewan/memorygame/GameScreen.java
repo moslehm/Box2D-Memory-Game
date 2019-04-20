@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
 import jwinpointer.JWinPointerReader;
 import aurelienribon.tweenengine.Tween;
@@ -25,6 +26,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
+
 import java.util.ArrayList;
 
 public class GameScreen implements Screen, InputProcessor, JWinPointerReader.PointerEventListener {
@@ -46,6 +48,10 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     protected Body hitBodies[] = new Body[200];
     protected Body hitBody = null;
 
+    long lastTimeCounted;
+    private float sinceChange;
+    private float frameRate;
+    private BitmapFont font;
     SpriteBatch batch;
     Label[] scoreLabels;
     Label[] timerLabels;
@@ -92,6 +98,10 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         boxesInContact = new ArrayList<Box[]>();
         particleEffect = new ParticleEffect();
         particleEffect.load(Gdx.files.internal("explosion.p"), Gdx.files.internal(""));
+        lastTimeCounted = TimeUtils.millis();
+        sinceChange = 0;
+        frameRate = Gdx.graphics.getFramesPerSecond();
+        font = new BitmapFont();
 
         plex = new InputMultiplexer();
         float red = 63;
@@ -195,9 +205,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                     Box secondBox = (Box) secondBody.getUserData();
                     if (firstBox.getCard().getValue() == secondBox.getCard().getValue()) {
                         boxesInContact.add(new Box[]{firstBox, secondBox});
-                        Vector2 contactPointInPixels = newCoords(contact.getWorldManifold().getPoints()[0]);
-                        firstBox.setPointOfContact(contactPointInPixels);
-                        secondBox.setPointOfContact(contactPointInPixels);
                     }
                 }
             }
@@ -230,7 +237,17 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
             @Override
             public void postSolve(Contact contact, ContactImpulse impulse) {
-
+                Body firstBody = contact.getFixtureA().getBody();
+                Body secondBody = contact.getFixtureB().getBody();
+                if (firstBody.getUserData() != null && secondBody.getUserData() != null) {
+                    Box firstBox = (Box) firstBody.getUserData();
+                    Box secondBox = (Box) secondBody.getUserData();
+                    if (firstBox.getCard().getValue() == secondBox.getCard().getValue()) {
+                        Vector2 contactPointInPixels = newCoords(contact.getWorldManifold().getPoints()[0]);
+                        firstBox.setPointOfContact(contactPointInPixels);
+                        secondBox.setPointOfContact(contactPointInPixels);
+                    }
+                }
             }
         });
 
@@ -264,25 +281,25 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
         Container container = new Container(label[0]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(bottomLeftScorePos.x, bottomLeftScorePos.y);
         container.setRotation(315);
         stage.addActor(container);
         container = new Container(label[1]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(topLeftScorePos.x, topLeftScorePos.y);
         container.setRotation(225);
         stage.addActor(container);
         container = new Container(label[2]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(bottomRightScorePos.x, bottomRightScorePos.y);
         container.setRotation(135 - 90);
         stage.addActor(container);
         container = new Container(label[3]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(topRightScorePos.x, topRightScorePos.y);
         container.setRotation(45 + 90);
         stage.addActor(container);
@@ -313,25 +330,25 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
         Container container = new Container(timerLabels[0]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(bottomLeftScorePos.x, bottomLeftScorePos.y);
         container.setRotation(315);
         stage.addActor(container);
         container = new Container(timerLabels[1]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(topLeftScorePos.x, topLeftScorePos.y);
         container.setRotation(225);
         stage.addActor(container);
         container = new Container(timerLabels[2]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(bottomRightScorePos.x, bottomRightScorePos.y);
         container.setRotation(135 - 90);
         stage.addActor(container);
         container = new Container(timerLabels[3]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(topRightScorePos.x, topRightScorePos.y);
         container.setRotation(45 + 90);
         stage.addActor(container);
@@ -422,6 +439,11 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         stage.draw();
         // Render the world using the debug box2DDebugRenderer to view bodies and joints
         //box2DDebugRenderer.render(world, camera.combined);
+
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.begin();
+        font.draw(batch, (int)frameRate + " fps", Gdx.graphics.getWidth() - 50f, Gdx.graphics.getHeight() - 10f);
+        batch.end();
     }
 
     Vector2 newCoords(Vector2 oldCoords) {
@@ -578,7 +600,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                             }
                         }
                     }
-                    pairSound.play(1.0f);
+                    pairSound.play(0.5f);
                     Vector2 contactPoint = (boxPairInContact[0].getPointOfContact());
                     particleEffect.getEmitters().first().setPosition(contactPoint.x, contactPoint.y);
                     particleEffect.start();
@@ -586,6 +608,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             }
         }
     }
+
     private void animateFlippingCard(Box box, int targetValue) {
         // Kill current tween - or pre-existing
         tweenManager.killTarget(box);
@@ -649,6 +672,15 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     boolean roundInProgress = true;
 
     void update() {
+        long delta = TimeUtils.timeSinceMillis(lastTimeCounted);
+        lastTimeCounted = TimeUtils.millis();
+
+        sinceChange += delta;
+        if(sinceChange >= 1000) {
+            sinceChange = 0;
+            frameRate = Gdx.graphics.getFramesPerSecond();
+        }
+
         currentScore = game.getScore();
         scoreLabels[0].setText(currentScore);
         scoreLabels[1].setText(currentScore);
@@ -689,7 +721,12 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                 float minutes = (int) (timeLeft / 60f);
                 float seconds = ((timeLeft / 60f) - minutes) * 60f;
                 for (Label timer : timerLabels) {
-                    timer.setText((int) minutes + ":" + (int) seconds);
+                    if (seconds > 10) {
+                        timer.setText((int) minutes + ":" + (int) seconds);
+                    }
+                    else{
+                        timer.setText((int) minutes + ":0" + (int) seconds);
+                    }
                 }
             }
         }
@@ -699,7 +736,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Round over
         // Destroy bodies and joints
         // Then start next round
-        winSound.play(1.0f);
+        winSound.play(0.5f);
         currentTime = 0;
         destroyAll();
         boxPairs = new ArrayList<Box[]>();
@@ -892,7 +929,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                         animateFlippingCard(box, 0);
                         //System.out.println("Flipping card at index: " + boxCard.getKey());
                         Card[] newPair = game.flipUp(boxCard.getKey());
-                        turnOverSound.play(1f);
+                        turnOverSound.play(0.5f);
                         if (newPair != null) {
                             int numOfBoxes = 0;
                             boxPairs.add(new Box[2]);
@@ -985,7 +1022,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                         }
                     }
                     game.flipDown(boxCard.getKey());
-                    turnOverSound.play(1f);
+                    turnOverSound.play(0.5f);
                 }
             }
         }
@@ -1006,7 +1043,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Round over
         // Destroy bodies and joints
         // Then start next round
-        currentTime = 0;
+        for (Label label: timerLabels){
+            label.setText("00:00");
+        }
         destroyAll();
         boxPairs = new ArrayList<Box[]>();
         game.prevDiff();
