@@ -92,12 +92,13 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
     @Override
     public void show() {
+        Assets.load();
+        Assets.manager.finishLoading();
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         boxPairs = new ArrayList<Box[]>();
         boxesInContact = new ArrayList<Box[]>();
-        particleEffect = new ParticleEffect();
-        particleEffect.load(Gdx.files.internal("explosion.p"), Gdx.files.internal(""));
+        particleEffect = new ParticleEffect(Assets.manager.get(Assets.particleEffect));
         lastTimeCounted = TimeUtils.millis();
         sinceChange = 0;
         frameRate = Gdx.graphics.getFramesPerSecond();
@@ -133,11 +134,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         camera = new OrthographicCamera(CAMERA_WIDTH_METERS, CAMERA_HEIGHT_METERS);
         camera.position.set(0, 0, 0);
 
-        backSideTexture = new TextureRegion(new Texture(Gdx.files.internal("cardBack.png")));
-        Texture unmatchedTextureSheet = new Texture(Gdx.files.internal("unmatched.png"));
-        Texture matchedTextureSheet = new Texture(Gdx.files.internal("matched.png"));
-        TextureRegion[][] unmatchedTextureRegions = TextureRegion.split(unmatchedTextureSheet, 276, 276);
-        TextureRegion[][] matchedTextureRegions = TextureRegion.split(matchedTextureSheet, 276, 276);
+        backSideTexture = new TextureRegion(Assets.manager.get(Assets.cardBack));
+        TextureRegion[][] unmatchedTextureRegions = TextureRegion.split(Assets.manager.get(Assets.unmatchedTextureSheet), 276, 276);
+        TextureRegion[][] matchedTextureRegions = TextureRegion.split(Assets.manager.get(Assets.matchedTextureSheet), 276, 276);
         int columns = 10;
         int rows = 9;
         Sprite[] unmatchedFrontSideSprites = new Sprite[columns * rows];
@@ -181,8 +180,10 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Creates the boxes and joints
         createGame();
 
-        //load sound effects
-        loadSound();
+        // load sound effects
+        pairSound = Assets.manager.get(Assets.pairSound);
+        turnOverSound = Assets.manager.get(Assets.turnOverSound);
+        winSound = Assets.manager.get(Assets.winSound);
 
         // Batch to draw textures
         batch = new SpriteBatch();
@@ -257,8 +258,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     public static Label[] addScoreActors(Stage stage, int currentScore) {
         // Load font
         Label.LabelStyle labelStyle = new Label.LabelStyle();
-        BitmapFont font = new BitmapFont(Gdx.files.internal("KenPixelBlocks.fnt"));
-        labelStyle.font = font;
+        labelStyle.font = Assets.manager.get(Assets.font);
         Label[] label = new Label[4];
         label[0] = new Label(Integer.toString(currentScore), labelStyle);
         label[1] = new Label(Integer.toString(currentScore), labelStyle);
@@ -309,8 +309,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     void setTimerLabels() {
         // Load font
         Label.LabelStyle labelStyle = new Label.LabelStyle();
-        BitmapFont font = new BitmapFont(Gdx.files.internal("KenPixelBlocks.fnt"));
-        labelStyle.font = font;
+        labelStyle.font = Assets.manager.get(Assets.font);
         timerLabels = new Label[4];
         for (int i = 0; i < 4; i++) {
             timerLabels[i] = new Label("00:00", labelStyle);
@@ -362,6 +361,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         currentTime += Gdx.graphics.getRawDeltaTime();
 
         if (difficulty != 0 && currentTime > timeLimits[difficulty]) {
+            currentTime = 0;
             parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor, currentScore));
         }
 
@@ -711,11 +711,17 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     }
 
     private void updateTimeLabels() {
-        if (difficulty != 0) {
+        if (difficulty != 0 && roundInProgress) {
             float timeLeft = timeLimits[difficulty] - currentTime;
             if ((timeLeft / 60f) < 1) {
                 for (Label timer : timerLabels) {
-                    timer.setText("00:" + (int) timeLeft);
+                    float seconds = ((timeLeft / 60f)) * 60f;
+                    if (seconds > 10) {
+                        timer.setText("00:" + (int) seconds);
+                    }
+                    else{
+                        timer.setText("00:0" + (int) seconds);
+                    }
                 }
             } else {
                 float minutes = (int) (timeLeft / 60f);
@@ -777,11 +783,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         }
     }
 
-    void loadSound() {
-        pairSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/pair.mp3"));
-        turnOverSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/turnOver.mp3"));
-        winSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/Winning&nextLevel.mp3"));
-    }
 
     public void createBox(float xPosition, float yPosition, float angle, Card card) {
         PolygonShape shape = new PolygonShape();
@@ -854,15 +855,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         hitBodies = null;
     }
 
-
-    public Vector2 vectorToMeters(Vector2 vectorInPixels) {
-        return new Vector2(CAMERA_WIDTH_PIXELS / 2f + toMeters(vectorInPixels.x), CAMERA_HEIGHT_PIXELS / 2f + toMeters(vectorInPixels.y)); // DEFAULT: 0.018f
-    }
-
-    public Vector2 vectorToPixels(Vector2 vectorInMeters) {
-        return new Vector2(Gdx.graphics.getWidth() / 2f + toPixels(vectorInMeters.x), Gdx.graphics.getHeight() / 2f + toPixels(vectorInMeters.y)); // DEFAULT: 0.018f
-    }
-
     public float toMeters(float pixels) {
         return pixels * 0.013f;
     }
@@ -927,7 +919,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                     Card boxCard = box.getCard();
                     if (boxCard.getState() == State.HIDDEN) {
                         animateFlippingCard(box, 0);
-                        //System.out.println("Flipping card at index: " + boxCard.getKey());
                         Card[] newPair = game.flipUp(boxCard.getKey());
                         turnOverSound.play(0.5f);
                         if (newPair != null) {

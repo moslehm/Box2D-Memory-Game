@@ -12,7 +12,6 @@ public class MemoryGameView extends Game implements ApplicationListener {
     public void create() {
         jWinPointerReader = new JWinPointerReader("MemoryGameView");
         this.setScreen(new GameScreen(this, jWinPointerReader));
-        //this.setScreen(new ScoreboardScreen(this, jWinPointerReader, Color.BLACK, 400));
     }
 
     @Override
@@ -22,6 +21,7 @@ public class MemoryGameView extends Game implements ApplicationListener {
 
     @Override
     public void dispose() {
+        Assets.dispose();
     }
 
     @Override
