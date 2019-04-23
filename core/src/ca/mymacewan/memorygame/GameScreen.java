@@ -696,12 +696,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
         updateTimeLabels();
         checkForMatches();
-        if (game.isIdle()) {
-            destroyAll();
-            boxPairs = new ArrayList<Box[]>();
-            game.gameStart();
-            createGame();
-        }
         if (game.isRoundOver() && roundInProgress) {
             if (game.isGameOver()) {
                 winSound.play();

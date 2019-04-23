@@ -10,7 +10,7 @@ public class MemoryGameView extends Game implements ApplicationListener {
 
     @Override
     public void create() {
-        jWinPointerReader = new JWinPointerReader("MemoryGameView");
+        jWinPointerReader = new JWinPointerReader("EPL Memory Game");
         this.setScreen(new GameScreen(this, jWinPointerReader));
     }
 
