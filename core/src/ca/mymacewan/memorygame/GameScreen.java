@@ -78,11 +78,13 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     private Sound pairSound;
     private Sound turnOverSound;
     private Sound winSound;
+    private Sound loseSound;
 
     private static TweenManager tweenManager;
     private JWinPointerReader jWinPointerReader;
 
     private Game parentGame;
+    private boolean drawFps;
 
 
     public GameScreen(Game parent, JWinPointerReader jWinPointerReader) {
@@ -103,6 +105,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         sinceChange = 0;
         frameRate = Gdx.graphics.getFramesPerSecond();
         font = new BitmapFont();
+        drawFps = false;
 
         plex = new InputMultiplexer();
         float red = 63;
@@ -184,6 +187,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         pairSound = Assets.manager.get(Assets.pairSound);
         turnOverSound = Assets.manager.get(Assets.turnOverSound);
         winSound = Assets.manager.get(Assets.winSound);
+        loseSound = Assets.manager.get(Assets.loseSound);
 
         // Batch to draw textures
         batch = new SpriteBatch();
@@ -361,6 +365,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         currentTime += Gdx.graphics.getRawDeltaTime();
 
         if (difficulty != 0 && currentTime > timeLimits[difficulty]) {
+            loseSound.play();
             currentTime = 0;
             parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor, currentScore));
         }
@@ -440,10 +445,12 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Render the world using the debug box2DDebugRenderer to view bodies and joints
         //box2DDebugRenderer.render(world, camera.combined);
 
-        batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.begin();
-        font.draw(batch, (int)frameRate + " fps", Gdx.graphics.getWidth() - 50f, Gdx.graphics.getHeight() - 10f);
-        batch.end();
+        if (drawFps) {
+            batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.begin();
+            font.draw(batch, (int) frameRate + " fps", Gdx.graphics.getWidth() - 50f, Gdx.graphics.getHeight() - 10f);
+            batch.end();
+        }
     }
 
     Vector2 newCoords(Vector2 oldCoords) {
@@ -600,7 +607,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                             }
                         }
                     }
-                    pairSound.play(0.5f);
+                    pairSound.play(1.5f);
                     Vector2 contactPoint = (boxPairInContact[0].getPointOfContact());
                     particleEffect.getEmitters().first().setPosition(contactPoint.x, contactPoint.y);
                     particleEffect.start();
@@ -697,15 +704,18 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         }
         if (game.isRoundOver() && roundInProgress) {
             if (game.isGameOver()) {
+                winSound.play();
                 parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor, currentScore));
             }
-            roundInProgress = false;
-            Timer.schedule(new Timer.Task() {
-                @Override
-                public void run() {
-                    nextLevel();
-                }
-            }, 2);
+            else {
+                roundInProgress = false;
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        nextLevel();
+                    }
+                }, 2);
+            }
         }
         updateCards();
     }
@@ -843,11 +853,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         batch.dispose();
         shapeRenderer.dispose();
         particleEffect.dispose();
-
-        //dispose sound effects
-        pairSound.dispose();
-        turnOverSound.dispose();
-        winSound.dispose();
 
         box2DDebugRenderer = null;
         world = null;
@@ -1025,6 +1030,12 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             nextLevel();
         } else if (keycode == Input.Keys.LEFT) {
             prevLevel();
+        }
+        else if (keycode == Input.Keys.UP){
+            drawFps = true;
+        }
+        else if (keycode == Input.Keys.DOWN){
+            drawFps = false;
         }
         return false;
     }
