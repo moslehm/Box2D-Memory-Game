@@ -22,11 +22,13 @@ public class Assets {
     public static final AssetDescriptor<BitmapFont> font =
             new AssetDescriptor<BitmapFont>("KenPixelBlocks.fnt", BitmapFont.class);
     public static final AssetDescriptor<Sound> pairSound =
-            new AssetDescriptor<Sound>("SoundEffects/pair.mp3", Sound.class);
+            new AssetDescriptor<Sound>("SoundEffects/match.mp3", Sound.class);
     public static final AssetDescriptor<Sound> turnOverSound =
-            new AssetDescriptor<Sound>("SoundEffects/turnOver.mp3", Sound.class);
+            new AssetDescriptor<Sound>("SoundEffects/flip.wav", Sound.class);
     public static final AssetDescriptor<Sound> winSound =
-            new AssetDescriptor<Sound>("SoundEffects/Winning&nextLevel.mp3", Sound.class);
+            new AssetDescriptor<Sound>("SoundEffects/win.mp3", Sound.class);
+    public static final AssetDescriptor<Sound> loseSound =
+            new AssetDescriptor<Sound>("SoundEffects/lose.mp3", Sound.class);
 
     public static void load(){
         manager.load(particleEffect);
@@ -37,6 +39,7 @@ public class Assets {
         manager.load(pairSound);
         manager.load(turnOverSound);
         manager.load(winSound);
+        manager.load(loseSound);
     }
 
     public static void dispose(){
