@@ -45,7 +45,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     protected Body groundBody;
     public ArrayList<GameScreen.TouchInfo> arrayOfTouchInfo = new ArrayList<GameScreen.TouchInfo>();
     protected Array<Joint> frictionJoints = new Array<Joint>();
-    protected Body hitBodies[] = new Body[200];
+    protected Body hitBodies[] = new Body[1000];
     protected Body hitBody = null;
 
     long lastTimeCounted;
@@ -631,7 +631,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     private void createGame() {
         boxPairs = new ArrayList<Box[]>();
         boxesInContact = new ArrayList<Box[]>();
-        hitBodies = new Body[200];
+        hitBodies = new Body[1000];
         frictionJoints = new Array<Joint>();
         cards = game.getCards();
         difficulty = game.getDifficulty();
