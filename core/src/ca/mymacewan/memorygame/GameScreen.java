@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
 import jwinpointer.JWinPointerReader;
 import aurelienribon.tweenengine.Tween;
@@ -25,6 +26,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
+
 import java.util.ArrayList;
 
 public class GameScreen implements Screen, InputProcessor, JWinPointerReader.PointerEventListener {
@@ -42,12 +44,14 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     private ArrayList<Box> boxes = new ArrayList<Box>();
     protected Body groundBody;
     public ArrayList<GameScreen.TouchInfo> arrayOfTouchInfo = new ArrayList<GameScreen.TouchInfo>();
-    //protected Array<MouseJoint> mouseJoints = new Array<MouseJoint>();
     protected Array<Joint> frictionJoints = new Array<Joint>();
-    //protected Array<Joint> motorJoints = new Array<Joint>();
-    protected Body hitBodies[] = new Body[200];
+    protected Body hitBodies[] = new Body[1000];
     protected Body hitBody = null;
 
+    long lastTimeCounted;
+    private float sinceChange;
+    private float frameRate;
+    private BitmapFont font;
     SpriteBatch batch;
     Label[] scoreLabels;
     Label[] timerLabels;
@@ -59,6 +63,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     private float halfBoxSizes[] = {1.5f, 1.5f, 1f, 0.8f, 0.7f, 0.7f, 0.6f, 0.5f, 0.5f};
     private float xyBoxSpacing[][] = {{3.1f, 1.9f}, {3.7f, 1.9f}, {5f, 2f}, {3.7f, 2.5f}, {3f, 2f}, {2.7f, 1.7f}, {2f, 1.6f}, {1.9f, 1.4f}, {2f, 1.1f}};
     private float timeLimits[] = {0f, 45f, 90f, 120f, 120f, 160f, 190f, 240f, 300f};
+    int currentNumOfCards;
     private float currentTime;
     int currentScore;
     ShapeRenderer shapeRenderer;
@@ -73,12 +78,14 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     private Sound pairSound;
     private Sound turnOverSound;
     private Sound winSound;
-    //float timeAtImpact;
+    private Sound loseSound;
 
     private static TweenManager tweenManager;
     private JWinPointerReader jWinPointerReader;
 
     private Game parentGame;
+    private boolean drawFps;
+
 
     public GameScreen(Game parent, JWinPointerReader jWinPointerReader) {
         this.parentGame = parent;
@@ -87,24 +94,24 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
     @Override
     public void show() {
+        Assets.load();
+        Assets.manager.finishLoading();
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
         boxPairs = new ArrayList<Box[]>();
         boxesInContact = new ArrayList<Box[]>();
-        particleEffect = new ParticleEffect();
-        particleEffect.load(Gdx.files.internal("explosion.p"), Gdx.files.internal(""));
+        particleEffect = new ParticleEffect(Assets.manager.get(Assets.particleEffect));
+        lastTimeCounted = TimeUtils.millis();
+        sinceChange = 0;
+        frameRate = Gdx.graphics.getFramesPerSecond();
+        font = new BitmapFont();
+        drawFps = false;
 
         plex = new InputMultiplexer();
-        //createTopButtons();
-        //createBottomButtons();
         float red = 63;
         float green = 168;
         float blue = 65;
         worldColor = new Color(red / 255f, green / 255f, blue / 255f, 1f);
-/*        worldColor.r = 0 / 255f;
-        worldColor.g = 161 / 255f;
-        worldColor.b = 206 / 255f;
-        worldColor.a = 1;*/
 
         // "Meters" are the units of Box2D
         // 1 pixel = 0.018 meters
@@ -114,7 +121,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         CAMERA_HEIGHT_PIXELS = 1080;
         CAMERA_WIDTH_METERS = toMeters(CAMERA_WIDTH_PIXELS);
         CAMERA_HEIGHT_METERS = toMeters(CAMERA_HEIGHT_PIXELS);
-
 
         // Tween setup
         Tween.setCombinedAttributesLimit(1);
@@ -131,11 +137,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         camera = new OrthographicCamera(CAMERA_WIDTH_METERS, CAMERA_HEIGHT_METERS);
         camera.position.set(0, 0, 0);
 
-        backSideTexture = new TextureRegion(new Texture(Gdx.files.internal("cardBack.png")));
-        Texture unmatchedTextureSheet = new Texture(Gdx.files.internal("unmatched.png"));
-        Texture matchedTextureSheet = new Texture(Gdx.files.internal("matched.png"));
-        TextureRegion[][] unmatchedTextureRegions = TextureRegion.split(unmatchedTextureSheet, 276, 276);
-        TextureRegion[][] matchedTextureRegions = TextureRegion.split(matchedTextureSheet, 276, 276);
+        backSideTexture = new TextureRegion(Assets.manager.get(Assets.cardBack));
+        TextureRegion[][] unmatchedTextureRegions = TextureRegion.split(Assets.manager.get(Assets.unmatchedTextureSheet), 276, 276);
+        TextureRegion[][] matchedTextureRegions = TextureRegion.split(Assets.manager.get(Assets.matchedTextureSheet), 276, 276);
         int columns = 10;
         int rows = 9;
         Sprite[] unmatchedFrontSideSprites = new Sprite[columns * rows];
@@ -179,8 +183,11 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Creates the boxes and joints
         createGame();
 
-        //load sound effects
-        loadSound();
+        // load sound effects
+        pairSound = Assets.manager.get(Assets.pairSound);
+        turnOverSound = Assets.manager.get(Assets.turnOverSound);
+        winSound = Assets.manager.get(Assets.winSound);
+        loseSound = Assets.manager.get(Assets.loseSound);
 
         // Batch to draw textures
         batch = new SpriteBatch();
@@ -203,9 +210,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                     Box secondBox = (Box) secondBody.getUserData();
                     if (firstBox.getCard().getValue() == secondBox.getCard().getValue()) {
                         boxesInContact.add(new Box[]{firstBox, secondBox});
-                        Vector2 contactPointInPixels = newCoords(contact.getWorldManifold().getPoints()[0]);
-                        firstBox.setPointOfContact(contactPointInPixels);
-                        secondBox.setPointOfContact(contactPointInPixels);
                     }
                 }
             }
@@ -238,19 +242,17 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
             @Override
             public void postSolve(Contact contact, ContactImpulse impulse) {
-                /*float normalImpulse = impulse.getNormalImpulses()[0];
-                if (normalImpulse >= 600){
-                    normalImpulse = 600;
+                Body firstBody = contact.getFixtureA().getBody();
+                Body secondBody = contact.getFixtureB().getBody();
+                if (firstBody.getUserData() != null && secondBody.getUserData() != null) {
+                    Box firstBox = (Box) firstBody.getUserData();
+                    Box secondBox = (Box) secondBody.getUserData();
+                    if (firstBox.getCard().getValue() == secondBox.getCard().getValue()) {
+                        Vector2 contactPointInPixels = newCoords(contact.getWorldManifold().getPoints()[0]);
+                        firstBox.setPointOfContact(contactPointInPixels);
+                        secondBox.setPointOfContact(contactPointInPixels);
+                    }
                 }
-                float impactForce = normalImpulse / 600f;
-                System.out.println("timeAtImpact: " + timeAtImpact);
-                float timeSinceImpact = currentTime - timeAtImpact;
-                if (timeSinceImpact > 0.2f && impactForce > 0.3f) {
-                    timeAtImpact = currentTime;
-                    // From 0 to 1
-                    impactSound.play(impactForce);
-                    // TODO: COLLISION SOUND?
-                }*/
             }
         });
 
@@ -260,16 +262,14 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     public static Label[] addScoreActors(Stage stage, int currentScore) {
         // Load font
         Label.LabelStyle labelStyle = new Label.LabelStyle();
-        BitmapFont font = new BitmapFont(Gdx.files.internal("KenPixelBlocks.fnt"));
-        labelStyle.font = font;
+        labelStyle.font = Assets.manager.get(Assets.font);
         Label[] label = new Label[4];
         label[0] = new Label(Integer.toString(currentScore), labelStyle);
         label[1] = new Label(Integer.toString(currentScore), labelStyle);
         label[2] = new Label(Integer.toString(currentScore), labelStyle);
         label[3] = new Label(Integer.toString(currentScore), labelStyle);
+
         // Display score
-        //float distanceFromCorner = Gdx.graphics.getHeight()/8f;
-        // get these
         Vector2 bottomLeftCornerPos = new Vector2(0, 0);
         Vector2 bottomRightCornerPos = new Vector2(Gdx.graphics.getWidth(), 0);
         Vector2 topLeftCornerPos = new Vector2(0, Gdx.graphics.getHeight());
@@ -285,25 +285,25 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
         Container container = new Container(label[0]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(bottomLeftScorePos.x, bottomLeftScorePos.y);
         container.setRotation(315);
         stage.addActor(container);
         container = new Container(label[1]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(topLeftScorePos.x, topLeftScorePos.y);
         container.setRotation(225);
         stage.addActor(container);
         container = new Container(label[2]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(bottomRightScorePos.x, bottomRightScorePos.y);
         container.setRotation(135 - 90);
         stage.addActor(container);
         container = new Container(label[3]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(topRightScorePos.x, topRightScorePos.y);
         container.setRotation(45 + 90);
         stage.addActor(container);
@@ -313,35 +313,17 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     void setTimerLabels() {
         // Load font
         Label.LabelStyle labelStyle = new Label.LabelStyle();
-        BitmapFont font = new BitmapFont(Gdx.files.internal("KenPixelBlocks.fnt"));
-        labelStyle.font = font;
+        labelStyle.font = Assets.manager.get(Assets.font);
         timerLabels = new Label[4];
-        /*float timeLeft = timeLimits[difficulty] - currentTime;
-        if (timeLeft/60f < 1){
-            for (int i = 0; i < 4; i++){
-                timerLabels[i] = new Label("00:" + timeLeft, labelStyle);
-            }
-        }
-        else{
-            float minutes = (int) (timeLeft/60f);
-            float seconds = ((timeLeft/60f) - minutes) * 60f;
-            for (int i = 0; i < 4; i++){
-                timerLabels[i] = new Label(minutes + ":" + seconds, labelStyle);
-            }
-        }*/
         for (int i = 0; i < 4; i++) {
             timerLabels[i] = new Label("00:00", labelStyle);
         }
 
-        // Display score
-        //float distanceFromCorner = Gdx.graphics.getHeight()/8f;
-        // get these
         Vector2 bottomLeftCornerPos = new Vector2(0, 0);
         Vector2 bottomRightCornerPos = new Vector2(Gdx.graphics.getWidth(), 0);
         Vector2 topLeftCornerPos = new Vector2(0, Gdx.graphics.getHeight());
         Vector2 topRightCornerPos = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        // define this
         float scoreDistanceFromCorner = Gdx.graphics.getHeight() / 10f - 10f;
 
         Vector2 bottomLeftScorePos = bottomLeftCornerPos.cpy().add(new Vector2(1, 1).cpy().scl(scoreDistanceFromCorner));
@@ -351,25 +333,25 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
         Container container = new Container(timerLabels[0]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(bottomLeftScorePos.x, bottomLeftScorePos.y);
         container.setRotation(315);
         stage.addActor(container);
         container = new Container(timerLabels[1]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(topLeftScorePos.x, topLeftScorePos.y);
         container.setRotation(225);
         stage.addActor(container);
         container = new Container(timerLabels[2]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(bottomRightScorePos.x, bottomRightScorePos.y);
         container.setRotation(135 - 90);
         stage.addActor(container);
         container = new Container(timerLabels[3]);
         container.setTransform(true);
-        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth())/Gdx.graphics.getWidth());
+        container.setScale(1 - (CAMERA_WIDTH_PIXELS - Gdx.graphics.getWidth()) / Gdx.graphics.getWidth());
         container.setPosition(topRightScorePos.x, topRightScorePos.y);
         container.setRotation(45 + 90);
         stage.addActor(container);
@@ -383,6 +365,8 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         currentTime += Gdx.graphics.getRawDeltaTime();
 
         if (difficulty != 0 && currentTime > timeLimits[difficulty]) {
+            loseSound.play();
+            currentTime = 0;
             parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor, currentScore));
         }
 
@@ -403,7 +387,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Set the projection matrix of the SpriteBatch to the camera's combined matrix.
         // This will make the SpriteBatch work in world coordinates (meters)
         batch.getProjectionMatrix().set(camera.combined);
-        //batch.enableBlending();
         batch.begin();
         // Draw backside first to make the front side of the cards on top
         for (int i = 0; i < boxes.size(); i++) {
@@ -440,27 +423,13 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             Vector2 position = boxBody.getPosition(); // Get the box's center position
             float angle = MathUtils.radiansToDegrees * boxBody.getAngle(); // Get the box's rotation angle around the center
             Sprite currentSprite = frontSideSprites[cards.get(i).getState().getValue()][cards.get(i).getValue()];
-            /*Color textureColour = currentSprite.getColor();
-            textureColour.a = box.getAlpha();*/
-            //System.out.println("ALPHA: " + box.getAlpha());
             currentSprite.setAlpha(box.getAlpha());
             Vector2 spritePosition = newCoords(position);
             currentSprite.setX(spritePosition.x - currentSprite.getWidth() / 2f);
             currentSprite.setY(spritePosition.y - currentSprite.getHeight() / 2f);
-            //currentSprite.setOrigin(-currentSprite.getWidth()/2f, currentSprite.getHeight()/2f);
-            // ScaleX: (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0))
             currentSprite.setScale((float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), box.getScaleY());
             currentSprite.setRotation(angle);
             currentSprite.draw(batch);
-            // Draw the back side
-            // To make it set textures from the game logic, do frontSideTextures[card.getIndex] or something
-            //System.out.println("i: " + Integer.toString(i));
-            //System.out.println("cards.get(i).getValue()): " + cards.get(i).getValue());
-           /* batch.draw(currentSprite, position.x - halfBoxSizes[difficulty], position.y - halfBoxSizes[difficulty],
-                    halfBoxSizes[difficulty], halfBoxSizes[difficulty],
-                    halfBoxSizes[difficulty] * 2, halfBoxSizes[difficulty] * 2,
-                    (float) Math.abs(Math.min(-Math.cos(box.getScaleX() * Math.PI), 0)), box.getScaleY(),
-                    angle);*/
         }
         batch.end();
 
@@ -475,6 +444,13 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         stage.draw();
         // Render the world using the debug box2DDebugRenderer to view bodies and joints
         //box2DDebugRenderer.render(world, camera.combined);
+
+        if (drawFps) {
+            batch.getProjectionMatrix().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.begin();
+            font.draw(batch, (int) frameRate + " fps", Gdx.graphics.getWidth() - 50f, Gdx.graphics.getHeight() - 10f);
+            batch.end();
+        }
     }
 
     Vector2 newCoords(Vector2 oldCoords) {
@@ -518,7 +494,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0.195f, 0.64f, 0.94f, 1);
-        //shapeRenderer.line(p1.x, p1.y, p2.x, p2.y);
         shapeRenderer.rectLine(p1, p2, 2f);
         shapeRenderer.end();
 
@@ -526,7 +501,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 1, 0, 1);
 
-        //shapeRenderer.line(midSegmentStartPoint.x, midSegmentStartPoint.y, midSegmentEndPoint.x, midSegmentEndPoint.y);
         shapeRenderer.rectLine(midSegmentStartPoint, midSegmentEndPoint, 4f);
 
         shapeRenderer.end();
@@ -538,14 +512,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     public void DrawArrow(Vector2 origin, Vector2 endpoint) {
         // Draw arrowhead so we can see direction
         Vector2 arrowDirection = origin.cpy().sub(endpoint);
-        DebugDrawArrowhead(endpoint, arrowDirection.cpy().nor(), toPixels(0.2f)); //GetArrowSizeForLine(arrowDirection)
+        DebugDrawArrowhead(endpoint, arrowDirection.cpy().nor(), toPixels(0.2f));
     }
 
-    /*private float GetArrowSizeForLine(Vector2 line)
-    {
-        float defaultArrowPercentage = 0.05f;
-        return (line.cpy().scl(defaultArrowPercentage)).;
-    }*/
 
     private void DebugDrawArrowhead(Vector2 origin, Vector2 direction, float size) {
         float theta = 30.0f;
@@ -560,24 +529,10 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         Vector2 leftSide = origin.cpy().add(arrowheadL);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        /*shapeRenderer.line(origin.x, origin.y, rightSide.x, rightSide.y);
-        shapeRenderer.line(origin.x, origin.y, leftSide.x, leftSide.y);*/
         shapeRenderer.rectLine(origin, rightSide, 4f);
         shapeRenderer.rectLine(origin, leftSide, 4f);
         shapeRenderer.end();
     }
-
-    /*void getPairs(){
-        ArrayList<Box> copyOfBoxes = boxes;
-        for (int i = 0; i < copyOfBoxes.size(); i++){
-            Box firstBox = copyOfBoxes.remove(i);
-            for (int index2 = 0; i < copyOfBoxes.size(); i++){
-                Box secondBox = copyOfBoxes.remove(index2);
-                if (firstBox.getCard())
-             }
-        }
-    }*/
-
 
     protected void createWorld(World world) {
         float boardWidth = CAMERA_WIDTH_METERS;
@@ -598,12 +553,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             sd.shape = shape;
             sd.density = 0;
             sd.restitution = 0.4f;
-
-            // categoryBits is what the body is (a world entity)
-            // maskBits is what it collides with (a physics entity)
-            //sd.filter.categoryBits = WORLD_ENTITY;
-            //sd.filter.maskBits = PHYSICS_ENTITY;
-
 
             // Draws sides around the board
             // LEFT
@@ -644,7 +593,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     }
 
     private void checkForMatches() {
-        int index = 0;
         for (Box[] boxPairInContact : boxesInContact) {
             Card firstCard = boxPairInContact[0].getCard();
             Card secondCard = boxPairInContact[1].getCard();
@@ -659,14 +607,12 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                             }
                         }
                     }
-
-                    pairSound.play(1.0f);
+                    pairSound.play(1.5f);
                     Vector2 contactPoint = (boxPairInContact[0].getPointOfContact());
                     particleEffect.getEmitters().first().setPosition(contactPoint.x, contactPoint.y);
                     particleEffect.start();
                 }
             }
-            index++;
         }
     }
 
@@ -682,212 +628,14 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
     }
 
-    private void removeMatchingCard(Box box) {
-        // Scale X down
-        Tween.to(box, BoxAccessor.SCALE_X, 0.3f)
-                .target(2f)
-                .ease(TweenEquations.easeOutQuad)
-                .start(tweenManager);
-        // Scale Y down
-        Tween.to(box, BoxAccessor.SCALE_Y, 0.3f)
-                .target(2f)
-                .ease(TweenEquations.easeOutQuad)
-                .start(tweenManager);
-        // Scale X down
-        Tween.to(box, BoxAccessor.ALPHA, 0.3f)
-                .target(0)
-                .ease(TweenEquations.easeOutQuad)
-                .start(tweenManager);
-    }
-
-    /*private void createTopButtons() {
-        Image yellowImage = new Image(new Texture("yellow.png"));
-        Image greenImage = new Image(new Texture("green.png"));
-        Image pinkImage = new Image(new Texture("pink.png"));
-        Image purpleImage = new Image(new Texture("purple.png"));
-        Image blueImage = new Image(new Texture("blue.png"));
-
-        float xPosition = Gdx.graphics.getWidth()/8f;
-
-        Container wrapper = new Container(yellowImage);
-        wrapper.setTransform(true);
-        wrapper.setTouchable(Touchable.enabled);
-        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
-        wrapper.setPosition(Gdx.graphics.getWidth()/2f - xPosition*2f - wrapper.getWidth()/2f, Gdx.graphics.getHeight() - wrapper.getHeight());
-        wrapper.addListener(new ClickListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                worldColor.r = 255 / 255f;
-                worldColor.g = 183 / 255f;
-                worldColor.b = 24 / 255f;
-                return true;
-            }
-        });
-        stage.addActor(wrapper);
-
-        wrapper = new Container(greenImage);
-        wrapper.setTransform(true);
-        wrapper.setTouchable(Touchable.enabled);
-        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
-        wrapper.setPosition(Gdx.graphics.getWidth()/2f - xPosition - wrapper.getWidth()/2f, Gdx.graphics.getHeight() - wrapper.getHeight());
-        wrapper.addListener(new ClickListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                worldColor.r = 118 / 255f;
-                worldColor.g = 189 / 255f;
-                worldColor.b = 29 / 255f;
-                return true;
-            }
-        });
-        stage.addActor(wrapper);
-
-        wrapper = new Container(pinkImage);
-        wrapper.setTransform(true);
-        wrapper.setTouchable(Touchable.enabled);
-        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
-        wrapper.setPosition(Gdx.graphics.getWidth()/2f - wrapper.getWidth()/2f, Gdx.graphics.getHeight() - wrapper.getHeight());
-        wrapper.addListener(new ClickListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                worldColor.r = 215 / 255f;
-                worldColor.g = 0 / 255f;
-                worldColor.b = 53 / 255f;
-                return true;
-            }
-        });
-        stage.addActor(wrapper);
-
-        wrapper = new Container(purpleImage);
-        wrapper.setTransform(true);
-        wrapper.setTouchable(Touchable.enabled);
-        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
-        wrapper.setPosition(Gdx.graphics.getWidth()/2f + xPosition - wrapper.getWidth()/2f, Gdx.graphics.getHeight() - wrapper.getHeight());
-        wrapper.addListener(new ClickListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                worldColor.r = 135 / 255f;
-                worldColor.g = 49 / 255f;
-                worldColor.b = 154 / 255f;
-                return true;
-            }
-        });
-        stage.addActor(wrapper);
-
-        wrapper = new Container(blueImage);
-        wrapper.setTransform(true);
-        wrapper.setTouchable(Touchable.enabled);
-        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
-        wrapper.setPosition(Gdx.graphics.getWidth()/2f + xPosition*2f - wrapper.getWidth()/2f, Gdx.graphics.getHeight() - wrapper.getHeight());
-        wrapper.addListener(new ClickListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                worldColor.r = 0 / 255f;
-                worldColor.g = 161 / 255f;
-                worldColor.b = 206 / 255f;
-                return true;
-            }
-        });
-        stage.addActor(wrapper);
-    }
-    private void createBottomButtons() {
-        Image yellowImage = new Image(new Texture("yellow.png"));
-        Image greenImage = new Image(new Texture("green.png"));
-        Image pinkImage = new Image(new Texture("pink.png"));
-        Image purpleImage = new Image(new Texture("purple.png"));
-        Image blueImage = new Image(new Texture("blue.png"));
-
-        float xPosition = Gdx.graphics.getWidth()/8f;
-
-        Container wrapper = new Container(yellowImage);
-        wrapper.setTransform(true);
-        wrapper.setTouchable(Touchable.enabled);
-        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
-        wrapper.setPosition(Gdx.graphics.getWidth()/2f - xPosition*2f - wrapper.getWidth()/2f, 0);
-        wrapper.addListener(new ClickListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                worldColor.r = 255 / 255f;
-                worldColor.g = 183 / 255f;
-                worldColor.b = 24 / 255f;
-                return true;
-            }
-        });
-        stage.addActor(wrapper);
-
-        wrapper = new Container(greenImage);
-        wrapper.setTransform(true);
-        wrapper.setTouchable(Touchable.enabled);
-        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
-        wrapper.setPosition(Gdx.graphics.getWidth()/2f - xPosition - wrapper.getWidth()/2f, 0);
-        wrapper.addListener(new ClickListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                worldColor.r = 118 / 255f;
-                worldColor.g = 189 / 255f;
-                worldColor.b = 29 / 255f;
-                return true;
-            }
-        });
-        stage.addActor(wrapper);
-
-        wrapper = new Container(pinkImage);
-        wrapper.setTransform(true);
-        wrapper.setTouchable(Touchable.enabled);
-        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
-        wrapper.setPosition(Gdx.graphics.getWidth()/2f - wrapper.getWidth()/2f, 0);
-        wrapper.addListener(new ClickListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                worldColor.r = 215 / 255f;
-                worldColor.g = 0 / 255f;
-                worldColor.b = 53 / 255f;
-                return true;
-            }
-        });
-        stage.addActor(wrapper);
-
-        wrapper = new Container(purpleImage);
-        wrapper.setTransform(true);
-        wrapper.setTouchable(Touchable.enabled);
-        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
-        wrapper.setPosition(Gdx.graphics.getWidth()/2f + xPosition - wrapper.getWidth()/2f, 0);
-        wrapper.addListener(new ClickListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                worldColor.r = 135 / 255f;
-                worldColor.g = 49 / 255f;
-                worldColor.b = 154 / 255f;
-                return true;
-            }
-        });
-        stage.addActor(wrapper);
-
-        wrapper = new Container(blueImage);
-        wrapper.setTransform(true);
-        wrapper.setTouchable(Touchable.enabled);
-        wrapper.setSize(toPixels(1.5f), toPixels(.4f));
-        wrapper.setPosition(Gdx.graphics.getWidth()/2f + xPosition*2f - wrapper.getWidth()/2f, 0);
-        wrapper.addListener(new ClickListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                worldColor.r = 0 / 255f;
-                worldColor.g = 161 / 255f;
-                worldColor.b = 206 / 255f;
-                return true;
-            }
-        });
-        stage.addActor(wrapper);
-    }*/
-
-    int currentNumOfCards;
-
     private void createGame() {
         boxPairs = new ArrayList<Box[]>();
         boxesInContact = new ArrayList<Box[]>();
-        hitBodies = new Body[200];
-        //mouseJoints = new Array<MouseJoint>();
+        hitBodies = new Body[1000];
         frictionJoints = new Array<Joint>();
-        /*motorJoints = new Array<Joint>();
-        for (int i = 0; i < hitBodies.length; i++) {
-            hitBodies[i] = null;
-            //mouseJoints.add(null);
-            frictionJoints.add(null);
-            motorJoints.add(null);
-        }*/
         cards = game.getCards();
         difficulty = game.getDifficulty();
         currentNumOfCards = 0;
-        //timeAtImpact = 0;
 
         for (Sprite[] frontSideSpriteArray : frontSideSprites) {
             for (Sprite frontSideSprite : frontSideSpriteArray) {
@@ -900,39 +648,29 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         float halfHeight = CAMERA_HEIGHT_METERS / 2f;
 
         float goldenAngle = (float) ((2 * Math.PI) / Math.pow((1f + Math.sqrt(5)) / 2f, 2));
-        float radius = 0f;
+        float radius;
         float maxRadius = 3.5f;
         float scalingFactor = 0f;
         float angle;
         int k = 0;
         float xPosition;
         float yPosition;
-        boolean farFromAxis;
         boolean xPointInRange;
         boolean yPointInRange;
-        boolean inRange;
         float littleSpaceAtTheEdge = 0.4f;
 
         while (currentNumOfCards < cards.size()) {
             // Box bodies
-            angle = k * goldenAngle;// * 0.367f;
+            angle = k * goldenAngle;
             radius = scalingFactor * (float) Math.sqrt(k);
             scalingFactor = (float) (maxRadius / Math.sqrt(k)) - 1f;
             xPosition = (float) (radius * Math.cos(angle) * xyBoxSpacing[difficulty][0] - 0.2f);
             yPosition = (float) (radius * Math.sin(angle) * xyBoxSpacing[difficulty][1]);
-            farFromAxis = xPosition > halfBoxSizes[difficulty] && yPosition > halfBoxSizes[difficulty];
             xPointInRange = xPosition < halfWidth - littleSpaceAtTheEdge && xPosition > -halfWidth + littleSpaceAtTheEdge;// && xPosition > 0;
             yPointInRange = yPosition < halfHeight - littleSpaceAtTheEdge && yPosition > -halfHeight + littleSpaceAtTheEdge;// && yPosition > 0;
-            inRange = (30 < k && 33 > k) | 34 < k;
             if (xPointInRange && yPointInRange && k > 3) {
-                createBox(xPosition, yPosition, angle, cards.get(currentNumOfCards));
+                createBox(xPosition, yPosition, angle - 90f, cards.get(currentNumOfCards));
                 currentNumOfCards++;
-                //createBox(-xPosition, -yPosition, angle, cards.get(currentNumOfCards));
-                //currentNumOfCards++;
-                //createBox(xPosition, -yPosition, angle, cards.get(currentNumOfCards));
-                //currentNumOfCards++;
-                //createBox(-xPosition, yPosition, angle, cards.get(currentNumOfCards));
-                //currentNumOfCards++;
             }
             k++;
         }
@@ -941,6 +679,15 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     boolean roundInProgress = true;
 
     void update() {
+        long delta = TimeUtils.timeSinceMillis(lastTimeCounted);
+        lastTimeCounted = TimeUtils.millis();
+
+        sinceChange += delta;
+        if(sinceChange >= 1000) {
+            sinceChange = 0;
+            frameRate = Gdx.graphics.getFramesPerSecond();
+        }
+
         currentScore = game.getScore();
         scoreLabels[0].setText(currentScore);
         scoreLabels[1].setText(currentScore);
@@ -949,39 +696,47 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
         updateTimeLabels();
         checkForMatches();
-        if (game.isIdle()) {
-            destroyAll();
-            boxPairs = new ArrayList<Box[]>();
-            game.gameStart();
-            createGame();
-        }
         if (game.isRoundOver() && roundInProgress) {
             if (game.isGameOver()) {
+                winSound.play();
                 parentGame.setScreen(new ScoreboardScreen(parentGame, jWinPointerReader, worldColor, currentScore));
             }
-            roundInProgress = false;
-            Timer.schedule(new Timer.Task() {
-                @Override
-                public void run() {
-                    nextLevel();
-                }
-            }, 2);
+            else {
+                roundInProgress = false;
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        nextLevel();
+                    }
+                }, 2);
+            }
         }
         updateCards();
     }
 
     private void updateTimeLabels() {
-        if (difficulty != 0) {
+        if (difficulty != 0 && roundInProgress) {
             float timeLeft = timeLimits[difficulty] - currentTime;
             if ((timeLeft / 60f) < 1) {
                 for (Label timer : timerLabels) {
-                    timer.setText("00:" + (int) timeLeft);
+                    float seconds = ((timeLeft / 60f)) * 60f;
+                    if (seconds > 10) {
+                        timer.setText("00:" + (int) seconds);
+                    }
+                    else{
+                        timer.setText("00:0" + (int) seconds);
+                    }
                 }
             } else {
                 float minutes = (int) (timeLeft / 60f);
                 float seconds = ((timeLeft / 60f) - minutes) * 60f;
                 for (Label timer : timerLabels) {
-                    timer.setText((int) minutes + ":" + (int) seconds);
+                    if (seconds > 10) {
+                        timer.setText((int) minutes + ":" + (int) seconds);
+                    }
+                    else{
+                        timer.setText((int) minutes + ":0" + (int) seconds);
+                    }
                 }
             }
         }
@@ -991,7 +746,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Round over
         // Destroy bodies and joints
         // Then start next round
-        winSound.play(1.0f);
+        winSound.play(0.5f);
         currentTime = 0;
         destroyAll();
         boxPairs = new ArrayList<Box[]>();
@@ -1017,19 +772,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                     touchPoint.mouseJoint = null;
                 }
             }
-            // One more for loop to remove the last kind of joint, motor joints
-            // Use the motorJoints array
-            /*Joint motorJointToDestroy;
-            for (int i = 0; i < motorJoints.size; i++) {
-                motorJointToDestroy = motorJoints.get(i);
-                if (motorJoints.get(i) != null) {
-                    world.destroyJoint(motorJointToDestroy);
-                    motorJoints.set(i, null);
-
-                }
-            }*/
             Body bod;
-            int size = boxes.size();
             while (boxes.size() > 0) {
                 Box box = boxes.get(0);
                 bod = box.getBody();
@@ -1044,12 +787,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         }
     }
 
-    void loadSound() {
-        //impactSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/impact.wav"));
-        pairSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/pair.mp3"));
-        turnOverSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/turnOver.mp3"));
-        winSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects/Winning&nextLevel.mp3"));
-    }
 
     public void createBox(float xPosition, float yPosition, float angle, Card card) {
         PolygonShape shape = new PolygonShape();
@@ -1062,15 +799,13 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         fd.shape = shape;
         fd.density = 1.0f;
         fd.friction = 0.3f;
-        //fd.filter.categoryBits = PHYSICS_ENTITY;
-        //fd.filter.maskBits = WORLD_ENTITY;
 
         // Create the BodyDef, set a position, and other properties.
         BodyDef boxBodyDef = new BodyDef();
         boxBodyDef.type = BodyDef.BodyType.DynamicBody;
         boxBodyDef.position.x = xPosition;
         boxBodyDef.position.y = yPosition;
-        //boxBodyDef.angle = angle;
+        boxBodyDef.angle = angle;
         Body boxBody = world.createBody(boxBodyDef);
         boxBody.createFixture(fd);
 
@@ -1088,16 +823,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         BodyDef jointBodyDef = new BodyDef();
         jointBodyDef.position.set(xPosition, yPosition);
         jointBody = world.createBody(jointBodyDef);
-
-        // Motor joint
-        /*MotorJointDef jointDef = new MotorJointDef();
-        jointDef.angularOffset = 0f;
-        jointDef.collideConnected = false;
-        jointDef.correctionFactor = 1f;
-        jointDef.maxForce = 70f;
-        jointDef.maxTorque = 50f;
-        jointDef.initialize(jointBody, boxBody);
-        motorJoints.set(currentNumOfCards, world.createJoint(jointDef));*/
 
         // Friction joint
         // Connected between each box and the ground body
@@ -1123,33 +848,18 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         shapeRenderer.dispose();
         particleEffect.dispose();
 
-        //dispose sound effects
-        //impactSound.dispose();
-        pairSound.dispose();
-        turnOverSound.dispose();
-        winSound.dispose();
-
         box2DDebugRenderer = null;
         world = null;
         //mouseJoints = null;
         hitBodies = null;
     }
 
-
-    public Vector2 vectorToMeters(Vector2 vectorInPixels) {
-        return new Vector2(CAMERA_WIDTH_PIXELS / 2f + toMeters(vectorInPixels.x), CAMERA_HEIGHT_PIXELS / 2f + toMeters(vectorInPixels.y)); // DEFAULT: 0.018f
-    }
-
-    public Vector2 vectorToPixels(Vector2 vectorInMeters) {
-        return new Vector2(Gdx.graphics.getWidth() / 2f + toPixels(vectorInMeters.x), Gdx.graphics.getHeight() / 2f + toPixels(vectorInMeters.y)); // DEFAULT: 0.018f
-    }
-
     public float toMeters(float pixels) {
-        return pixels * 0.013f; // DEFAULT: 0.018f
+        return pixels * 0.013f;
     }
 
     public float toPixels(float meters) {
-        return meters / 0.013f; // DEFAULT: 0.018f
+        return meters / 0.013f;
     }
 
     // Instantiate vector and the callback here to avoid errors from the GC
@@ -1169,9 +879,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
     @Override
     public boolean touchDown(int x, int y, int pointer, int button) {
-        //System.out.println("touchDown: " + x + ", " + y);
         return false;
-        //return realTouchDown(x, y, pointer);
     }
 
     class TouchInfo {
@@ -1210,9 +918,8 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                     Card boxCard = box.getCard();
                     if (boxCard.getState() == State.HIDDEN) {
                         animateFlippingCard(box, 0);
-                        //System.out.println("Flipping card at index: " + boxCard.getKey());
                         Card[] newPair = game.flipUp(boxCard.getKey());
-                        turnOverSound.play(1f);
+                        turnOverSound.play(0.5f);
                         if (newPair != null) {
                             int numOfBoxes = 0;
                             boxPairs.add(new Box[2]);
@@ -1234,7 +941,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             def.target.set(testPoint.x, testPoint.y);
             def.maxForce = 1000000.0f * hitBody.getMass();
 
-            //mouseJoints.insert(pointer, (MouseJoint) world.createJoint(def));
             GameScreen.TouchInfo newTouchInfo = new GameScreen.TouchInfo(pointer, (MouseJoint) world.createJoint(def));
             arrayOfTouchInfo.add(newTouchInfo);
             hitBody.setAwake(true);
@@ -1248,7 +954,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     @Override
     public boolean touchDragged(int x, int y, int pointer) {
         return false;
-        //return realTouchDragged(x, y, pointer);
     }
 
     private boolean realTouchDragged(int x, int y, int pointer) {
@@ -1263,7 +968,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                 targetMouseJoint = touchPoint.mouseJoint;
             }
         }
-        //MouseJoint targetMouseJoint = mouseJoints.get(pointer);
         if (targetMouseJoint != null) {
             camera.unproject(testPoint.set(x, y, 0));
             targetMouseJoint.setTarget(target.set(testPoint.x, testPoint.y));
@@ -1274,13 +978,10 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     @Override
     public boolean touchUp(int x, int y, int pointer, int button) {
         return false;
-        //return realTouchUp(x, y, pointer);
     }
 
     private boolean realTouchUp(int x, int y, int pointer) {
         game.resetIdleTime();
-        //System.out.println("Pointer up: " + pointer);
-        //System.out.println("mouseJoint null: " + (mouseJoint[pointer] != null));
 
         for (GameScreen.TouchInfo touchPoint : arrayOfTouchInfo) {
             if (touchPoint.pointer == pointer && touchPoint.mouseJoint != null) {
@@ -1288,23 +989,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                 touchPoint.mouseJoint = null;
             }
         }
-        /*MouseJoint targetMouseJoint = null;
-        // if a mouse joint exists we simply destroy it
-        if (targetMouseJoint != null) {
-            //MouseJoint targetMouseJoint = mouseJoints.get(pointer);
-            *//*for (Box box : boxes) {
-                if (box.getBody() == targetMouseJoint.getBodyB()) {
-                    Card boxCard = box.getCard();
-                    if (boxCard.getState() != State.PAIRED && !box.getBody().isAwake()) {
-                        tweenHelpingHand(box, 1);
-                        game.flipDown(boxCard.getKey());
-                    }
-                }
-            }*//*
-         *//*world.destroyJoint(targetMouseJoint);
-            targetMouseJoint.set(pointer, null);
-            targetMouseJoint = null;*//*
-        }*/
         return false;
     }
 
@@ -1328,10 +1012,8 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                         }
                     }
                     game.flipDown(boxCard.getKey());
-                    turnOverSound.play(1f);
-                } /*else if (boxCard.getState() == State.PAIRED) {
-                    removeMatchingCard(box);
-                }*/
+                    turnOverSound.play(0.5f);
+                }
             }
         }
     }
@@ -1343,6 +1025,12 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         } else if (keycode == Input.Keys.LEFT) {
             prevLevel();
         }
+        else if (keycode == Input.Keys.UP){
+            drawFps = true;
+        }
+        else if (keycode == Input.Keys.DOWN){
+            drawFps = false;
+        }
         return false;
     }
 
@@ -1351,6 +1039,9 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Round over
         // Destroy bodies and joints
         // Then start next round
+        for (Label label: timerLabels){
+            label.setText("00:00");
+        }
         destroyAll();
         boxPairs = new ArrayList<Box[]>();
         game.prevDiff();
@@ -1379,6 +1070,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         return false;
     }
 
+    // Initialize constant variables to help differentiate between mouse events
     private static final int EVENT_TYPE_DRAG = 1;
     private static final int EVENT_TYPE_HOVER = 2;
     private static final int EVENT_TYPE_DOWN = 3;
@@ -1429,10 +1121,6 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
                     break;
             }
         }
-        //Point p = SwingUtilities.convertPoint(rootComponent, x, y, this);
-        //x = p.x;
-        //y = p.y;
-        //System.out.println("Pointer coordinates: "+x+","+y);
     }
 
     @Override
@@ -1444,17 +1132,4 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     public void pointerEvent(int i, int i1, int i2, boolean b) {
 
     }
-
-	/*public boolean keyDown(int keyCode) {
-		if (keyCode == Keys.W) {
-			Vector2 f = m_body.getWorldVector(tmp.set(0, -200));
-			Vector2 p = m_body.getWorldPoint(tmp.set(0, 2));
-			m_body.applyForce(f, p, true);
-		}
-		if (keyCode == Keys.A) m_body.applyTorque(50, true);
-		if (keyCode == Keys.D) m_body.applyTorque(-50, true);
-
-		return false;
-	}*/
-
 }
