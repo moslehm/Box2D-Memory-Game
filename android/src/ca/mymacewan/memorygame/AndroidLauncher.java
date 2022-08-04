@@ -1,10 +1,8 @@
 package ca.mymacewan.memorygame;
 
 import android.os.Bundle;
-
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import ca.mymacewan.memorygame.MemoryGameView;
 
 public class AndroidLauncher extends AndroidApplication {
 	@Override

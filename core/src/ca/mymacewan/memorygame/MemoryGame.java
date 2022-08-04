@@ -29,6 +29,7 @@ public class MemoryGame {
     void gameStart(){
         numOfCards = difficulty[diffLevel];
         startTime = System.currentTimeMillis();
+        idleStartTime = startTime;
         combo = 2;
         cards = new ArrayList<Card>(numOfCards);
         for (int i = 0; i < numOfCards; i++) {

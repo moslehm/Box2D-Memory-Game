@@ -1,11 +1,23 @@
 package ca.mymacewan.memorygame;
 
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenEquations;
+import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
+import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
+import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -13,19 +25,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
 import jwinpointer.JWinPointerReader;
-import aurelienribon.tweenengine.Tween;
-import aurelienribon.tweenengine.TweenEquations;
-import aurelienribon.tweenengine.TweenManager;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
-import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
-import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 
 import java.util.ArrayList;
 
@@ -117,8 +116,8 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // 1 pixel = 0.018 meters
         // 1 meter = 55.556 pixels
         // This can be changed. The lower the meters are, the more the screen "zooms in".
-        CAMERA_WIDTH_PIXELS = 1920;
-        CAMERA_HEIGHT_PIXELS = 1080;
+        CAMERA_WIDTH_PIXELS = Gdx.graphics.getWidth();
+        CAMERA_HEIGHT_PIXELS = Gdx.graphics.getHeight();
         CAMERA_WIDTH_METERS = toMeters(CAMERA_WIDTH_PIXELS);
         CAMERA_HEIGHT_METERS = toMeters(CAMERA_HEIGHT_PIXELS);
 
@@ -127,7 +126,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         Tween.registerAccessor(Box.class, new BoxAccessor());
         tweenManager = new TweenManager();
 
-        // setup the camera. In Box2D we operate on a
+        // set up the camera. In Box2D we operate on a
         // meter scale, pixels won't do it. So we use
         // an orthographic camera with a viewport of
         // CAMERA_WIDTH_METERS in width and CAMERA_HEIGHT_METERS meters in height.
@@ -256,7 +255,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
             }
         });
 
-        jWinPointerReader.addPointerEventListener(this);
+//        jWinPointerReader.addPointerEventListener(this);
     }
 
     public static Label[] addScoreActors(Stage stage, int currentScore) {
@@ -362,7 +361,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         update();
 
         particleEffect.update(Gdx.graphics.getDeltaTime());
-        currentTime += Gdx.graphics.getRawDeltaTime();
+        currentTime += Gdx.graphics.getDeltaTime();
 
         if (difficulty != 0 && currentTime > timeLimits[difficulty]) {
             loseSound.play();
@@ -377,7 +376,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
         // Update the world with a fixed time step
         world.step(Gdx.app.getGraphics().getDeltaTime(), 3, 3);
 
-        // Clear the screen and setup the projection matrix
+        // Clear the screen and set up the projection matrix
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
 
@@ -523,8 +522,8 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
         Quaternion arrowRotationR = new Quaternion(new Vector3(0, 0, 1), theta);
         Quaternion arrowRotationL = new Quaternion(new Vector3(0, 0, 1), -theta);
-        Vector2 arrowheadR = arrowheadHandle.cpy().rotate(arrowRotationR.getAngle());
-        Vector2 arrowheadL = arrowheadHandle.cpy().rotate(arrowRotationL.getAngle());
+        Vector2 arrowheadR = arrowheadHandle.cpy().rotateDeg(arrowRotationR.getAngle());
+        Vector2 arrowheadL = arrowheadHandle.cpy().rotateDeg(arrowRotationL.getAngle());
         Vector2 rightSide = origin.cpy().add(arrowheadR);
         Vector2 leftSide = origin.cpy().add(arrowheadL);
 
@@ -879,7 +878,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
     @Override
     public boolean touchDown(int x, int y, int pointer, int button) {
-        return false;
+        return realTouchDown(x, y, pointer);
     }
 
     class TouchInfo {
@@ -953,7 +952,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
     @Override
     public boolean touchDragged(int x, int y, int pointer) {
-        return false;
+        return realTouchDragged(x, y, pointer);
     }
 
     private boolean realTouchDragged(int x, int y, int pointer) {
@@ -977,7 +976,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
 
     @Override
     public boolean touchUp(int x, int y, int pointer, int button) {
-        return false;
+        return realTouchUp(x, y, pointer);
     }
 
     private boolean realTouchUp(int x, int y, int pointer) {
@@ -1066,7 +1065,7 @@ public class GameScreen implements Screen, InputProcessor, JWinPointerReader.Poi
     }
 
     @Override
-    public boolean scrolled(int amount) {
+    public boolean scrolled(float amountX, float amountY) {
         return false;
     }
 

@@ -1,8 +1,7 @@
 package ca.mymacewan.memorygame;
 
-import com.badlogic.gdx.*;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Game;
 import jwinpointer.JWinPointerReader;
 
 public class MemoryGameView extends Game implements ApplicationListener {
@@ -10,7 +9,8 @@ public class MemoryGameView extends Game implements ApplicationListener {
 
     @Override
     public void create() {
-        jWinPointerReader = new JWinPointerReader("EPL Memory Game");
+        // jWinPointerReader is used for multitouch on Windows touch screens, currently not working
+        // jWinPointerReader = new JWinPointerReader("Memory Game");
         this.setScreen(new GameScreen(this, jWinPointerReader));
     }
 
